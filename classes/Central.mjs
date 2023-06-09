@@ -45,17 +45,19 @@ export default class Central {
 
   static nodePackages = new Set();
 
-  static classPath = new Map(); // {'ORM'          => 'APP_PATH/classes/ORM.js'}
+  static classPath = new Map(); // {'ORM'          => 'APP_PATH/classes/ORM.mjs'}
 
   static viewPath = new Map(); // {'layout/index' => 'APP_PATH/views/layout/index'}
 
-  static configPath = new Map(); // {'site.js       => 'APP_PATH/config/site.js'}
+  static configPath = new Map(); // {'site.mjs       => 'APP_PATH/config/site.mjs'}
 
   static bootstrap = {};
 
   static addNodeModules(modules=[]) {
     modules.forEach(it=>{
-      const dirname = it.dirname || it.default.dirname;
+      if(!it)return;
+
+      const dirname = it.dirname || it.default?.dirname;
       if(!dirname)return;
       this.nodePackages.add(this.adapter.normalize(dirname));
     });
@@ -78,8 +80,13 @@ export default class Central {
 
     // set paths
     this.#setPath(options);
-    const bootstrap = await import(`${this.APP_PATH}/bootstrap.mjs?r=${this.#cacheId}`);
-    this.bootstrap = bootstrap.default || bootstrap;
+    try{
+      const bootstrap = await import(`${this.APP_PATH}/bootstrap.mjs?r=${this.#cacheId}`);
+      this.bootstrap = bootstrap.default || bootstrap;
+    }catch(e){
+      //suppress error when bootstrap.mjs not found
+      if(e.constructor.name !== 'ModuleNotFoundError')throw e;
+    }
 
     this.initConfig(new Map([
       ['classes', await import('../config/classes.mjs')],
@@ -118,7 +125,7 @@ export default class Central {
       initFiles.map(async it => {
         //suppress error when package without init.mjs
         try{
-          import(`${it}?r=${this.#cacheId}`)
+          await import(`${it}?r=${this.#cacheId}`)
         }catch(e){}
       })
     );

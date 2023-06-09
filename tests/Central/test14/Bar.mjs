@@ -1,7 +1,5 @@
-class Bar{
+export default class Bar{
   greeting(){
     return 'Hello from Bar';
   }
 }
-
-module.exports = Bar;

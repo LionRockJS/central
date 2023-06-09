@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import Central from "../../classes/Central";
-import KohanaJSAdapterNode from "../../classes/KohanaJS-adapter/Node";
+import KohanaJSAdapterNode from "../../classes/adapter/Node";
 
 Central.adapter = KohanaJSAdapterNode;
 
@@ -114,9 +114,8 @@ describe('KohanaJS test', () => {
   });
 
   test('npm modules init ', async () => {
-    const testDir = __dirname;
     expect(global.testInit).toBe(undefined);
-    await Central.init({ EXE_PATH: `${testDir}/test5` });
+    await Central.init({ EXE_PATH: `${__dirname}/test5` });
     expect(global.testInit).toBe(true);
     delete global.testInit;
   });
@@ -180,7 +179,7 @@ describe('KohanaJS test', () => {
     await Central.flushCache();
     expect(Central.config.salt.value).toBe('default salt 1');
 
-    fs.unlinkSync(`${Central.APP_PATH}/config/salt.js`);
+    fs.unlinkSync(`${Central.APP_PATH}/config/salt.mjs`);
 
     try {
       await Central.flushCache();
@@ -193,7 +192,7 @@ describe('KohanaJS test', () => {
 
   test('setPath default value', async() => {
     await Central.init();
-    expect(path.normalize(`${Central.EXE_PATH}/`)).toBe(path.normalize(`${__dirname}/../../`));
+    expect(path.normalize(`${Central.EXE_PATH}/`)).toBe(path.normalize(`${__dirname}/../../classes/adapter/`));
   });
 
   test('set all init value', async () => {
@@ -207,7 +206,7 @@ describe('KohanaJS test', () => {
 
   test('KohanaJS nodePackages without init', async () => {
     await Central.init({ EXE_PATH: `${__dirname}/test9` });
-    expect(Central.nodePackages.length).toBe(2);
+    expect(Central.nodePackages.size).toBe(2);
     // KohanaJS will load bootstrap from test9/application/bootstrap.js
     //
   });
@@ -235,21 +234,21 @@ describe('KohanaJS test', () => {
     }
   });
 
-  test('specific KohanaJS.require file', async () => {
-    Central.classPath.set('foo/Bar.js', path.normalize(`${__dirname}/test14/Bar`));
+  test('specific Central.import file', async () => {
+    Central.classPath.set('foo/Bar.mjs', path.normalize(`${__dirname}/test14/Bar`));
     const Bar = await Central.import('foo/Bar');
     const bar = new Bar();
     expect(bar.greeting()).toBe('Hello from Bar');
 
-    Central.classPath.set('kaa/Tar.js', path.normalize(`${__dirname}/test14/Tar.js`));
-    const Tar = await Central.import('kaa/Tar.js');
+    Central.classPath.set('kaa/Tar.mjs', path.normalize(`${__dirname}/test14/Tar.mjs`));
+    const Tar = await Central.import('kaa/Tar.mjs');
     const tar = new Tar();
     expect(tar.greeting()).toBe('Hello from Tar');
   });
 
-  test('explict set class to KohanaJS.require', async () => {
+  test('explict set class to Central.import', async () => {
     const C = class Collection {};
-    Central.classPath.set('model/Collection.js', C);
+    Central.classPath.set('model/Collection.mjs', C);
     const C2 = await Central.import('model/Collection');
 
     expect(C === C2).toBe(true);

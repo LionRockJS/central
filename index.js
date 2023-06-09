@@ -7,7 +7,7 @@
  */
 
 import Central from './classes/Central.mjs';
-import KohanaJSAdapterNode from './classes/kohanajs-adapter/Node.mjs';
+import CentralAdapterNode from './classes/adapter/Node.mjs';
 import ORM from './classes/ORM';
 import ORMAdapter from './classes/ORMAdapter';
 import DatabaseDriver from './classes/DatabaseDriver';
@@ -15,9 +15,9 @@ import ControllerMixinMime from './classes/controller-mixin/Mime';
 import ControllerMixinView from './classes/controller-mixin/View';
 import ControllerMixinDatabase from './classes/controller-mixin/Database';
 
-export{
+export default {
   Central,
-  KohanaJSAdapterNode,
+  CentralAdapterNode,
   ORM,
   ORMAdapter,
   DatabaseDriver,
