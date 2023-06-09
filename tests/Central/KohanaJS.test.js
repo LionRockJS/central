@@ -9,47 +9,55 @@ import KohanaJSAdapterNode from "../../classes/KohanaJS-adapter/Node";
 Central.adapter = KohanaJSAdapterNode;
 
 describe('KohanaJS test', () => {
-  const EXE_PATH = `${__dirname.replace(/\/tests$/, '')}/server`;
-
-  test('APP Path', async () => {
-    await Central.init({ EXE_PATH });
-    expect(Central.APP_PATH).toBe(`${EXE_PATH}/application`);
+  test('default APP Path', async () => {
+    await Central.init({ EXE_PATH : __dirname });
+    expect(Central.APP_PATH).toBe(`${__dirname}/application`);
+    expect(Central.VIEW_PATH).toBe(`${__dirname}/views`);
   });
 
-  test('KohanaJS.init', async () => {
-    const packagePath = `${__dirname}/test1/`;
-    await Central.init({ EXE_PATH: packagePath, MOD_PATH: `${packagePath}/modules` });
+  test('nodePackages after re-init', async () => {
+    await Central.init({ EXE_PATH: `${__dirname}/test1/`});
+    expect(JSON.stringify([...Central.nodePackages.keys()])).toBe(JSON.stringify([path.normalize(`${__dirname}/test1/modules/test`)]));
 
-    expect(Central.MOD_PATH).toBe(`${packagePath}/modules`);
+    await Central.init({ EXE_PATH: `${__dirname}/test1/`});
+    expect(JSON.stringify([...Central.nodePackages.keys()])).toBe(JSON.stringify([path.normalize(`${__dirname}/test1/modules/test`)]));
   });
 
   test('KohanaJS.import', async () => {
-    const packagePath = `${__dirname}/test1/`;
-    await Central.init({ EXE_PATH: packagePath, MOD_PATH: `${packagePath}/modules` });
+    await Central.init({ EXE_PATH: `${__dirname}/test1/`});
+    expect(JSON.stringify([...Central.nodePackages.keys()])).toBe(JSON.stringify([path.normalize(`${__dirname}/test1/modules/test`)]));
 
     const Test = await Central.import('Test');
+    const t = new Test();
+    expect(t.getFoo()).toBe('bar');
+  });
 
+  test('KohanaJS.import again', async () => {
+    await Central.init({ EXE_PATH: `${__dirname}/test1/`});
+    expect(JSON.stringify([...Central.nodePackages.keys()])).toBe(JSON.stringify([path.normalize(`${__dirname}/test1/modules/test`)]));
+
+    const Test = await Central.import('Test');
     const t = new Test();
     expect(t.getFoo()).toBe('bar');
   });
 
   test('switch package', async () => {
-    const testDir = __dirname;
-    await Central.init({ EXE_PATH: `${testDir}/test1`, MOD_PATH: `${testDir}/test1/modules` });
-    expect(Central.MOD_PATH).toBe(`${testDir}/test1/modules`);
+    await Central.init({ EXE_PATH: `${__dirname}/test1`});
+    expect(JSON.stringify([...Central.nodePackages.keys()]))
+      .toBe(JSON.stringify([path.normalize(`${__dirname}/test1/modules/test`)]));
 
-    let T = await Central.import('Test');
-    const t1 = new T();
-    expect(t1.getFoo()).toBe('bar');
+    const Test = await Central.import('Test');
+    const t = new Test();
+    expect(t.getFoo()).toBe('bar');
 
     const Foo1 = await Central.import('Foo');
     const f1 = new Foo1();
     expect(f1.getFoo()).toBe('fooo');
 
-    await Central.init({ EXE_PATH: `${testDir}/test2`, MOD_PATH: `${testDir}/test2/modules` });
-    expect(Central.MOD_PATH).toBe(`${testDir}/test2/modules`);
-
-    T = await Central.import('Test');
+    await Central.init({ EXE_PATH: `${__dirname}/test2`});
+    expect(JSON.stringify([...Central.nodePackages.keys()]))
+      .toBe(JSON.stringify([path.normalize(`${__dirname}/test2/modules/test`)]));
+    const T = await Central.import('Test');
     const t2 = new T();
     expect(t2.getFoo()).toBe('tar');
 
@@ -85,9 +93,8 @@ describe('KohanaJS test', () => {
 
   test('custom module folder', async () => {
     const testDir = __dirname;
-    await Central.init({ EXE_PATH: `${testDir}/test1`, APP_PATH: `${testDir}/test3/application`, MOD_PATH: `${testDir}/test1/modules` });
+    await Central.init({ EXE_PATH: `${testDir}/test1`, APP_PATH: `${testDir}/test3/application`});
     expect(Central.APP_PATH).toBe(`${testDir}/test3/application`);
-    expect(Central.MOD_PATH).toBe(`${testDir}/test1/modules`);
 
     const Foo1 = await Central.import('Foo');// test3/Foo
     const f1 = new Foo1();
@@ -145,7 +152,6 @@ describe('KohanaJS test', () => {
     // change config after validateCache. otherwise the config file will over write it.
 
     // jest override require, need to use reset modules to invalidate
-    jest.resetModules();
 
     expect(Central.config.view.cache).toBe(true);
 
@@ -170,7 +176,7 @@ describe('KohanaJS test', () => {
 
     expect(Central.config.salt.value).toBe('hello');
 
-    fs.copyFileSync(path.normalize(`${Central.APP_PATH}/config/salt.default.js`), path.normalize(`${Central.APP_PATH}/config/salt.js`));
+    fs.copyFileSync(path.normalize(`${Central.APP_PATH}/config/salt.default.mjs`), path.normalize(`${Central.APP_PATH}/config/salt.mjs`));
     await Central.flushCache();
     expect(Central.config.salt.value).toBe('default salt 1');
 
@@ -194,21 +200,9 @@ describe('KohanaJS test', () => {
     await Central.init({
       EXE_PATH: `${__dirname}/test1`,
       APP_PATH: `${__dirname}/test2/application`,
-      MOD_PATH: `${__dirname}/test3/modules`,
     });
     expect(Central.EXE_PATH).toBe(`${__dirname}/test1`);
     expect(Central.APP_PATH).toBe(`${__dirname}/test2/application`);
-    expect(Central.MOD_PATH).toBe(`${__dirname}/test3/modules`);
-  });
-
-  test('test default MODPATH ', async() => {
-    await Central.init({
-      EXE_PATH: `${__dirname}/test1`,
-      APP_PATH: `${__dirname}/test2/application`,
-    });
-    expect(Central.EXE_PATH).toBe(`${__dirname}/test1`);
-    expect(Central.APP_PATH).toBe(`${__dirname}/test2/application`);
-    expect(Central.MOD_PATH).toBe(`${__dirname}/test2/application/modules`);
   });
 
   test('KohanaJS nodePackages without init', async () => {

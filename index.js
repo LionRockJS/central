@@ -15,7 +15,7 @@ import ControllerMixinMime from './classes/controller-mixin/Mime';
 import ControllerMixinView from './classes/controller-mixin/View';
 import ControllerMixinDatabase from './classes/controller-mixin/Database';
 
-export {
+export{
   Central,
   KohanaJSAdapterNode,
   ORM,

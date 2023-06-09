@@ -8,7 +8,7 @@
 
 
 // KohanaJS is singleton
-import { View } from '@lionrockjs/mvc';
+import MVC from '@lionrockjs/mvc';
 
 export default class Central {
   static adapter = {
@@ -43,7 +43,7 @@ export default class Central {
 
   static configForceUpdate = true;
 
-  static nodePackages = [];
+  static nodePackages = new Set();
 
   static classPath = new Map(); // {'ORM'          => 'APP_PATH/classes/ORM.js'}
 
@@ -53,6 +53,14 @@ export default class Central {
 
   static bootstrap = {};
 
+  static addNodeModules(modules=[]) {
+    modules.forEach(it=>{
+      const dirname = it.dirname || it.default.dirname;
+      if(!dirname)return;
+      this.nodePackages.add(this.adapter.normalize(dirname));
+    });
+  }
+
   static async init(opts = {}) {
     const options = {
       EXE_PATH: null,
@@ -61,14 +69,17 @@ export default class Central {
       ...opts,
     };
 
+    this.#cacheId ++;
+
     this.#configs = new Set();
     this.classPath = new Map();
     this.viewPath = new Map();
-    this.nodePackages = [];
+    this.nodePackages = new Set();
 
     // set paths
     this.#setPath(options);
-    await this.#loadBootStrap();
+    const bootstrap = await import(`${this.APP_PATH}/bootstrap.mjs?r=${this.#cacheId}`);
+    this.bootstrap = bootstrap.default || bootstrap;
 
     this.initConfig(new Map([
       ['classes', await import('../config/classes.mjs')],
@@ -81,20 +92,9 @@ export default class Central {
   }
 
   static #setPath(opts) {
-    Central.EXE_PATH = opts.EXE_PATH || this.adapter.dirname();
-    Central.APP_PATH = opts.APP_PATH || `${Central.EXE_PATH}/application`;
-    Central.MOD_PATH = opts.MOD_PATH || `${Central.APP_PATH}/modules`;
-    Central.VIEW_PATH = opts.VIEW_PATH || `${Central.APP_PATH}/views`;
-  }
-
-  static async #loadBootStrap() {
-    const bootstrapFile = `${Central.APP_PATH}/bootstrap.mjs`;
-
-    try{
-      await import(bootstrapFile);
-    }catch(e){
-
-    }
+    this.EXE_PATH = opts.EXE_PATH   || this.adapter.dirname();
+    this.APP_PATH = opts.APP_PATH   || `${this.EXE_PATH}/application`;
+    this.VIEW_PATH = opts.VIEW_PATH || `${this.EXE_PATH}/views`;
   }
 
   /**
@@ -113,24 +113,18 @@ export default class Central {
   }
 
   static async #reloadModuleInit() {
-    await Promise.all([
-      ...this.nodePackages.map(x => `${x}/init.mjs`)
-    ].map(async initPath => {
-      const filePath = this.adapter.normalize(initPath);
-      try{
-        await import(filePath + '?r=' + this.#cacheId);
-      }catch(e){}
-    }))
-  }
-
-  static addNodeModule(dirname) {
-    this.nodePackages.push(dirname);
-    return Central;
+    const initFiles = [...this.nodePackages.keys()].map(x => this.adapter.normalize(`${x}/init.mjs`));
+    await Promise.all(
+      initFiles.map(async it => {
+        //suppress error when package without init.mjs
+        try{
+          import(`${it}?r=${this.#cacheId}`)
+        }catch(e){}
+      })
+    );
   }
 
   static async flushCache() {
-    this.#cacheId++;
-
     if (this.configForceUpdate) await this.#updateConfig();
     if (!this.config.classes.cache) this.#clearRequireCache();
     if (!this.config.view.cache) this.#clearViewCache();
@@ -171,9 +165,7 @@ export default class Central {
       fetchList.push(`${Central.APP_PATH}/${prefixPath}/${pathToFile}`);
       fetchList.push(pathToFile);
 
-      // load from app/modules
-      [...Central.bootstrap.modules].reverse().forEach(x => fetchList.push(`${Central.MOD_PATH}/${x}/${prefixPath}/${pathToFile}`));
-
+      // load from node_modules and modules
       fetchList.push(`${Central.SYS_PATH}/${prefixPath}/${pathToFile}`);
       [...Central.nodePackages].reverse().forEach(x => fetchList.push(`${x}/${prefixPath}/${pathToFile}`));
 
@@ -200,7 +192,7 @@ export default class Central {
       try{
         Central.configPath.set(fileName, null); // never cache config file path.
         const file = Central.#resolve(fileName, 'config', Central.configPath, true);
-        Object.assign(Central.config[key], await import(file + '?r=' + this.#cacheId));
+        Object.assign(Central.config[key], await this.import(file ));
       }catch(e){
         //config file not found;
       }
@@ -208,6 +200,7 @@ export default class Central {
   }
 
   static #clearRequireCache() {
+    this.#cacheId++;
     this.classPath.forEach((v, k) => {
       if (typeof v === 'string') this.classPath.delete(k);
     });
@@ -217,6 +210,6 @@ export default class Central {
 
   static #clearViewCache() {
     this.viewPath = new Map();
-    View.DefaultViewClass.clearCache();
+    MVC.View.DefaultViewClass.clearCache();
   }
 }

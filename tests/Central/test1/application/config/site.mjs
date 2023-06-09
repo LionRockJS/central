@@ -1,6 +1,4 @@
-delete require.cache[require.resolve('./site')];
-
-module.exports = {
+export default {
   cache : {
     exports  : false,
     database : false,

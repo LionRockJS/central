@@ -1,2 +1,1 @@
-import Central from "../../../../classes/KohanaJS.mjs";
-Central.bootstrap.modules = ['test'];
+await import(`../../test1/modules/test/index.js?r=${Math.random()}`);

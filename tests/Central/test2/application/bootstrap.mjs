@@ -1,2 +1,4 @@
-import Central from "../../../../classes/KohanaJS.mjs";
-Central.bootstrap.modules = ['test'];
+import Central from '../../../../classes/Central.mjs';
+Central.addNodeModules([
+  await import('../modules/test/index.js')
+])

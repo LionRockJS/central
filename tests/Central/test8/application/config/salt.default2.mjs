@@ -1,3 +1,3 @@
-module.exports = {
+export default {
   value : 'default salt 2'
 };
