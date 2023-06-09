@@ -1,1 +1,1 @@
-import('../npm/test');
+import {} from '../npm/test/index.js';

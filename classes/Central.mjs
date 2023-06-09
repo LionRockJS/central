@@ -31,8 +31,6 @@ export default class Central {
 
   static APP_PATH = this.SYS_PATH;
 
-  static MOD_PATH = this.SYS_PATH;
-
   static VIEW_PATH = this.SYS_PATH;
 
   static ENV = '';
@@ -53,13 +51,12 @@ export default class Central {
 
   static configPath = new Map(); // {'site.js       => 'APP_PATH/config/site.js'}
 
-  static bootstrap = { modules: [] };
+  static bootstrap = {};
 
   static async init(opts = {}) {
     const options = {
       EXE_PATH: null,
       APP_PATH: null,
-      MOD_PATH: null,
       VIEW_PATH: null,
       ...opts,
     };
@@ -117,8 +114,7 @@ export default class Central {
 
   static async #reloadModuleInit() {
     await Promise.all([
-      ...this.nodePackages.map(x => `${x}/init.mjs`),
-      ...this.bootstrap.modules.map( x => `${this.MOD_PATH}/${x}/init.mjs`)
+      ...this.nodePackages.map(x => `${x}/init.mjs`)
     ].map(async initPath => {
       const filePath = this.adapter.normalize(initPath);
       try{
@@ -128,7 +124,7 @@ export default class Central {
   }
 
   static addNodeModule(dirname) {
-    Central.nodePackages.push(dirname);
+    this.nodePackages.push(dirname);
     return Central;
   }
 
@@ -136,9 +132,9 @@ export default class Central {
     this.#cacheId++;
 
     if (this.configForceUpdate) await this.#updateConfig();
-    if (!this.config.classes?.cache) Central.#clearRequireCache();
-    if (!this.config.view?.cache) Central.#clearViewCache();
-    if (!this.config.classes?.cache) await this.#reloadModuleInit();
+    if (!this.config.classes.cache) this.#clearRequireCache();
+    if (!this.config.view.cache) this.#clearViewCache();
+    if (!this.config.classes.cache) await this.#reloadModuleInit();
   }
 
   static async import(pathToFile) {
@@ -186,7 +182,7 @@ export default class Central {
       });
 
       if (!store.get(pathToFile)) {
-        throw new Error(`KohanaJS resolve path error: path ${pathToFile} not found. ${prefixPath} , ${JSON.stringify(store)} `);
+        throw new Error(`KohanaJS resolve path error: path ${pathToFile} not found. prefixPath: ${prefixPath} , store: ${JSON.stringify(store)} `);
       }
     }
 

@@ -58,7 +58,7 @@ describe('KohanaJS test', () => {
       // eslint-disable-next-line no-unused-vars
       const f2 = new Foo2();
     } catch (e) {
-      expect(e.message.replace(/ {[^}]+}/, '')).toBe('KohanaJS resolve path error: path Foo.mjs not found. classes , {} ');
+      expect(e.message.replace(/ {[^}]+}/, '')).toBe('KohanaJS resolve path error: path Foo.mjs not found. prefixPath: classes , store: {} ');
     }
   });
 
@@ -79,7 +79,7 @@ describe('KohanaJS test', () => {
       // eslint-disable-next-line no-unused-vars
       const f2 = new Foo2();
     } catch (e) {
-      expect(e.message.replace(/ {[^}]+}/, '')).toBe('KohanaJS resolve path error: path Foo.mjs not found. classes , {} ');
+      expect(e.message.replace(/ {[^}]+}/, '')).toBe('KohanaJS resolve path error: path Foo.mjs not found. prefixPath: classes , store: {} ');
     }
   });
 
@@ -102,16 +102,8 @@ describe('KohanaJS test', () => {
     try {
       await Central.import('NotFound');
     } catch (e) {
-      expect(e.message.replace(/ {[^}]+}/, '')).toBe('KohanaJS resolve path error: path NotFound.mjs not found. classes , {} ');
+      expect(e.message.replace(/ {[^}]+}/, '')).toBe('KohanaJS resolve path error: path NotFound.mjs not found. prefixPath: classes , store: {} ');
     }
-  });
-
-  test('inline modules init', async () => {
-    const testDir = __dirname;
-    expect(global.testInit).toBe(undefined);
-    await Central.init({ EXE_PATH: `${testDir}/test4`, MOD_PATH: `${testDir}/test4/modules` });
-    expect(global.testInit).toBe(true);
-    delete global.testInit;
   });
 
   test('npm modules init ', async () => {
@@ -140,8 +132,6 @@ describe('KohanaJS test', () => {
     Central.config.classes.cache = false;
     Central.config.view.cache = false;
     await Central.flushCache();
-    // jest override require, need to use reset modules to invalidate
-    jest.resetModules();
 
     const Foo4 = await Central.import('Foo');
     expect(Foo4.id).toBe(2);
@@ -181,12 +171,10 @@ describe('KohanaJS test', () => {
     expect(Central.config.salt.value).toBe('hello');
 
     fs.copyFileSync(path.normalize(`${Central.APP_PATH}/config/salt.default.js`), path.normalize(`${Central.APP_PATH}/config/salt.js`));
-    jest.resetModules();
     await Central.flushCache();
     expect(Central.config.salt.value).toBe('default salt 1');
 
     fs.unlinkSync(`${Central.APP_PATH}/config/salt.js`);
-    jest.resetModules();
 
     try {
       await Central.flushCache();
@@ -224,8 +212,7 @@ describe('KohanaJS test', () => {
   });
 
   test('KohanaJS nodePackages without init', async () => {
-    const testDir = __dirname;
-    await Central.init({ EXE_PATH: `${testDir}/test9` });
+    await Central.init({ EXE_PATH: `${__dirname}/test9` });
     expect(Central.nodePackages.length).toBe(2);
     // KohanaJS will load bootstrap from test9/application/bootstrap.js
     //

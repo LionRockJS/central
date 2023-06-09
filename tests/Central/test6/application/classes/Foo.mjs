@@ -1,4 +1,4 @@
-class Foo{
+export default class Foo{
     constructor(){
     }
 
@@ -9,5 +9,3 @@ class Foo{
 global.FooID = global.FooID || 0;
 global.FooID++;
 Foo.id = global.FooID;
-
-module.exports = Foo;

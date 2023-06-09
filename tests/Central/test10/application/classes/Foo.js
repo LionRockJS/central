@@ -1,4 +1,4 @@
-class Foo{
+export default class Foo{
     constructor(){
     }
 
@@ -6,5 +6,3 @@ class Foo{
         return 'bar';
     }
 }
-
-module.exports = Foo;
