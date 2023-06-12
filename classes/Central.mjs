@@ -8,7 +8,7 @@
 
 
 // KohanaJS is singleton
-import MVC from '@lionrockjs/mvc';
+import { View } from '@lionrockjs/mvc';
 
 export default class Central {
   static adapter = {
@@ -144,10 +144,8 @@ export default class Central {
 
     // if explicit set classPath to Class or required object, just return it.
     const c = this.classPath.get(adjustedPathToFile);
+    if (c && typeof c !== 'string') return c;
 
-    if (c && typeof c !== 'string') {
-      return c;
-    }
 
     const file = this.#resolve(adjustedPathToFile, 'classes', this.classPath);
     const {default: d} = await import(file + '?r=' + this.#cacheId);
@@ -168,13 +166,13 @@ export default class Central {
     if (!store.get(pathToFile) || forceUpdate) {
       // search application, then modules
       const fetchList = [];
-      if (prefixPath === 'views')fetchList.push(`${Central.VIEW_PATH}/${pathToFile}`);
-      fetchList.push(`${Central.APP_PATH}/${prefixPath}/${pathToFile}`);
+      if (prefixPath === 'views')fetchList.push(`${this.VIEW_PATH}/${pathToFile}`);
+      fetchList.push(`${this.APP_PATH}/${prefixPath}/${pathToFile}`);
       fetchList.push(pathToFile);
 
       // load from node_modules and modules
-      fetchList.push(`${Central.SYS_PATH}/${prefixPath}/${pathToFile}`);
-      [...Central.nodePackages].reverse().forEach(x => fetchList.push(`${x}/${prefixPath}/${pathToFile}`));
+      fetchList.push(`${this.SYS_PATH}/${prefixPath}/${pathToFile}`);
+      [...this.nodePackages].reverse().forEach(x => fetchList.push(`${x}/${prefixPath}/${pathToFile}`));
 
       fetchList.some(x => {
         return this.adapter.resolveFetchList(x, store, pathToFile);
@@ -217,6 +215,6 @@ export default class Central {
 
   static #clearViewCache() {
     this.viewPath = new Map();
-    MVC.View.DefaultViewClass.clearCache();
+    View.DefaultViewClass.clearCache();
   }
 }

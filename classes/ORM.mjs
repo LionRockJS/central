@@ -605,7 +605,7 @@ export default class ORM {
   }
 
   static async import(modelName) {
-    return Central.import(this.classPrefix + modelName);
+    return Central.import(ORM.classPrefix + modelName);
   }
 
   /**
@@ -628,7 +628,10 @@ export default class ORM {
     const allowClasses = new Set(eagerLoadOptions.with);
 
     await Promise.all(
-    [...M.belongsTo.entries()].map( async (parentModel, field) => {
+    [...M.belongsTo.entries()].map( async it => {
+      const parentModel = it[1];
+      const field = it[0];
+
       if(!allowClasses.has(parentModel))return;
       const ParentModel = await ORM.import(parentModel);
 

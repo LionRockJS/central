@@ -1,4 +1,4 @@
-import {Controller } from '@lionrockjs/mvc';
+import {Controller} from '@lionrockjs/mvc';
 import ControllerMixinMime from '../../classes/controller-mixin/Mime';
 
 class C extends Controller {

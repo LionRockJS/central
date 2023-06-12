@@ -1,4 +1,5 @@
-const crypto = require('node:crypto');
+import crypto from 'node:crypto';
+
 import { ControllerMixin } from '@lionrockjs/mvc';
 import DatabaseDriver from '../DatabaseDriver';
 
@@ -56,5 +57,3 @@ export default class ControllerMixinDatabase extends ControllerMixin {
     return connections;
   }
 }
-
-module.exports = ControllerMixinDatabase;

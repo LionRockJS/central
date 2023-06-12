@@ -2,26 +2,25 @@ import * as url from 'node:url';
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url)).replace(/\/$/, '');
 
 import Central from "../../classes/Central";
+import CentralAdapterNode from "../../classes/adapter/Node";
+
 import ORM from "../../classes/ORM";
 import ORMAdapterTest from "./orm/application/classes/ORMAdapterTest";
 
+Central.adapter = CentralAdapterNode;
 ORM.defaultAdapter = ORMAdapterTest;
+
+const init = async () =>{
+  await Central.init({
+    EXE_PATH: __dirname,
+    APP_PATH: `${__dirname}/orm/application`,
+  });
+}
 
 describe('orm test', () => {
 
-  beforeEach(() => {
-    Central.init({
-      EXE_PATH: __dirname,
-      APP_PATH: `${__dirname}/orm/application`,
-      MOD_PATH: `${__dirname}/test1/modules`,
-    });
-  });
-
-  afterEach(() => {
-
-  });
-
   test('orm', async () => {
+    await init();
     const obj = new ORM();
     const className = obj.constructor.name;
 
@@ -205,7 +204,7 @@ describe('orm test', () => {
   });
 
   test('prepend model prefix path', async () => {
-    Central.init({ EXE_PATH: `${__dirname}/test15` });
+    await Central.init({ EXE_PATH: `${__dirname}/test15` });
     const Person = await ORM.import('Person');
     const p = new Person();
     expect(!!p).toBe(true);
@@ -216,12 +215,12 @@ describe('orm test', () => {
       expect('this line should not be run').expect(true);
     } catch (e) {
       ORM.classPrefix = 'model/';
-      expect(e.message).toBe('KohanaJS resolve path error: path models/Person.js not found. classes , {} ');
+      expect(e.message).toBe('KohanaJS resolve path error: path models/Person.mjs not found. prefixPath: classes , store: {} ');
     }
   });
 
   test('ORM require', async () => {
-    Central.init({ EXE_PATH: `${__dirname}/test15` });
+    await Central.init({ EXE_PATH: `${__dirname}/test15` });
     const Person = await ORM.import('Person');
     const p = new Person();
     expect(!!p).toBe(true);
@@ -396,7 +395,5 @@ describe('orm test', () => {
     orms.push(await ORM.factory(Address, 11));
 
     await ORM.eagerLoad(orms, {with :["Person"]}, {});
-
-    console.log(orms);
   })
 });
