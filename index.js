@@ -16,7 +16,9 @@ import ControllerMixinMime from './classes/controller-mixin/Mime';
 import ControllerMixinView from './classes/controller-mixin/View';
 import ControllerMixinDatabase from './classes/controller-mixin/Database';
 
-export default {
+export default Central
+
+export {
   Central,
   CentralAdapterNoop,
   CentralAdapterNode,
