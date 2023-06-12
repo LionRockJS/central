@@ -9,15 +9,10 @@
 
 // KohanaJS is singleton
 import { View } from '@lionrockjs/mvc';
+import NoopAdapter from './adapter/Noop';
 
 export default class Central {
-  static adapter = {
-    dirname : () => '',
-    normalize : source => source,
-    resolveFetchList: (x, store, pathToFile) => {
-      store.set(pathToFile, x); return true;
-    }
-  }
+  static adapter = NoopAdapter;
 
   static #cacheId = 0;
 
@@ -53,7 +48,7 @@ export default class Central {
 
   static bootstrap = {};
 
-  static addNodeModules(modules=[]) {
+  static addNodeModules(modules) {
     modules.forEach(it=>{
       if(!it)return;
 

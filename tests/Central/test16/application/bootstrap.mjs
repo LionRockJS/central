@@ -1,0 +1,1 @@
+throw new Error('Test Error when import bootstrap');

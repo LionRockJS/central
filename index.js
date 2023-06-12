@@ -7,6 +7,7 @@
  */
 
 import Central from './classes/Central.mjs';
+import CentralAdapterNoop from './classes/adapter/Noop.mjs';
 import CentralAdapterNode from './classes/adapter/Node.mjs';
 import ORM from './classes/ORM';
 import ORMAdapter from './classes/ORMAdapter';
@@ -17,6 +18,7 @@ import ControllerMixinDatabase from './classes/controller-mixin/Database';
 
 export default {
   Central,
+  CentralAdapterNoop,
   CentralAdapterNode,
   ORM,
   ORMAdapter,

@@ -253,4 +253,42 @@ describe('KohanaJS test', () => {
 
     expect(C === C2).toBe(true);
   });
+
+  test('Central default adapter', async () =>{
+    Central.adapter = KohanaJSAdapterNode;
+  })
+
+  test('add node module', async () => {
+    await Central.init({ EXE_PATH: __dirname });
+    const Test = await import('./test1/modules/test/index');
+    Central.addNodeModules([Test])
+    expect(Central.nodePackages.size).toBe(1);
+
+    expect([...Central.nodePackages.keys()][0]).toBe(path.normalize(__dirname + '/test1/modules/test'));
+  });
+
+  test('add node module with empty value', async () => {
+    await Central.init({ EXE_PATH: __dirname });
+    const Test = await import('./test1/modules/test/index');
+    Central.addNodeModules([Test, null, Test])
+    expect(Central.nodePackages.size).toBe(1);
+
+    expect([...Central.nodePackages.keys()][0]).toBe(path.normalize(__dirname + '/test1/modules/test'));
+  });
+
+  test('add node module without default dirname', async () => {
+    await Central.init({ EXE_PATH: __dirname });
+    const Test = await import('./test1/modules/test2/index');
+    Central.addNodeModules([Test])
+    expect(Central.nodePackages.size).toBe(0);
+  });
+
+  test('error when import bootstrap', async () => {
+    try{
+      await Central.init({ EXE_PATH: __dirname+ '/test16/' });
+      expect('this line should not run').toBe('');
+    }catch(e){
+      expect(e.message).toBe('Test Error when import bootstrap');
+    }
+  });
 });
