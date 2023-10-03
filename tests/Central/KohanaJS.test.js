@@ -190,6 +190,20 @@ describe('KohanaJS test', () => {
     expect(Central.config.salt.value).toBe('hello');
   });
 
+  test('config path, init config with null value', async ()=>{
+    await Central.init({ EXE_PATH: `${__dirname}/test8` });
+
+    if (fs.existsSync(`${Central.APP_PATH}/config/salt.js`)) {
+      fs.unlinkSync(`${Central.APP_PATH}/config/salt.js`);
+    }
+
+    Central.configForceUpdate = true;
+    Central.initConfig(new Map([['salt', {value:'hello'}], ['test', null]]));
+
+    expect(Central.config.salt.value).toBe('hello');
+    expect(JSON.stringify(Central.config.test)).toBe("{}");
+  })
+
   test('setPath default value', async() => {
     await Central.init();
     expect(path.normalize(`${Central.EXE_PATH}/`)).toBe(path.normalize(`${__dirname}/../../classes/adapter/`));
@@ -252,6 +266,12 @@ describe('KohanaJS test', () => {
     const C2 = await Central.import('model/Collection');
 
     expect(C === C2).toBe(true);
+
+    //clear cache should not clear explict set class
+    await Central.flushCache();
+    const C3 = await Central.import('model/Collection');
+    expect(C === C3).toBe(true);
+
   });
 
   test('Central default adapter', async () =>{
@@ -290,5 +310,10 @@ describe('KohanaJS test', () => {
     }catch(e){
       expect(e.message).toBe('Test Error when import bootstrap');
     }
+  });
+
+  test('coverage central.mjs', async () => {
+    await Central.init({ EXE_PATH: __dirname });
+
   });
 });

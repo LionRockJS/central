@@ -106,12 +106,13 @@ export default class Central {
   static initConfig(configMap) {
     configMap.forEach((v, k) => {
       this.#configs.add(k);
+      if(!v)return;
 
       const existConfigSource = Central.#configSources.get(k);
-      if (v) Central.#configSources.set(k, { ...existConfigSource, ...v });
+      Central.#configSources.set(k, { ...existConfigSource, ...v });
     });
 
-    this.#updateConfig();
+    this.#updateConfig().then();
   }
 
   static async #reloadModuleInit() {
@@ -202,7 +203,8 @@ export default class Central {
   static #clearRequireCache() {
     this.#cacheId++;
     this.classPath.forEach((v, k) => {
-      if (typeof v === 'string') this.classPath.delete(k);
+      if (typeof v !== 'string')return;
+      this.classPath.delete(k);
     });
 
     this.configPath = new Map();
