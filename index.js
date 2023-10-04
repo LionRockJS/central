@@ -9,12 +9,12 @@
 import Central from './classes/Central.mjs';
 import CentralAdapterNoop from './classes/adapter/Noop.mjs';
 import CentralAdapterNode from './classes/adapter/Node.mjs';
-import ORM from './classes/ORM';
-import ORMAdapter from './classes/ORMAdapter';
-import DatabaseDriver from './classes/DatabaseDriver';
-import ControllerMixinMime from './classes/controller-mixin/Mime';
-import ControllerMixinView from './classes/controller-mixin/View';
-import ControllerMixinDatabase from './classes/controller-mixin/Database';
+import ORM from './classes/ORM.mjs';
+import ORMAdapter from './classes/ORMAdapter.mjs';
+import DatabaseDriver from './classes/DatabaseDriver.mjs';
+import ControllerMixinMime from './classes/controller-mixin/Mime.mjs';
+import ControllerMixinView from './classes/controller-mixin/View.mjs';
+import ControllerMixinDatabase from './classes/controller-mixin/Database.mjs';
 
 export default Central
 

@@ -9,7 +9,7 @@
 
 // KohanaJS is singleton
 import { View } from '@lionrockjs/mvc';
-import NoopAdapter from './adapter/Noop';
+import NoopAdapter from './adapter/Noop.mjs';
 
 export default class Central {
   static adapter = NoopAdapter;
@@ -76,7 +76,7 @@ export default class Central {
     // set paths
     this.#setPath(options);
     try{
-      const bootstrap = await import(`${this.APP_PATH}/bootstrap.mjs?r=${this.#cacheId}`);
+      const bootstrap = await import(`file://${this.APP_PATH}/bootstrap.mjs?r=${this.#cacheId}`);
       this.bootstrap = bootstrap.default || bootstrap;
     }catch(e){
       //suppress error when bootstrap.mjs not found

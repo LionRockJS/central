@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 
 import { ControllerMixin } from '@lionrockjs/mvc';
-import DatabaseDriver from '../DatabaseDriver';
+import DatabaseDriver from '../DatabaseDriver.mjs';
 
 export default class ControllerMixinDatabase extends ControllerMixin {
   static #dbConnection = new Map();

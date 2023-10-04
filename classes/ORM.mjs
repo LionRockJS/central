@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
-import Central from './Central';
-import ORMAdapter from './ORMAdapter';
+import Central from './Central.mjs';
+import ORMAdapter from './ORMAdapter.mjs';
 
 export default class ORM {
   // ORM is abstract, joinTablePrefix and tableName is null.
