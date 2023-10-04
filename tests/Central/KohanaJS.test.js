@@ -3,8 +3,8 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url)).replace(/\/$/
 import fs from 'node:fs';
 import path from 'node:path';
 
-import Central from "../../classes/Central";
-import KohanaJSAdapterNode from "../../classes/adapter/Node";
+import Central from "../../classes/Central.mjs";
+import KohanaJSAdapterNode from "../../classes/adapter/Node.mjs";
 
 Central.adapter = KohanaJSAdapterNode;
 
@@ -322,6 +322,6 @@ describe('KohanaJS test', () => {
   });
 
   test('exit render json', async()=>{
-    
+
   })
 });
