@@ -17,7 +17,7 @@ import ControllerMixinView from './classes/controller-mixin/View.mjs';
 import ControllerMixinDatabase from './classes/controller-mixin/Database.mjs';
 import RouteAdapter from "./classes/RouteAdapter.mjs";
 import RouteList from "./classes/RouteList.mjs";
-import HelperRoute from "./classes/helper/HelperRoute.mjs";
+import HelperRoute from "./classes/helper/Route.mjs";
 
 export default Central
 

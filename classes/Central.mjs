@@ -85,8 +85,8 @@ export default class Central {
     }
 
     this.initConfig(new Map([
-      ['classes', await import('../config/classes.mjs')],
-      ['view', await import('../config/view.mjs')],
+      ['classes', (await import('../config/classes.mjs')).default],
+      ['view', (await import('../config/view.mjs')).default],
     ]));
 
     await this.#reloadModuleInit();
