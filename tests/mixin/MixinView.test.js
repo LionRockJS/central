@@ -171,7 +171,45 @@ describe('Controller Mixin View Test', () => {
   })
 
   test('direct assign view', async () => {
+    class C extends Controller {
+      static mixins = [ControllerMixinView];
+      constructor(request) {
+        super(request);
+        ControllerMixinView.setLayout(this.state, {render:()=>"layout", data:{}}, {});
+        ControllerMixinView.setTemplate(this.state, {render:()=>'template', data:{}}, {});
+        ControllerMixinView.setErrorTemplate(this.state, {render:()=>'error_tpl', data:{}}, {});
+      }
+      async action_test() {
+        this.body = {
+          foo: 'bar',
+        };
+      }
+    }
 
+    const c = new C({});
+    await c.execute('test');
+    expect(c.body).toBe('{"main":"template"}');
+  });
+
+  test('direct assign view, without data', async () => {
+    class C extends Controller {
+      static mixins = [ControllerMixinView];
+      constructor(request) {
+        super(request);
+        ControllerMixinView.setLayout(this.state, {render:()=>"layout", data:{}});
+        ControllerMixinView.setTemplate(this.state, {render:()=>'template', data:{}});
+        ControllerMixinView.setErrorTemplate(this.state, {render:()=>'error_tpl', data:{}});
+      }
+      async action_test() {
+        this.body = {
+          foo: 'bar',
+        };
+      }
+    }
+
+    const c = new C({});
+    await c.execute('test');
+    expect(c.body).toBe('{"main":"template"}');
   });
 
   test('mixin view with assigned properties', async () => {
