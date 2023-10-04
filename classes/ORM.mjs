@@ -146,7 +146,7 @@ export default class ORM {
 
         if(p.opt){
           await Promise.all(
-            instances.map(instance => instance.eagerLoad(p.opt)),
+            instances.map(async instance => instance.eagerLoad(p.opt)),
           );
         }
       }),

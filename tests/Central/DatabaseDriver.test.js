@@ -71,5 +71,9 @@ describe('Database Driver test', () => {
     }
 
     expect(isRollback).toBe(true);
-  })
+  });
+
+  test('database connection error', async () => {
+
+  });
 });

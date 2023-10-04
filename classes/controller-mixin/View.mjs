@@ -31,22 +31,25 @@ export default class ControllerMixinView extends ControllerMixin {
     if (!state.get(this.VIEW_CLASS))state.set(this.VIEW_CLASS, View.DefaultViewClass);
     if (!state.get(this.LAYOUT_DEFAULT_DATA))state.set(this.LAYOUT_DEFAULT_DATA, defaultLayoutData);
     if (!state.get(this.VIEW_DEFAULT_DATA))state.set(this.VIEW_DEFAULT_DATA, defaultViewData);
+    if (!state.get(this.LAYOUT))this.setLayout(state, state.get(this.LAYOUT_FILE), {});
+  }
 
-    client.getView = (file, data = {}) => this.#getView(file, data, state.get(this.THEME_PATH), state.get(this.VIEW_CLASS));
-
-    client.setTemplate = (file, data = {}) => state.set(this.TEMPLATE, (typeof file === 'string')
-      ? this.#getView(file, { ...defaultViewData, ...data }, state.get(this.THEME_PATH), state.get(this.VIEW_CLASS))
+  static setTemplate(state, file, data = {}) {
+    state.set(this.TEMPLATE, (typeof file === 'string')
+      ? this.#getView(file, { ...state.get(this.VIEW_DEFAULT_DATA), ...data }, state.get(this.THEME_PATH), state.get(this.VIEW_CLASS))
       : file);
+  }
 
-    client.setLayout = (file, data = {}) => state.set(this.LAYOUT, (typeof file === 'string')
-      ? this.#getView(file, { ...defaultViewData, ...defaultLayoutData, ...data }, state.get(this.THEME_PATH), state.get(this.VIEW_CLASS))
+  static setLayout(state, file, data = {}) {
+    state.set(this.LAYOUT, (typeof file === 'string')
+      ? this.#getView(file, { ...state.get(this.VIEW_DEFAULT_DATA), ...state.get(this.LAYOUT_DEFAULT_DATA), ...data }, state.get(this.THEME_PATH), state.get(this.VIEW_CLASS))
       : file);
+  }
 
-    client.setErrorTemplate = (file, data = {}) => state.set(this.ERROR_TEMPLATE, (typeof file === 'string')
-      ? this.#getView(file, { ...defaultViewData, ...data }, state.get(this.THEME_PATH), state.get(this.VIEW_CLASS))
+  static setErrorTemplate(state, file, data = {}) {
+    state.set(this.ERROR_TEMPLATE, (typeof file === 'string')
+      ? this.#getView(file, { ...state.get(this.VIEW_DEFAULT_DATA), ...data }, state.get(this.THEME_PATH), state.get(this.VIEW_CLASS))
       : file);
-
-    if (!state.get(this.LAYOUT))client.setLayout(state.get(this.LAYOUT_FILE), {});
   }
 
   static async setup(state) {
@@ -65,10 +68,11 @@ export default class ControllerMixinView extends ControllerMixin {
       return;
     }
 
-    // do not render non text content, eg, no need to render when controller read protected pdf
-    if (client.headers['Content-Type'] && /^text/.test(client.headers['Content-Type']) === false) {
-      return;
-    }
+/* depreciate, should not use mixin view if the controller no need to render */
+// do not render non text content, eg, no need to render when controller read protected pdf
+//    if (client.headers['Content-Type'] && /^text/.test(client.headers['Content-Type']) === false) {
+//      return;
+//    }
 
     // render template and put into layout's main output.
     // no template, replace the controller body string into layout.

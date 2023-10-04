@@ -316,4 +316,12 @@ describe('KohanaJS test', () => {
     await Central.init({ EXE_PATH: __dirname });
 
   });
+
+  test('render pdf', async()=>{
+
+  });
+
+  test('exit render json', async()=>{
+    
+  })
 });

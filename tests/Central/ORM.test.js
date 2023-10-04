@@ -395,5 +395,13 @@ describe('orm test', () => {
     orms.push(await ORM.factory(Address, 11));
 
     await ORM.eagerLoad(orms, {with :["Person"]}, {});
+  });
+
+  test('write retry when id collide', async () => {
+
+  });
+
+  test('count', async ()=>{
+
   })
 });
