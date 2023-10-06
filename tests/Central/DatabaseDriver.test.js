@@ -1,4 +1,4 @@
-import DatabaseDriver from '../../classes/DatabaseDriver';
+import DatabaseDriver from '../../classes/adapter/DatabaseDriver';
 
 describe('Database Driver test', () => {
   const datasource = ""
