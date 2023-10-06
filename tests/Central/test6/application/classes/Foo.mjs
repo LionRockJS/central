@@ -3,7 +3,7 @@ export default class Foo{
     }
 
     getFooId(){
-      return Foo.id;
+      return Foo.id || 0;
     }
 }
 global.FooID = global.FooID || 0;

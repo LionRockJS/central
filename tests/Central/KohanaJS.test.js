@@ -249,12 +249,12 @@ describe('KohanaJS test', () => {
   });
 
   test('specific Central.import file', async () => {
-    Central.classPath.set('foo/Bar.mjs', path.normalize(`${__dirname}/test14/Bar`));
+    Central.setClassPath('foo/Bar.mjs', path.normalize(`${__dirname}/test14/Bar`));
     const Bar = await Central.import('foo/Bar');
     const bar = new Bar();
     expect(bar.greeting()).toBe('Hello from Bar');
 
-    Central.classPath.set('kaa/Tar.mjs', path.normalize(`${__dirname}/test14/Tar.mjs`));
+    Central.setClassPath('kaa/Tar.mjs', path.normalize(`${__dirname}/test14/Tar.mjs`));
     const Tar = await Central.import('kaa/Tar.mjs');
     const tar = new Tar();
     expect(tar.greeting()).toBe('Hello from Tar');
@@ -262,7 +262,7 @@ describe('KohanaJS test', () => {
 
   test('explict set class to Central.import', async () => {
     const C = class Collection {};
-    Central.classPath.set('model/Collection.mjs', C);
+    Central.setClassPath('model/Collection.mjs', C);
     const C2 = await Central.import('model/Collection');
 
     expect(C === C2).toBe(true);
@@ -300,6 +300,7 @@ describe('KohanaJS test', () => {
     await Central.init({ EXE_PATH: __dirname });
     const Test = await import('./test1/modules/test2/index');
     Central.addNodeModules([Test])
+
     expect(Central.nodePackages.size).toBe(0);
   });
 

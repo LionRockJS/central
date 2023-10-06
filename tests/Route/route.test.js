@@ -3,7 +3,7 @@ import Central from '../../classes/Central.mjs';
 import HelperRoute from '../../classes/helper/Route.mjs';
 
 Central.config.classes.cache = true;
-Central.classPath.set('helper/HelperRoute.mjs', HelperRoute);
+Central.setClassPath('helper/HelperRoute.mjs', HelperRoute);
 
 import RouteList from '../../classes/RouteList.mjs';
 
