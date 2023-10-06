@@ -1,13 +1,10 @@
-const fs = await import('node:fs');
-const path = await import('node:path');
+import fs from 'node:fs';
+import path from 'node:path';
 
 import * as url from 'node:url';
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url)).replace(/\/$/, '');
 
 export default class {
-  static normalize(source){
-    return path.normalize(source);
-  }
 
   static resolveFetchList(x, store, pathToFile){
     if (fs.existsSync(path.normalize(x))) {

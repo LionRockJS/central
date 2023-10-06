@@ -8,9 +8,9 @@
 
 
 // KohanaJS is singleton
-import path from 'node:path';
 import { View } from '@lionrockjs/mvc';
 import NoopAdapter from './adapter/Noop.mjs';
+import Os from "node:os";
 
 export default class Central {
   static adapter = NoopAdapter;
@@ -55,8 +55,13 @@ export default class Central {
 
       const dirname = it.dirname || it.default?.dirname;
       if(!dirname)return;
-      this.nodePackages.add(this.adapter.normalize(dirname));
+      this.nodePackages.add(dirname.replace(/[/\\]+$/, ''));
     });
+  }
+
+  static async importAbsolute(path) {
+    const fixWindowsImport = (Os.type() === 'Windows_NT') ? "file://": "";
+    return import(fixWindowsImport + path);
   }
 
   static async init(opts = {}) {
@@ -77,7 +82,7 @@ export default class Central {
     // set paths
     this.#setPath(options);
     try{
-      const bootstrap = await import(path.normalize(`${this.APP_PATH}/bootstrap.mjs`) + `?r=${this.#cacheId}`);
+      const bootstrap = await this.importAbsolute(`${this.APP_PATH}/bootstrap.mjs` + `?r=${this.#cacheId}`);
       this.bootstrap = bootstrap.default || bootstrap;
     }catch(e){
       //suppress error when bootstrap.mjs not found
@@ -117,7 +122,7 @@ export default class Central {
   }
 
   static async #reloadModuleInit() {
-    const initFiles = [...this.nodePackages.keys()].map(x => this.adapter.normalize(`${x}/init.mjs`));
+    const initFiles = [...this.nodePackages.keys()].map(x => `${x}/init.mjs`);
     await Promise.all(
       initFiles.map(async it => {
         //suppress error when package without init.mjs
@@ -145,7 +150,7 @@ export default class Central {
 
 
     const file = this.#resolve(adjustedPathToFile, 'classes', this.classPath);
-    const {default: d} = await import(file + '?r=' + this.#cacheId);
+    const {default: d} = await this.importAbsolute(file + '?r=' + this.#cacheId);
 
     return d;
   }
