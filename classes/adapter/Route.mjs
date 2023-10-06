@@ -1,4 +1,4 @@
-export default class RouteAdapter {
+export default class Route {
   static async handler(result, response) {
 
     //result.cookies

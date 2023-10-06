@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 
-export default class ORMAdapter {
+export default class ORM {
   static OP = {
     EQUAL: '=',
     GREATER_THAN: '>',

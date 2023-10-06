@@ -1,4 +1,4 @@
-import ORMAdapter from '../../../../../classes/ORMAdapter';
+import ORMAdapter from '../../../../../classes/adapter/ORM';
 
 export default class ORMAdapterTest extends ORMAdapter {
   read() {

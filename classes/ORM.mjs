@@ -6,7 +6,7 @@
  *
  */
 import Central from './Central.mjs';
-import ORMAdapter from './ORMAdapter.mjs';
+import ORMAdapter from './adapter/ORM.mjs';
 
 export default class ORM {
   // ORM is abstract, joinTablePrefix and tableName is null.

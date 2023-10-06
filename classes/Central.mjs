@@ -149,7 +149,6 @@ class HelperPath{
   }
 }
 
-
 export default class Central {
   static adapter = NoopAdapter;
 
@@ -167,6 +166,8 @@ export default class Central {
   static configForceUpdate = true;
   static config = HelperConfig.config;
   static nodePackages = HelperPath.nodePackages;
+  static classPath = HelperCache.classPath;
+  static viewPath = HelperCache.viewPath;
 
   static bootstrap = {};
 
