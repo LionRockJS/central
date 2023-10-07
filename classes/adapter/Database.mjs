@@ -45,7 +45,7 @@ export default class Database {
 
   // eslint-disable-next-line class-methods-use-this
   async exec(sql) {
-    console.log('Database exec using Abstract DatabaseDriver');
+    console.log('Database exec using Abstract DatabaseAdapter');
     console.log(sql);
   }
 

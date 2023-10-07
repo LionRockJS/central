@@ -1,27 +1,27 @@
 import crypto from 'node:crypto';
 
 import { ControllerMixin } from '@lionrockjs/mvc';
-import Database from '../adapter/Database.mjs';
+import DatabaseAdapter from '../adapter/Database.mjs';
 
 export default class ControllerMixinDatabase extends ControllerMixin {
   static #dbConnection = new Map();
 
   static DATABASE_MAP = 'databaseMap';
 
-  static DATABASE_DRIVER = 'databaseDriver';
+  static DATABASE_ADAPTER = 'databaseAdapter';
 
   static DATABASES = 'databases';
 
-  static DEFAULT_DATABASE_DRIVER = Database;
+  static DEFAULT_DATABASE_ADAPTER = DatabaseAdapter;
 
   static init(state) {
     if (!state.get(this.DATABASE_MAP))state.set(this.DATABASE_MAP, new Map());
     if (!state.get(this.DATABASES))state.set(this.DATABASES, new Map());
-    if (!state.get(this.DATABASE_DRIVER))state.set(this.DATABASE_DRIVER, this.DEFAULT_DATABASE_DRIVER);
+    if (!state.get(this.DATABASE_ADAPTER))state.set(this.DATABASE_ADAPTER, this.DEFAULT_DATABASE_ADAPTER);
   }
 
   static async setup(state) {
-    const conn = this.#getConnections(state.get(this.DATABASE_MAP), state.get(this.DATABASE_DRIVER));
+    const conn = this.#getConnections(state.get(this.DATABASE_MAP), state.get(this.DATABASE_ADAPTER));
     conn.forEach((v, k) => {
       state.get(this.DATABASES).set(k, v);
     });
