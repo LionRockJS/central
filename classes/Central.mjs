@@ -158,10 +158,9 @@ class HelperPath{
 export default class Central {
   static adapter = NoopAdapter;
 
-  static SYS_PATH = '';
-  static EXE_PATH = this.SYS_PATH;
-  static APP_PATH = this.SYS_PATH;
-  static VIEW_PATH = this.SYS_PATH;
+  static EXE_PATH = null;
+  static APP_PATH = null;
+  static VIEW_PATH = null;
 
   static ENV = '';
   static ENV_DEVE = 'dev';
