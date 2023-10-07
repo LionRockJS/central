@@ -12,6 +12,13 @@ import { View } from '@lionrockjs/mvc';
 import NoopAdapter from './adapter/Noop.mjs';
 import Os from "node:os";
 
+class HelperImport{
+  static async importAbsolute(path) {
+    const fixWindowsImport = (Os.type() === 'Windows_NT') ? "file://": "";
+    return import(fixWindowsImport + path);
+  }
+}
+
 class HelperCache{
   static cacheId = 0;
   static classPath = new Map(); // {'ORM'          => 'APP_PATH/classes/ORM.mjs'}
@@ -43,8 +50,7 @@ class HelperCache{
 class HelperBootstrap{
   static async init(){
     try{
-      const bootstrap = await Central.importAbsolute(`${Central.APP_PATH}/bootstrap.mjs` + `?r=${HelperCache.cacheId}`);
-      this.bootstrap = bootstrap.default || bootstrap;
+      await HelperImport.importAbsolute(`${Central.APP_PATH}/bootstrap.mjs` + `?r=${HelperCache.cacheId}`);
     }catch(e){
       //suppress error when bootstrap.mjs not found
       if(e.constructor.name !== 'ModuleNotFoundError')throw e;
@@ -169,17 +175,6 @@ export default class Central {
   static classPath = HelperCache.classPath;
   static viewPath = HelperCache.viewPath;
 
-  static bootstrap = {};
-
-  static addNodeModules(modules) {
-    HelperPath.addNodeModules(modules);
-  }
-
-  static async importAbsolute(path) {
-    const fixWindowsImport = (Os.type() === 'Windows_NT') ? "file://": "";
-    return import(fixWindowsImport + path);
-  }
-
   static async init(opts = {}) {
     const options = {
       EXE_PATH: null,
@@ -197,8 +192,8 @@ export default class Central {
     return Central;
   }
 
-  static setClassPath(importPath, target){
-    HelperCache.classPath.set(importPath, target);
+  static addNodeModules(modules) {
+    HelperPath.addNodeModules(modules);
   }
 
   /**
@@ -241,7 +236,7 @@ export default class Central {
 
 
     const file = HelperPath.resolve(adjustedPathToFile, 'classes', HelperCache.classPath);
-    const {default: d} = await this.importAbsolute(file + '?r=' + HelperCache.cacheId);
+    const {default: d} = await HelperImport.importAbsolute(file + '?r=' + HelperCache.cacheId);
 
     return d;
   }

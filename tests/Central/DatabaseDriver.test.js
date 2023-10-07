@@ -1,4 +1,4 @@
-import DatabaseDriver from '../../classes/adapter/DatabaseDriver';
+import Database from '../../classes/adapter/Database';
 
 describe('Database Driver test', () => {
   const datasource = ""
@@ -7,17 +7,17 @@ describe('Database Driver test', () => {
   });
 
   test('test constructor', () => {
-    const instance = new DatabaseDriver(datasource);
+    const instance = new Database(datasource);
     expect(typeof instance).toBe('object');
   });
 
   test('test factory', ()=>{
-    const instance = DatabaseDriver.create(datasource);
+    const instance = Database.create(datasource);
     expect(typeof instance).toBe('object');
   })
 
   test('prepare', async ()=>{
-    const instance = new DatabaseDriver(datasource);
+    const instance = new Database(datasource);
     const statement = instance.prepare('SELECT * FROM tablesample');
     expect(statement.constructor.name).toBe('DatabaseStatement');
     const mockrun = await statement.run();
@@ -38,25 +38,25 @@ describe('Database Driver test', () => {
   });
 
   test('transaction', async () => {
-    const instance = new DatabaseDriver(datasource);
+    const instance = new Database(datasource);
     await instance.transaction(()=>{});
     expect('no error').toBe('no error');
   })
 
   test('exec', async () => {
-    const instance = new DatabaseDriver(datasource);
+    const instance = new Database(datasource);
     await instance.exec('SELECT * FROM tablesample');
     expect('no error').toBe('no error');
   })
 
   test('close', async () => {
-    const instance = new DatabaseDriver(datasource);
+    const instance = new Database(datasource);
     await instance.close();
     expect('no error').toBe('no error');
   })
 
   test('transaction fail', async () => {
-    const instance = new DatabaseDriver(datasource);
+    const instance = new Database(datasource);
     let isRollback = false;
     instance.transactionRollback = async () =>{
       isRollback = true;

@@ -20,7 +20,7 @@ class DatabaseStatement {
   async all(arg) { return []; }
 }
 
-export default class DatabaseDriver {
+export default class Database {
   /**
    *
    * @param {string} datasource
@@ -67,9 +67,9 @@ export default class DatabaseDriver {
   /**
    *
    * @param {string} datasource
-   * @returns {function | Object | DatabaseDriver}
+   * @returns {function | Object | Database}
    */
   static create(datasource) {
-    return new DatabaseDriver(datasource);
+    return new Database(datasource);
   }
 }
