@@ -4,6 +4,6 @@ export default class Noop {
   }
 
   static dirname(){
-    return '';
+    return './';
   }
 }
