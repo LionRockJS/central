@@ -1,11 +1,27 @@
 import Central from "../../Central.mjs";
+import HelperCache from "./Cache.mjs";
+import HelperImport from "./Import.mjs";
 
 export default class HelperPath{
   static nodePackages = new Set();
 
-  static async init(EXE_PATH=null, APP_PATH=null, VIEW_PATH=null){
+  static async init(EXE_PATH=null, APP_PATH=null, VIEW_PATH=null, node_modules=[]){
     this.nodePackages.clear();
-    HelperPath.setCentralDefaultPaths(EXE_PATH, APP_PATH, VIEW_PATH);
+    this.addModules(node_modules);
+    this.setCentralDefaultPaths(EXE_PATH, APP_PATH, VIEW_PATH);
+  }
+
+  static async reloadModuleInit() {
+    const initFiles = [...this.nodePackages.keys()].map(x => `${x}/init.mjs`);
+    await Promise.all(
+      initFiles.map(async it => {
+        //suppress error when package without init.mjs
+        try{
+          await HelperImport.importAbsolute(`${it}?r=${HelperCache.cacheId}`);
+        }catch(e){
+        }
+      })
+    );
   }
 
   static setCentralDefaultPaths(EXE_PATH=null, APP_PATH=null, VIEW_PATH=null, MOD_PATH=null){
@@ -43,7 +59,7 @@ export default class HelperPath{
     return store.get(pathToFile);
   }
 
-  static addNodeModules(modules){
+  static addModules(modules){
     modules.forEach(it=>{
       if(!it)return;
 

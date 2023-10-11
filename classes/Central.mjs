@@ -42,20 +42,21 @@ export default class Central {
       APP_PATH: null,
       VIEW_PATH: null,
       MOD_PATH: null,
+      node_modules: [],
       ...opts,
     };
 
-    await HelperPath.init(options.EXE_PATH, options.APP_PATH, options.VIEW_PATH);
+    await HelperPath.init(options.EXE_PATH, options.APP_PATH, options.VIEW_PATH, options.node_modules);
     await HelperCache.init();
     await HelperBootstrap.init();
     await HelperConfig.init();
-    await this.#reloadModuleInit();
+    await HelperPath.reloadModuleInit();
 
     return Central;
   }
 
-  static addNodeModules(modules) {
-    HelperPath.addNodeModules(modules);
+  static addModules(modules) {
+    HelperPath.addModules(modules);
   }
 
   /**
@@ -66,18 +67,6 @@ export default class Central {
     HelperConfig.addConfig(configMap).then();
   }
 
-  static async #reloadModuleInit() {
-    const initFiles = [...this.nodePackages.keys()].map(x => `${x}/init.mjs`);
-    await Promise.all(
-      initFiles.map(async it => {
-        //suppress error when package without init.mjs
-        try{
-          await import(`${it}?r=${HelperCache.cacheId}`)
-        }catch(e){}
-      })
-    );
-  }
-
   static async flushCache() {
     if (this.configForceUpdate) await HelperConfig.update();
     if (!HelperConfig.config.classes?.cache) {
@@ -85,7 +74,7 @@ export default class Central {
       this.configPath = new Map();
     }
     if (!HelperConfig.config.view?.cache) HelperCache.clearViewCache();
-    if (!HelperConfig.config.classes?.cache) await this.#reloadModuleInit();
+    if (!HelperConfig.config.classes?.cache) await HelperPath.reloadModuleInit();
   }
 
   static async import(pathToFile) {
@@ -109,6 +98,6 @@ export default class Central {
 
   static log(args) {
     if(Central.ENV === Central.ENV_PROD)return;
-    console.log(...args);
+    console.trace(args);
   }
 }
