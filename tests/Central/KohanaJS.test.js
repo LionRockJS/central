@@ -167,11 +167,8 @@ describe('KohanaJS test', () => {
   test('config path', async() => {
     await Central.init({ EXE_PATH: `${__dirname}/test8` });
 
-    if (fs.existsSync(`${Central.APP_PATH}/config/salt.js`)) {
-      fs.unlinkSync(`${Central.APP_PATH}/config/salt.js`);
-    }
+    if (fs.existsSync(`${Central.APP_PATH}/config/salt.js`)) fs.unlinkSync(`${Central.APP_PATH}/config/salt.js`);
 
-    Central.configForceUpdate = true;
     Central.initConfig(new Map([['salt', {value:'hello'}]]));
 
     expect(Central.config.salt.value).toBe('hello');
@@ -179,6 +176,12 @@ describe('KohanaJS test', () => {
     fs.copyFileSync(path.normalize(`${Central.APP_PATH}/config/salt.default.mjs`), path.normalize(`${Central.APP_PATH}/config/salt.mjs`));
     await Central.flushCache();
     expect(Central.config.salt.value).toBe('default salt 1');
+
+    Central.config.salt.value = 'default salt 2';
+    Central.config.classes.cache = true;
+    await Central.flushCache();
+    expect(Central.config.salt.value).toBe('default salt 2');
+    Central.config.classes.cache = false;
 
     fs.unlinkSync(`${Central.APP_PATH}/config/salt.mjs`);
 

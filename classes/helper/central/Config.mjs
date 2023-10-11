@@ -1,5 +1,6 @@
-import Central from "../../Central.mjs";
 import HelperPath from "./Path.mjs";
+import HelperImport from "./Import.mjs";
+import HelperCache from "./Cache.mjs";
 
 export default class HelperConfig{
   static configs = new Set();
@@ -8,39 +9,48 @@ export default class HelperConfig{
   static configPath = new Map(); // {'site.mjs       => 'APP_PATH/config/site.mjs'}
 
   static async init(){
-    this.configs = new Set();
+    this.configs.clear();
+    this.configSources.clear();
 
     await this.addConfig(new Map([
-      ['classes', (await import('../../../config/classes.mjs')).default],
-      ['view', (await import('../../../config/view.mjs')).default],
+      ['classes', await import('../../../config/classes.mjs')],
+      ['view', await import('../../../config/view.mjs')],
+      ['system', await import('../../../config/system.mjs')],
     ]));
   }
 
-  static async update() {
-    // search all config files
-    await Promise.all([...this.configs.keys()].map(async key => {
-      this.config[key] = {...this.configSources.get(key)}
-      const fileName = `${key}.mjs`;
+  static async update(key) {
+    if(!key)return;
 
-      try{
-        this.configPath.set(fileName, null); // never cache config file path.
-        const file = HelperPath.resolve(fileName, 'config', this.configPath, true);
-        Object.assign(this.config[key], await Central.import(file ));
-      }catch(e){
-        //config file not found;
-      }
-    }));
+    this.config[key] = {...this.configSources.get(key)}
+    const fileName = `${key}.mjs`;
+
+    try{
+      const file = HelperPath.resolve(fileName, 'config', this.configPath, true);
+
+      Object.assign(this.config[key], await HelperImport.importAbsolute( file + '?r=' + HelperCache.cacheId ));
+    }catch(e){
+      //config file not found;
+    }
+  }
+
+  static async updateAll(){
+    // search all config files
+    await Promise.all([...this.configs.keys()].map(async key => this.update(key)));
   }
 
   static async addConfig(configMap) {
-    configMap.forEach((v, k) => {
-      this.configs.add(k);
-      if(!v)return;
+    await Promise.all(
+      [...configMap.entries()].map(async it =>{
+        const k = it[0];
+        const v = it[1] || {};
+        this.configs.add(k);
 
-      const existConfigSource = this.configSources.get(k);
-      this.configSources.set(k, { ...existConfigSource, ...v });
-    });
-
-    await this.update();
+        const existConfigSource = this.configSources.get(k);
+        const module = v.default || v;
+        this.configSources.set(k, { ...existConfigSource, ...module });
+        await this.update(k);
+      })
+    );
   }
 }

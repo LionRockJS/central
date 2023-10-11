@@ -30,7 +30,6 @@ export default class Central {
   static ENV_STAG = 'stg';
   static ENV_PROD = 'prd';
 
-  static configForceUpdate = true;
   static config = HelperConfig.config;
   static nodePackages = HelperPath.nodePackages;
   static classPath = HelperCache.classPath;
@@ -48,8 +47,8 @@ export default class Central {
 
     await HelperPath.init(options.EXE_PATH, options.APP_PATH, options.VIEW_PATH, options.node_modules);
     await HelperCache.init();
-    await HelperBootstrap.init();
     await HelperConfig.init();
+    await HelperBootstrap.init();
     await HelperPath.reloadModuleInit();
 
     return Central;
@@ -68,13 +67,12 @@ export default class Central {
   }
 
   static async flushCache() {
-    if (this.configForceUpdate) await HelperConfig.update();
-    if (!HelperConfig.config.classes?.cache) {
+    if (!Central.config.classes.cache) {
       HelperCache.clearImportCache();
-      this.configPath = new Map();
+      await HelperConfig.updateAll();
     }
-    if (!HelperConfig.config.view?.cache) HelperCache.clearViewCache();
-    if (!HelperConfig.config.classes?.cache) await HelperPath.reloadModuleInit();
+    if (!Central.config.view.cache) HelperCache.clearViewCache();
+    if (!Central.config.classes.cache) await HelperPath.reloadModuleInit();
   }
 
   static async import(pathToFile) {
@@ -87,9 +85,7 @@ export default class Central {
 
 
     const file = HelperPath.resolve(adjustedPathToFile, 'classes', HelperCache.classPath);
-    const {default: d} = await HelperImport.importAbsolute(file + '?r=' + HelperCache.cacheId);
-
-    return d;
+    return await HelperImport.importAbsolute(file + '?r=' + HelperCache.cacheId);
   }
 
   static resolveView(pathToFile) {

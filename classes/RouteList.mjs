@@ -111,7 +111,7 @@ export default class RouteList {
         request.params.action = route.action;
         request.params.controller = (typeof route.controller === 'string') ? route.controller : route.controller.name;
         //TODO, move execute to config
-        const execute = (Central.ENV === Central.ENV_DEVE) ? execute_debug : execute_production;
+        const execute = (Central.config.system?.debug === true) ? execute_debug : execute_production;
 
         try {
           const controller = (typeof route.controller === 'string') ? await Central.import(route.controller) : route.controller;
