@@ -32,29 +32,22 @@ export default class HelperPath{
   }
 
   static resolve(pathToFile, prefixPath, store, forceUpdate = false) {
-    if (/\.\./.test(pathToFile)) {
-      throw new Error('invalid require path');
-    }
+    if (/\.\./.test(pathToFile)) throw new Error('invalid require path');
+    if( store.get(pathToFile) && !forceUpdate )return store.get(pathToFile);
 
-    if (!store.get(pathToFile) || forceUpdate) {
-      // search application, then modules
-      const fetchList = [];
-      if (prefixPath === 'views')fetchList.push(`${Central.VIEW_PATH}/${pathToFile}`);
+    // search application, then modules
+    const fetchPaths = [];
+    if (prefixPath === 'views')fetchPaths.push(`${Central.VIEW_PATH}/${pathToFile}`);
 
-      fetchList.push(`${Central.APP_PATH || ''}/${prefixPath}/${pathToFile}`);
-      fetchList.push(pathToFile);
+    fetchPaths.push(`${Central.APP_PATH || ''}/${prefixPath}/${pathToFile}`);
+    fetchPaths.push(pathToFile);
 
-      // load from node_modules and modules
-      [...this.nodePackages].reverse().forEach(x => fetchList.push(`${x}/${prefixPath}/${pathToFile}`));
+    // load from node_modules and modules
+    [...this.nodePackages].reverse().forEach(x => fetchPaths.push(`${x}/${prefixPath}/${pathToFile}`));
 
-      fetchList.some(x => {
-        return Central.adapter.resolveFetchList(x, store, pathToFile);
-      });
+    fetchPaths.some(path => Central.adapter.resolveFetchList(path, store, pathToFile));
 
-      if (!store.get(pathToFile)) {
-        throw new Error(`KohanaJS resolve path error: path ${pathToFile} not found. prefixPath: ${prefixPath} , store: ${JSON.stringify(store)} `);
-      }
-    }
+    if (!store.get(pathToFile)) throw new Error(`KohanaJS resolve path error: path ${pathToFile} not found. prefixPath: ${prefixPath} , store: ${JSON.stringify(store)} `);
 
     return store.get(pathToFile);
   }
