@@ -103,7 +103,14 @@ export default class ORM {
     * }
     * */
 
-    const allowClasses = (option.with !== undefined) ? new Set(option.with) : null;
+    //allow option with contain classes
+    const optWithClasses = new Map();
+    const optWith = (Array.isArray(option.with)) ? option.with.map(it => {
+      if(typeof it === 'string') return it;
+      optWithClasses.set(it.name, it);
+      return it.name;
+    }) : option.with;
+    const allowClasses = (optWith !== undefined) ? new Set(optWith) : null;
 
     const parents = [];
     this.constructor.belongsTo.forEach((v, k) => {
@@ -127,10 +134,11 @@ export default class ORM {
     await Promise.all(
     this.constructor.hasMany.map(async x => {
       const k = x[0];
+      const v = x[1];
 
-      if (!allowClasses.has(x[1])) return;
+      if (!allowClasses.has(v)) return;
 
-      const ModelClass = await ORM.import(x[1]);
+      const ModelClass = optWithClasses.get(v) || await ORM.import(v);
       const name = ModelClass.tableName;
       props.push({
         name, opt: option[name], key: k, model: ModelClass,
@@ -157,7 +165,7 @@ export default class ORM {
       [...this.constructor.belongsToMany.keys()].map(async x => {
         if (!allowClasses || !allowClasses.has(x)) return;
 
-        const ModelClass = await ORM.import(x);
+        const ModelClass = optWithClasses.get(x) || await ORM.import(x);
         const name = ModelClass.tableName;
         siblings.push({ name, opt: option[name], model: ModelClass });
       })

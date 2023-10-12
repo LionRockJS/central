@@ -285,6 +285,46 @@ describe('orm test', () => {
     expect(p.tags.length).toBe(2);
   });
 
+  test('ORM Eager Load with Class', async () => {
+    await Central.init({ EXE_PATH: `${__dirname}/orm` });
+    const A = (await import('./orm/application/classes/model/Address.mjs')).default;
+    const P = (await import('./orm/application/classes/model/Person.mjs')).default;
+    const P2 = (await import('./orm/application/classes/model/Product.mjs')).default;
+
+    const a = await ORM.factory(A, 11);
+    expect(a.person).toBe(undefined);
+
+    await a.eagerLoad({
+      with: [P],
+      person: {
+        with: [A],
+        addresses: {
+          with: [P],
+          person: { with: null },
+        },
+      },
+    });
+
+    expect(a.person.id).toBe(2);
+
+    const person = await ORM.factory(P, 2);
+
+    await person.eagerLoad({
+      with: [A],
+      addresses: { with: null },
+    });
+
+    const p = await ORM.factory(P2, 22);
+    expect(p.tags).toBe(undefined);
+
+    await p.eagerLoad({
+      with: ['Tag'],
+      tags: { with: null },
+    });
+
+    expect(p.tags.length).toBe(2);
+  });
+
   test('no record on read', async () => {
     const Product = await ORM.import('Product');
     try {
