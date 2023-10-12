@@ -1,4 +1,5 @@
 import Central from '../Central.mjs';
+import HelperConfig from "./central/Config.mjs";
 import { performance } from 'node:perf_hooks';
 let benchmarkRecords = [];
 
@@ -91,7 +92,7 @@ const execute_debug = async (Controller, request) => {
   debugText += '<hr style="border-color:#666"/>';
   debugText += DevUtils.printList([...Central.viewPath.values()], 'Views');
   debugText += '<hr style="border-color:#666"/>';
-  debugText += DevUtils.printTable(Central.configPath, 'Config files');
+  debugText += DevUtils.printTable(HelperConfig.configPath, 'Config files');
   debugText += '<hr style="border-color:#666"/>';
 
   const config = {
