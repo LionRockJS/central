@@ -41,11 +41,11 @@ export default class Central {
       APP_PATH: null,
       VIEW_PATH: null,
       MOD_PATH: null,
-      node_modules: [],
+      modules: [],
       ...opts,
     };
 
-    await HelperPath.init(options.EXE_PATH, options.APP_PATH, options.VIEW_PATH, options.node_modules);
+    await HelperPath.init(options.EXE_PATH, options.APP_PATH, options.VIEW_PATH, options.modules);
     await HelperCache.init();
     await HelperConfig.init();
     await HelperBootstrap.init();

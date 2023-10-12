@@ -5,9 +5,9 @@ import HelperImport from "./Import.mjs";
 export default class HelperPath{
   static nodePackages = new Set();
 
-  static async init(EXE_PATH=null, APP_PATH=null, VIEW_PATH=null, node_modules=[]){
+  static async init(EXE_PATH=null, APP_PATH=null, VIEW_PATH=null, modules=[]){
     this.nodePackages.clear();
-    this.addModules(node_modules);
+    this.addModules(modules);
     this.setCentralDefaultPaths(EXE_PATH, APP_PATH, VIEW_PATH);
   }
 
