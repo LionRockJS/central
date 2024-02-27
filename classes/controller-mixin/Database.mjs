@@ -46,7 +46,7 @@ export default class ControllerMixinDatabase extends ControllerMixin {
       try {
         connections.set(k, driverClass.create(v));
       } catch (e) {
-        console.log(v);
+        console.log(e, v, driverClass);
         throw e;
       }
     });

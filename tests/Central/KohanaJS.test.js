@@ -5,7 +5,6 @@ import path from 'node:path';
 
 import Central from "../../classes/Central.mjs";
 import KohanaJSAdapterNode from "../../classes/adapter/Node.mjs";
-import {ORM} from "../../index.js";
 
 Central.adapter = KohanaJSAdapterNode;
 

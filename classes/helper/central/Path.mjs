@@ -21,11 +21,10 @@ export default class HelperPath{
     }));
   }
 
-  static setCentralDefaultPaths(EXE_PATH=null, APP_PATH=null, VIEW_PATH=null, MOD_PATH=null){
+  static setCentralDefaultPaths(EXE_PATH=null, APP_PATH=null, VIEW_PATH=null){
     Central.EXE_PATH  = (EXE_PATH  || Central.adapter.dirname()).replace(/\/$/, '');
     Central.APP_PATH  = (APP_PATH  || `${Central.EXE_PATH}/application`).replace(/\/$/, '');
     Central.VIEW_PATH = (VIEW_PATH || `${Central.EXE_PATH}/views`).replace(/\/$/, '');
-    Central.MOD_PATH  = (MOD_PATH  || `${Central.APP_PATH}/modules`).replace(/\/$/, '');
   }
 
   static resolve(pathToFile, prefixPath, store, forceUpdate = false) {

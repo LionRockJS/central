@@ -22,7 +22,6 @@ export default class Central {
   static EXE_PATH = null;
   static APP_PATH = null;
   static VIEW_PATH = null;
-  static MOD_PATH = null;
 
   static ENV = '';
   static ENV_DEVE = 'dev';
@@ -40,7 +39,6 @@ export default class Central {
       EXE_PATH: null,
       APP_PATH: null,
       VIEW_PATH: null,
-      MOD_PATH: null,
       modules: [],
       ...opts,
     };
@@ -52,10 +50,6 @@ export default class Central {
     await HelperPath.reloadModuleInit();
 
     return Central;
-  }
-
-  static addModules(modules) {
-    HelperPath.addModules(modules);
   }
 
   /**
@@ -82,7 +76,6 @@ export default class Central {
     // if explicit set classPath to Class or required object, just return it.
     const c = HelperCache.classPath.get(adjustedPathToFile);
     if (c && typeof c !== 'string') return c;
-
 
     const file = HelperPath.resolve(adjustedPathToFile, 'classes', HelperCache.classPath);
     return await HelperImport.importAbsolute(file + '?r=' + HelperCache.cacheId);
