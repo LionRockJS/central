@@ -89,4 +89,8 @@ export default class Central {
     if(Central.ENV === Central.ENV_PROD)return;
     console.trace(args);
   }
+
+  static addModules(modules){
+    HelperPath.addModules(modules);
+  }
 }

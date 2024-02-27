@@ -302,7 +302,8 @@ describe('KohanaJS test', () => {
   test('add node module without default dirname', async () => {
     await Central.init({ EXE_PATH: __dirname });
     const Test = await import('./test1/modules/test2/index');
-    Central.addModules([Test])
+    Central.addModules([Test]);
+    console.log(Central.nodePackages);
 
     expect(Central.nodePackages.size).toBe(0);
   });
@@ -328,4 +329,10 @@ describe('KohanaJS test', () => {
   test('exit render json', async()=>{
 
   })
+
+  test('log', async()=>{
+    Central.log('hello');
+    Central.ENV = Central.ENV_PROD;
+    Central.log('hello');
+  });
 });

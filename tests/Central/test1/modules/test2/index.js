@@ -1,8 +1,5 @@
-import Test from './classes/Test';
+import Test from './classes/Test.mjs';
 
 export default {
-}
-
-export {
   Test
 }

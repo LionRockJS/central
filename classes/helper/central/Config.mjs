@@ -20,8 +20,6 @@ export default class HelperConfig{
   }
 
   static async update(key) {
-    if(!key)return;
-
     this.config[key] = {...this.configSources.get(key)}
     const fileName = `${key}.mjs`;
 
