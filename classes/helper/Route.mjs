@@ -86,9 +86,9 @@ const execute_debug = async (Controller, request) => {
   debugText += benchmarkOutput;
   debugText += '<hr style="border-color:#666"/>';
 
-  debugText += DevUtils.printTable(Central.nodePackages, 'KohanaJS Node packages');
+  debugText += DevUtils.printTable(Central.nodePackages, 'Node packages');
   debugText += '<hr style="border-color:#666"/>';
-  debugText += DevUtils.printTable(Central.classPath, 'KohanaJS.import files');
+  debugText += DevUtils.printTable(Central.classPath, 'import files');
   debugText += '<hr style="border-color:#666"/>';
   debugText += DevUtils.printList([...Central.viewPath.values()], 'Views');
   debugText += '<hr style="border-color:#666"/>';

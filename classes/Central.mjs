@@ -8,7 +8,6 @@
 
 
 // KohanaJS is singleton
-import NoopAdapter from './adapter/Noop.mjs';
 
 import HelperCache from "./helper/central/Cache.mjs";
 import HelperImport from "./helper/central/Import.mjs";
@@ -17,8 +16,6 @@ import HelperConfig from "./helper/central/Config.mjs";
 import HelperPath from "./helper/central/Path.mjs";
 
 export default class Central {
-  static adapter = NoopAdapter;
-
   static EXE_PATH = null;
   static APP_PATH = null;
   static VIEW_PATH = null;
