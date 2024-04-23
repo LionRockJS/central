@@ -21,7 +21,7 @@ describe('Controller Mixin View Test', () => {
       static mixins = [ControllerMixinView];
     }
     const c = new C({});
-    c.headers['Content-Type'] = 'text/html';
+    c.state.get(Controller.STATE_HEADERS)['Content-Type'] = 'text/html';
     Object.assign(c.state.get(ControllerMixinView.LAYOUT).data, { header: 'head', footer: 'foot' });
 
     const r = await c.execute();
@@ -33,7 +33,7 @@ describe('Controller Mixin View Test', () => {
       static mixins = [ControllerMixinView];
     }
     const c = new C({});
-    c.headers['Content-Type'] = 'text/html';
+    c.state.get(Controller.STATE_HEADERS)['Content-Type'] = 'text/html';
 
     Object.assign(c.state.get('layout').data, { header: 'head', footer: 'foot' });
     ControllerMixinView.setTemplate(c.state,'', { content: 'hello' });
@@ -50,7 +50,7 @@ describe('Controller Mixin View Test', () => {
       static mixins = [ControllerMixinView];
     }
     const c = new C({});
-    c.headers['Content-Type'] = 'text/html';
+    c.state.get(Controller.STATE_HEADERS)['Content-Type'] = 'text/html';
 
     c.action_test = async () => {
       throw new Error('error throw');
@@ -89,7 +89,7 @@ describe('Controller Mixin View Test', () => {
       static mixins = [ControllerMixinView];
     }
     const c = new C({});
-    c.headers['Content-Type'] = 'text/html';
+    c.state.get(Controller.STATE_HEADERS)['Content-Type'] = 'text/html';
     ControllerMixinView.setLayout(c.state, 'layout', { foo: 'bar' });
 
     Object.assign(c.state.get('layout').data, { header: 'head', footer: 'foot' });
@@ -107,7 +107,7 @@ describe('Controller Mixin View Test', () => {
       static mixins = [ControllerMixinView];
     }
     const c = new C({});
-    c.headers['Content-Type'] = 'text/html';
+    c.state.get(Controller.STATE_HEADERS)['Content-Type'] = 'text/html';
 
     ControllerMixinView.setLayout(c.state, 'layout', { hello: 'world' });
     ControllerMixinView.setTemplate(c.state, 'tpl', { content: 'wow' });
@@ -136,20 +136,19 @@ describe('Controller Mixin View Test', () => {
       static mixins = [ControllerMixinView];
 
       async action_test() {
-        this.body = {
-          foo: 'bar',
-        };
+        this.state.set(Controller.STATE_BODY, { foo: 'bar' });
       }
     }
     const c = new C({});
-    c.headers['Content-Type'] = 'application/json';
-    await c.execute('test');
-    expect(c.body).toBe('{"foo":"bar"}');
+    c.state.get(Controller.STATE_HEADERS)['Content-Type'] = 'application/json';
+    const res = await c.execute('test');
+    expect(res.body).toBe('{"foo":"bar"}');
 
     const c2 = new C({});
-    c2.headers['Content-Type'] = 'application/json; charset=utf-8';
-    await c.execute('test');
-    expect(c.body).toBe('{"foo":"bar"}');
+    c2.state.get(Controller.STATE_HEADERS)['Content-Type'] = 'application/json; charset=utf-8';
+
+    const res2 = await c.execute('test');
+    expect(res2.body).toBe('{"foo":"bar"}');
   });
 
   test('render json on exit', async () => {
@@ -157,17 +156,17 @@ describe('Controller Mixin View Test', () => {
       static mixins = [ControllerMixinView];
 
       async action_test() {
-        this.body = {
+        this.state.set(Controller.STATE_BODY, {
           error: 'bar',
-        };
+        });
         throw new Error();
       }
     }
 
     const c = new C({});
-    c.headers['Content-Type'] = 'application/json';
-    await c.execute('test');
-    expect(c.body).toBe('{"error":"bar"}');
+    c.state.get(Controller.STATE_HEADERS)['Content-Type'] = 'application/json';
+    const res = await c.execute('test');
+    expect(res.body).toBe('{"error":"bar"}');
   })
 
   test('direct assign view', async () => {
@@ -180,15 +179,15 @@ describe('Controller Mixin View Test', () => {
         ControllerMixinView.setErrorTemplate(this.state, {render:()=>'error_tpl', data:{}}, {});
       }
       async action_test() {
-        this.body = {
+        this.state.set(Controller.STATE_BODY, {
           foo: 'bar',
-        };
+        });
       }
     }
 
     const c = new C({});
-    await c.execute('test');
-    expect(c.body).toBe('{"main":"template"}');
+    const res = await c.execute('test');
+    expect(res.body).toBe('{"main":"template"}');
   });
 
   test('direct assign view, without data', async () => {
@@ -201,15 +200,15 @@ describe('Controller Mixin View Test', () => {
         ControllerMixinView.setErrorTemplate(this.state, {render:()=>'error_tpl', data:{}});
       }
       async action_test() {
-        this.body = {
+        this.state.set(Controller.STATE_BODY, {
           foo: 'bar',
-        };
+        });
       }
     }
 
     const c = new C({});
-    await c.execute('test');
-    expect(c.body).toBe('{"main":"template"}');
+    const res = await c.execute('test');
+    expect(res.body).toBe('{"main":"template"}');
   });
 
   test('mixin view with assigned properties', async () => {
@@ -228,15 +227,15 @@ describe('Controller Mixin View Test', () => {
         );
       }
       async action_test() {
-        this.body = {
+        this.state.set(Controller.STATE_BODY, {
           foo: 'bar',
-        };
+        });
       }
     }
     const c = new C({});
-    await c.execute('test');
+    const res = await c.execute('test');
 
-    expect(c.body).toBe('{"base":{"foo":"bar"}}');
+    expect(res.body).toBe('{"base":{"foo":"bar"}}');
 
   });
 });

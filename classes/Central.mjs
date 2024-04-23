@@ -83,7 +83,7 @@ export default class Central {
   }
 
   static log(args) {
-    if(Central.ENV === Central.ENV_PROD)return;
+    if(Central.ENV === Central.ENV_PROD)return args;
     console.trace(args);
   }
 

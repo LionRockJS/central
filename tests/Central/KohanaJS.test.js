@@ -303,8 +303,6 @@ describe('KohanaJS test', () => {
     await Central.init({ EXE_PATH: __dirname });
     const Test = await import('./test1/modules/test2/index');
     Central.addModules([Test]);
-    console.log(Central.nodePackages);
-
     expect(Central.nodePackages.size).toBe(0);
   });
 

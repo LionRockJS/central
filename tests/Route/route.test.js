@@ -9,7 +9,7 @@ import RouteList from '../../classes/RouteList.mjs';
 
 class ControllerTest extends Controller {
   async action_test() {
-    this.body = 'test';
+    this.state.set(Controller.STATE_BODY, 'test');
   }
 
   async action_fail() {
