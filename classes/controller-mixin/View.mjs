@@ -1,4 +1,4 @@
-import { ControllerMixin, View } from '@lionrockjs/mvc';
+import { ControllerMixin, View, Controller } from '@lionrockjs/mvc';
 
 export default class ControllerMixinView extends ControllerMixin {
   static PLACEHOLDER = 'placeHolder';
@@ -19,9 +19,9 @@ export default class ControllerMixinView extends ControllerMixin {
   static VIEW_DEFAULT_DATA = 'viewDefaultData';
 
   static init(state) {
-    const client = state.get('client');
+    const language = state.get(Controller.STATE_LANGUAGE);
     const defaultViewData = {
-      language: client.language,
+      language
     };
 
     const defaultLayoutData = {}
@@ -60,47 +60,43 @@ export default class ControllerMixinView extends ControllerMixin {
   }
 
   static async after(state) {
-    const client = state.get('client');
+    const headers = state.get(Controller.STATE_HEADERS);
 
     // .json return json content;
-    if (/^application\/json/.test(client.headers['Content-Type'])) {
-      client.body = JSON.stringify(client.body);
+    if (/^application\/json/.test(headers['Content-Type'])) {
+      state.set(Controller.STATE_BODY, JSON.stringify(state.get(Controller.STATE_BODY)));
       return;
     }
-
-/* depreciate, should not use mixin view if the controller no need to render */
-// do not render non text content, eg, no need to render when controller read protected pdf
-//    if (client.headers['Content-Type'] && /^text/.test(client.headers['Content-Type']) === false) {
-//      return;
-//    }
 
     // render template and put into layout's main output.
     // no template, replace the controller body string into layout.
     const template = state.get(this.TEMPLATE);
     const layout = state.get(this.LAYOUT);
-    layout.data[state.get(this.PLACEHOLDER)] = template ? await template.render() : client.body;
-    client.body = await layout.render();
+    layout.data[state.get(this.PLACEHOLDER)] = template ? await template.render() : state.get(Controller.STATE_BODY);
+    state.set(Controller.STATE_BODY, await layout.render());
   }
 
   static async exit(state) {
-    const client = state.get('client');
-    const code = client.status;
-    if (code === 302) return;
-    if (client.headers && client.headers['Content-Type'] && /^application\/json/.test(client.headers['Content-Type'])) {
-      client.body = JSON.stringify(client.body);
+    if (state.get(Controller.STATE_STATUS) === 302) return;
+
+    const headers = state.get(Controller.STATE_HEADERS);
+    if (headers && headers['Content-Type'] && /^application\/json/.test(headers['Content-Type'])) {
+      state.set(Controller.STATE_BODY, JSON.stringify(state.get(Controller.STATE_BODY)));
       return;
     }
+
     const errorTemplate = state.get(this.ERROR_TEMPLATE);
     const layout = state.get(this.LAYOUT);
     const placeHolder = state.get(this.PLACEHOLDER);
 
     if (errorTemplate) {
-      Object.assign(errorTemplate.data, { body: client.body });
+      Object.assign(errorTemplate.data, { body: state.get(Controller.STATE_BODY) });
       layout.data[placeHolder] = await errorTemplate.render();
     } else {
-      layout.data[placeHolder] = client.body;
+      layout.data[placeHolder] = state.get(Controller.STATE_BODY);
     }
-    client.body = await layout.render();
+
+    state.set(Controller.STATE_BODY, await layout.render());
   }
 
   static #getView(path, data, themePath, ViewClass) {
