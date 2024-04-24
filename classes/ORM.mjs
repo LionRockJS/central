@@ -612,8 +612,19 @@ export default class ORM {
     return m.#adapter.insertAll(columns, values, options.insertIDs || []);
   }
 
-  static async import(modelName) {
-    return Central.import(ORM.classPrefix + modelName);
+  /**
+   *
+   * @param modelName
+   * @param defaultModel
+   * @returns {Promise<ORM>}
+   */
+  static async import(modelName, defaultModel=ORM){
+    try{
+      return await Central.import(ORM.classPrefix + modelName);
+    }catch(e){
+      if(defaultModel === ORM)throw e;
+      return defaultModel;
+    }
   }
 
   /**

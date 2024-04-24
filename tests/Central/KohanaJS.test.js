@@ -4,11 +4,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import Central from "../../classes/Central.mjs";
-import KohanaJSAdapterNode from "../../classes/adapter/Node.mjs";
+import CentralAdapterNode from "../../classes/adapter/Node.mjs";
 
-Central.adapter = KohanaJSAdapterNode;
+Central.adapter = CentralAdapterNode;
 
-describe('KohanaJS test', () => {
+describe('Central test', () => {
   test('default APP Path', async () => {
     await Central.init({ EXE_PATH : __dirname });
     expect(Central.APP_PATH).toBe(`${__dirname}/application`);
@@ -23,7 +23,7 @@ describe('KohanaJS test', () => {
     expect(JSON.stringify([...Central.nodePackages.keys()])).toBe(JSON.stringify([path.normalize(`${__dirname}/test1/modules/test`)]));
   });
 
-  test('KohanaJS.import', async () => {
+  test('Central.import', async () => {
     await Central.init({ EXE_PATH: `${__dirname}/test1/`});
     expect(JSON.stringify([...Central.nodePackages.keys()])).toBe(JSON.stringify([path.normalize(`${__dirname}/test1/modules/test`)]));
 
@@ -32,7 +32,7 @@ describe('KohanaJS test', () => {
     expect(t.getFoo()).toBe('bar');
   });
 
-  test('KohanaJS.import again', async () => {
+  test('Central.import again', async () => {
     await Central.init({ EXE_PATH: `${__dirname}/test1/`});
     expect(JSON.stringify([...Central.nodePackages.keys()])).toBe(JSON.stringify([path.normalize(`${__dirname}/test1/modules/test`)]));
 
@@ -66,7 +66,7 @@ describe('KohanaJS test', () => {
       // eslint-disable-next-line no-unused-vars
       const f2 = new Foo2();
     } catch (e) {
-      expect(e.message.replace(/ {[^}]+}/, '')).toBe('KohanaJS resolve path error: path Foo.mjs not found. prefixPath: classes , store: {} ');
+      expect(e.message.replace(/ {[^}]+}/, '')).toBe('Resolve path error: path Foo.mjs not found. prefixPath: classes , store: {} ');
     }
   });
 
@@ -87,7 +87,7 @@ describe('KohanaJS test', () => {
       // eslint-disable-next-line no-unused-vars
       const f2 = new Foo2();
     } catch (e) {
-      expect(e.message.replace(/ {[^}]+}/, '')).toBe('KohanaJS resolve path error: path Foo.mjs not found. prefixPath: classes , store: {} ');
+      expect(e.message.replace(/ {[^}]+}/, '')).toBe('Resolve path error: path Foo.mjs not found. prefixPath: classes , store: {} ');
     }
   });
 
@@ -109,7 +109,7 @@ describe('KohanaJS test', () => {
     try {
       await Central.import('NotFound');
     } catch (e) {
-      expect(e.message.replace(/ {[^}]+}/, '')).toBe('KohanaJS resolve path error: path NotFound.mjs not found. prefixPath: classes , store: {} ');
+      expect(e.message.replace(/ {[^}]+}/, '')).toBe('Resolve path error: path NotFound.mjs not found. prefixPath: classes , store: {} ');
     }
   });
 
@@ -187,7 +187,7 @@ describe('KohanaJS test', () => {
     try {
       await Central.flushCache();
     } catch (e) {
-      expect(e.message).toBe('KohanaJS resolve path error: path salt.js not found. config , {} ');
+      expect(e.message).toBe('Resolve path error: path salt.js not found. config , {} ');
     }
 
     expect(Central.config.salt.value).toBe('hello');
@@ -221,14 +221,12 @@ describe('KohanaJS test', () => {
     expect(Central.APP_PATH).toBe(`${__dirname}/test2/application`);
   });
 
-  test('KohanaJS nodePackages without init', async () => {
+  test('Central nodePackages without init', async () => {
     await Central.init({ EXE_PATH: `${__dirname}/test9` });
     expect(Central.nodePackages.size).toBe(2);
-    // KohanaJS will load bootstrap from test9/application/bootstrap.js
-    //
   });
 
-  test('KohanaJS require file with extension', async () => {
+  test('Central require file with extension', async () => {
     await Central.init({ EXE_PATH: `${__dirname}/test10` });
     const Foo = await Central.import('Foo.js');
     const ins = new Foo();
@@ -278,7 +276,7 @@ describe('KohanaJS test', () => {
   });
 
   test('Central default adapter', async () =>{
-    Central.adapter = KohanaJSAdapterNode;
+    Central.adapter = CentralAdapterNode;
   })
 
   test('add node module', async () => {

@@ -44,7 +44,7 @@ export default class HelperPath{
 
     fetchPaths.some(path => adapter.resolveFetchList(path, store, pathToFile));
 
-    if (!store.get(pathToFile)) throw new Error(`KohanaJS resolve path error: path ${pathToFile} not found. prefixPath: ${prefixPath} , store: ${JSON.stringify(store)} `);
+    if (!store.get(pathToFile)) throw new Error(`Resolve path error: path ${pathToFile} not found. prefixPath: ${prefixPath} , store: ${JSON.stringify(store)} `);
     return store.get(pathToFile);
   }
 

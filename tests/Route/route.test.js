@@ -213,6 +213,6 @@ describe('Route Test', () => {
 
     const reply = await app.run('/hello-world/:id', 'POST');
     expect(reply.result.status).toBe(500);
-    expect(reply.result.body).toBe("KohanaJS resolve path error: path controller/Missing.mjs not found. prefixPath: classes , store: {} ");
+    expect(reply.result.body).toBe("Resolve path error: path controller/Missing.mjs not found. prefixPath: classes , store: {} ");
   });
 });
