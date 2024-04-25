@@ -18,7 +18,9 @@ export default class HelperPath{
       //suppress error when package without init.mjs
       try{
         await HelperImport.importAbsolute(`${it}?r=${HelperCache.cacheId}`);
-      }catch(e){}
+      }catch(e){
+        Central.log(e);
+      }
     }));
   }
 

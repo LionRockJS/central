@@ -12,12 +12,12 @@ export default class ControllerMixinDatabase extends ControllerMixin {
 
   static DATABASES = 'databases';
 
-  static DEFAULT_DATABASE_ADAPTER = DatabaseAdapter;
+  static defaultAdapter = DatabaseAdapter;
 
   static init(state) {
     if (!state.get(this.DATABASE_MAP))state.set(this.DATABASE_MAP, new Map());
     if (!state.get(this.DATABASES))state.set(this.DATABASES, new Map());
-    if (!state.get(this.DATABASE_ADAPTER))state.set(this.DATABASE_ADAPTER, this.DEFAULT_DATABASE_ADAPTER);
+    if (!state.get(this.DATABASE_ADAPTER))state.set(this.DATABASE_ADAPTER, this.defaultAdapter);
   }
 
   static async setup(state) {
