@@ -44,7 +44,7 @@ export default class Central {
     await HelperCache.init();
     await HelperConfig.init();
     await HelperBootstrap.init();
-    await HelperPath.reloadModuleInit();
+    await this.reloadModuleInit(true);
 
     return Central;
   }
@@ -63,7 +63,7 @@ export default class Central {
       await HelperConfig.updateAll();
     }
     if (!Central.config.view.cache) HelperCache.clearViewCache();
-    if (!Central.config.classes.cache) await HelperPath.reloadModuleInit();
+    if (!Central.config.classes.cache) await this.reloadModuleInit();
   }
 
   static async import(pathToFile) {
@@ -89,5 +89,11 @@ export default class Central {
 
   static addModules(modules){
     HelperPath.addModules(modules);
+  }
+
+  //module may add after init, so we need to force reload module init
+  static async reloadModuleInit(force=false){
+    if(force === false && Central.config.classes.cache)return;
+    await HelperPath.reloadModuleInit();
   }
 }
