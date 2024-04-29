@@ -2,4 +2,4 @@
 // copy this file to /application folder.
 import Central from '../../../classes/Central.mjs';
 
-Central.initConfig(new Map([]));
+await Central.initConfig(new Map([]));

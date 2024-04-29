@@ -16,6 +16,7 @@ export default class HelperConfig{
       ['classes', await import('../../../config/classes.mjs')],
       ['view', await import('../../../config/view.mjs')],
       ['system', await import('../../../config/system.mjs')],
+      ['database', await import('../../../config/database.mjs')],
     ]));
   }
 

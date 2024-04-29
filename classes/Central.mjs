@@ -53,8 +53,8 @@ export default class Central {
    *
    * @param {Map} configMap
    */
-  static initConfig(configMap) {
-    HelperConfig.addConfig(configMap).then();
+  static async initConfig(configMap) {
+    await HelperConfig.addConfig(configMap);
   }
 
   static async flushCache() {

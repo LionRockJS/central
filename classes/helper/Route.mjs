@@ -120,9 +120,7 @@ const execute_debug = async (Controller, request) => {
 };
 const execute_production = async (Controller, request) => new Controller(request).execute();
 
-export default execute_production;
-
-export {
+export default {
   execute_debug,
   execute_production,
 };

@@ -1,6 +1,6 @@
 import { Controller } from '@lionrockjs/mvc';
 import Central from './Central.mjs';
-import { execute_debug, execute_production } from './helper/Route.mjs';
+import HelperRoute from './helper/Route.mjs';
 
 const noop = () => {/***/};
 
@@ -110,8 +110,9 @@ export default class RouteList {
         await Central.flushCache();
         request.params.action = route.action;
         request.params.controller = (typeof route.controller === 'string') ? route.controller : route.controller.name;
-        //TODO, move execute to config
-        const execute = (Central.config.system?.debug === true) ? execute_debug : execute_production;
+        const execute = (Central.config.system?.debug === true) ?
+          HelperRoute.execute_debug :
+          HelperRoute.execute_production;
 
         try {
           const controller = (typeof route.controller === 'string') ? await Central.import(route.controller) : route.controller;
