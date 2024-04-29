@@ -2,6 +2,7 @@ import crypto from 'node:crypto';
 
 import { ControllerMixin } from '@lionrockjs/mvc';
 import DatabaseAdapter from '../adapter/Database.mjs';
+import Central from "../Central.mjs";
 
 export default class ControllerMixinDatabase extends ControllerMixin {
   static #dbConnection = new Map();
@@ -46,7 +47,7 @@ export default class ControllerMixinDatabase extends ControllerMixin {
       try {
         connections.set(k, driverClass.create(v));
       } catch (e) {
-        console.log(e, v, driverClass);
+        Central.log(e, v, driverClass);
         throw e;
       }
     });

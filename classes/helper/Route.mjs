@@ -51,7 +51,7 @@ const execute_debug = async (Controller, request) => {
 
   const benchmarkOutput = JSON.stringify(getBenchmarkRecords().map(x => ({ label: x.label, ms: x.delta })));
   // eslint-disable-next-line no-console
-  console.log(`${request.url} :::: ${benchmarkOutput}`);
+  Central.log(`${request.url} :::: ${benchmarkOutput}`);
 
   if (global.gc)global.gc();
 
@@ -63,14 +63,14 @@ const execute_debug = async (Controller, request) => {
     result.body = JSON.stringify(result.body);
     if (c.error) {
       // eslint-disable-next-line no-console
-      console.log(c.error);
+      Central.log(c.error);
     }
     return result;
   }
 
   if (result.headers['Content-Type'] !== 'text/html; charset=utf-8') {
     // eslint-disable-next-line no-console
-    if (c.error) { console.log(c.error); }
+    if (c.error) { Central.log(c.error); }
     return result;
   }
 
@@ -80,7 +80,7 @@ const execute_debug = async (Controller, request) => {
     debugText += `<pre style="color:#C00; display:inline;">${c.error.stack}</pre>`;
     debugText += '<hr style="border-color:#666"/>';
     // eslint-disable-next-line no-console
-    console.log(c.error);
+    Central.log(c.error);
   }
 
   debugText += benchmarkOutput;

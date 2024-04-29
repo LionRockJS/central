@@ -15,6 +15,7 @@ const ErrorFactory = e => class ControllerError extends Controller {
 export default class RouteList {
   static routeMap = new Map();
   static routeCreated = false;
+  static verbose = false;
 
   static #addRoute(path, method, weight, route, errorMessage) {
     const key = `${path}-${method}`;
@@ -45,7 +46,7 @@ export default class RouteList {
   static add(path, controller, action = 'index', method = "GET", weight = 5) {
     //routes already created. do nothing
     if(this.routeCreated){
-      if(this.verbose) console.log('Cannot Add route after route created:' + path );
+      if(this.verbose) Central.log('Cannot Add route after route created:' + path );
       return;
     }
 

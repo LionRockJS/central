@@ -6,6 +6,8 @@
  *
  */
 
+import Central from '../Central.mjs';
+
 class DatabaseStatement {
   // eslint-disable-next-line no-useless-constructor,no-empty-function
   constructor(sql) {/***/}
@@ -45,8 +47,8 @@ export default class Database {
 
   // eslint-disable-next-line class-methods-use-this
   async exec(sql) {
-    console.log('Database exec using Abstract DatabaseAdapter');
-    console.log(sql);
+    Central.log('Database exec using Abstract DatabaseAdapter');
+    Central.log(sql);
   }
 
   // eslint-disable-next-line class-methods-use-this
