@@ -51,7 +51,7 @@ const execute_debug = async (Controller, request) => {
 
   const benchmarkOutput = JSON.stringify(getBenchmarkRecords().map(x => ({ label: x.label, ms: x.delta })));
   // eslint-disable-next-line no-console
-  Central.log(`${request.url} :::: ${benchmarkOutput}`);
+  Central.log(`${request.url} :::: ${benchmarkOutput}`, false);
 
   if (global.gc)global.gc();
 

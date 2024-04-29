@@ -82,8 +82,12 @@ export default class Central {
     return HelperPath.resolve(pathToFile, 'views', HelperCache.viewPath);
   }
 
-  static log(args) {
+  static log(args, verbose = true) {
     if(Central.ENV === Central.ENV_PROD)return args;
+    if(verbose === false){
+      console.log(args);
+      return;
+    }
     console.trace(args);
   }
 
