@@ -27,7 +27,8 @@ export default class RouteList {
       //different controller or action, throw error.
       if (record.weight >= route.weight) {
         if(record.controller !== route.controller || record.action !== route.action || record.message !== route.message ) {
-          Central.log(record, route);
+          Central.log('record', record);
+          Central.log('route', route);
           throw new Error(errorMessage + key);
         }
         return;
