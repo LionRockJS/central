@@ -25,14 +25,7 @@ export default class RouteList {
       //same route, skip adding to routeMap.
       if (record.controller === route.controller && record.action === route.action && record.message === route.message) return;
       //different controller or action, throw error.
-      if (record.weight >= route.weight) {
-        if(record.controller !== route.controller || record.action !== route.action || record.message !== route.message ) {
-          Central.log('record', record);
-          Central.log('route', route);
-          throw new Error(errorMessage + key);
-        }
-        return;
-      }
+      if (record.weight >= route.weight) return;
     }
 
     this.routeMap.set(key, route);
