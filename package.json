@@ -1,6 +1,6 @@
 {
   "name": "@lionrockjs/central",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Node.js MVC framework base on PHP Kohana Framework",
   "main": "index.js",
   "type": "module",
@@ -36,5 +36,8 @@
   "bugs": {
     "url": "https://github.com/LionRockJS/central/issues"
   },
-  "homepage": "https://github.com/LionRockJS/central#readme"
+  "homepage": "https://github.com/LionRockJS/central#readme",
+  "dependencies": {
+    "mime": "^4.0.3"
+  }
 }
