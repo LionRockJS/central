@@ -47,8 +47,8 @@ export default class Database {
 
   // eslint-disable-next-line class-methods-use-this
   async exec(sql) {
-    Central.log('Database exec using Abstract DatabaseAdapter');
-    Central.log(sql);
+    Central.log('Database exec using Abstract DatabaseAdapter', false);
+    Central.log(sql, false);
   }
 
   // eslint-disable-next-line class-methods-use-this

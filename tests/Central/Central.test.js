@@ -7,6 +7,7 @@ import Central from "../../classes/Central.mjs";
 import CentralAdapterNode from "../../classes/adapter/Node.mjs";
 
 Central.adapter = CentralAdapterNode;
+Central.ENV = Central.ENV_PROD;
 
 describe('Central test', () => {
   test('default APP Path', async () => {

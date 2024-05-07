@@ -59,7 +59,7 @@ const execute_debug = async (Controller, request) => {
     result.headers['Content-Type'] = 'text/html; charset=utf-8';
   }
 
-  if (result.headers['Content-Type'] === 'application/javascript; charset=utf-8') {
+  if (result.headers['Content-Type'] === 'text/javascript; charset=utf-8') {
     result.body = JSON.stringify(result.body);
     if (c.error) {
       // eslint-disable-next-line no-console

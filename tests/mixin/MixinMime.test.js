@@ -15,7 +15,7 @@ describe('ControllerMime test', () => {
   test('javascript', async () => {
     const c = new C({ url: '/articles/recent.js' });
     const r = await c.execute();
-    expect(r.headers['Content-Type']).toBe('application/javascript; charset=utf-8');
+    expect(r.headers['Content-Type']).toBe('text/javascript; charset=utf-8');
   });
 
   test('html', async () => {

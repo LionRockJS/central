@@ -1,6 +1,6 @@
 {
   "name": "@lionrockjs/central",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Node.js MVC framework base on PHP Kohana Framework",
   "main": "index.js",
   "type": "module",

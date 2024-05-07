@@ -25,7 +25,9 @@ export default class RouteList {
       //same route, skip adding to routeMap.
       if (record.controller === route.controller && record.action === route.action && record.message === route.message) return;
       //different controller or action, throw error.
-      if (record.weight >= route.weight) return;
+      if (record.weight > route.weight) return;
+      //same weight or lower, throw error
+      throw new Error(errorMessage + key);
     }
 
     this.routeMap.set(key, route);
