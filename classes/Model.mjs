@@ -226,7 +226,6 @@ export default class Model {
     } else {
       const adapterClass = this.#adapter.constructor;
       this.id = this.#options.insertID ?? adapterClass.defaultID() ?? ORMAdapter.defaultID();
-      this.#adapter.id = this.id;
       this.uuid = adapterClass.uuid() ?? ORMAdapter.uuid();
       await this.writeRetry(this.#adapter.processValues(), this.#options.retry);
     }
@@ -241,7 +240,7 @@ export default class Model {
   async read() {
     const result = await (
       this.id
-        ? this.#adapter.read(this.id)
+        ? this.#adapter.read()
         : this.#readByValues()
     );
 
@@ -265,7 +264,7 @@ export default class Model {
    */
   async delete() {
     if (!this.id) throw new Error('ORM delete Error, no id defined');
-    await this.#adapter.delete(this.id);
+    await this.#adapter.delete();
   }
 
   /**

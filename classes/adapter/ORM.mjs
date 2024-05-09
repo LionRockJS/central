@@ -3,12 +3,11 @@ import { randomUUID } from 'node:crypto';
 export default class ORM {
   /**
    *
-   * @param {ORM} client
+   * @param {Model} client
    * @param {*} database
    */
   constructor(client, database) {
     this.client = client;
-    this.id = client.id;
     this.tableName = client.constructor.tableName;
     this.database = database;
   }
