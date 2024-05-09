@@ -66,6 +66,7 @@ export default class Model {
   }
 
   /**
+   * columns is a list of fields and belongsTo keys.
    *
    * @returns {Array}
    */
@@ -74,6 +75,7 @@ export default class Model {
   }
 
   /**
+   * states is a list of snapshots of the model.
    *
    * @returns {Array}
    */
