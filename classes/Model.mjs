@@ -416,7 +416,7 @@ class ModelCollection{
   }
 
   async deleteBy(key, values){
-    await this.#adapter.deleteAll(key, values);
+    await this.#adapter.deleteBy(key, values);
   }
 
   async deleteWith(criteria=[]){
