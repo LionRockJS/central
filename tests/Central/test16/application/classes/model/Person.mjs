@@ -1,6 +1,6 @@
-import ORM from '../../../../../../classes/ORM';
+import Model from '../../../../../classes/Model';
 
-export default class Person extends ORM{
+export default class Person extends Model{
   constructor(id, options) {
     super(id, options);
 

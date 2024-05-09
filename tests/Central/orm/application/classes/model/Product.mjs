@@ -1,6 +1,6 @@
-import ORM from '../../../../../../classes/ORM';
+import Model from '../../../../../../classes/Model.mjs';
 
-export default class Product extends ORM{
+export default class Product extends Model{
   //foreignKeys
   default_image_id = null;
   type_id = null;

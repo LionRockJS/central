@@ -10,6 +10,7 @@ import Central from './classes/Central.mjs';
 import HelperCrypto from './classes/helper/Crypto.mjs';
 
 import ORM from './classes/ORM.mjs';
+import Model from './classes/Model.mjs';
 import ControllerMixinMime from './classes/controller-mixin/Mime.mjs';
 import ControllerMixinView from './classes/controller-mixin/View.mjs';
 import ControllerMixinDatabase from './classes/controller-mixin/Database.mjs';
@@ -26,6 +27,7 @@ export default Central
 export {
   Central,
   ORM,
+  Model,
   ControllerMixinMime,
   ControllerMixinView,
   ControllerMixinDatabase,

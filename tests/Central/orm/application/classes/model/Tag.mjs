@@ -1,6 +1,6 @@
-import ORM from '../../../../../../classes/ORM';
+import Model from '../../../../../../classes/Model.mjs';
 
-export default class Tag extends ORM{
+export default class Tag extends Model{
   name;
 
   static joinTablePrefix = 'tag';

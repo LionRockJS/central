@@ -1,0 +1,76 @@
+@startuml
+class Model {
+  {static} + database
+  {static} + tableName
+  {static} + joinTablePrefix
+  {static} + fields : Map
+  {static} + belongsTo : Map
+  {static} + hasMany : []
+  {static} + belongsToMany : Set
+  {static} + classPrefix = 'model/'
+---
+  + uuid
+  + created_at
+  + updated_at
+  - columns
+---
+  +getColumns()
+  +getStates()
+
+  +snapshot()
+  +eagerLoad()
+  +writeRetry()
+  +write()
+  +read()
+  +delete()
+  +parent(fk)
+  +children(fk)
+  +siblings(MClass)
+  +add(model)
+  +remove(model)
+  +removeAll(MClass)
+}
+
+note right of Model::getColumns
+?? for Database adapter orm
+end note
+
+note right of Model::snapshot
+for ORMWrite, ORMDelete
+end note
+
+class ORM {
+{static} +defaultAdapter
+{static} +classPrefix
+---
+  {static} + import(modelName, defaultMClass)
+---
+  << Create >>
+  {static} + create(MClass, opt)
+  {static} + insertAll(MClass, columns, values, opts)
+---
+  << Read (All, By, With) >>
+  {static} + factory(MClass, id, opt)
+  {static} + readAll(MClass, opt)
+  {static} + readBy(MClass, key, values, opt)
+  {static} + readWith(MClass, criteria, opt)
+---
+  {static} + countAll(MClass, opt)
+  {static} + countBy(MClass, key, values, opt)
+  {static} + countWith(MClass, criteria, opt)
+---
+  << Update (All, By, With) >>
+  {static} + updateAll(MClass, kv, columnValues, opt)
+  {static} + updateBy(MClass, key, values, columnValues, opt)
+  {static} + updateWith(MClass, criteria, columnValues, opt)
+---
+  << Delete (All, By, With) >>
+  {static} + deleteAll(MClass, opt)
+  {static} + deleteBy(MClass, key, values, opt)
+  {static} + deleteWith(MClass, criteria, opt)
+}
+
+note right of ORM::factory
+alias of ORM.readBy(MClass, 'id', [id], opt)
+end note
+@enduml

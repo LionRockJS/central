@@ -1,6 +1,6 @@
-import ORM from '../../../../../../classes/ORM';
+import Model from '../../../../../../classes/Model.mjs';
 
-export default class Address extends ORM{
+export default class Address extends Model{
   person_id = null;
   address1 = null;
   address2 = null;

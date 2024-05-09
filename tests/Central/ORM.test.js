@@ -5,6 +5,7 @@ import Central from "../../classes/Central";
 import CentralAdapterNode from "../../classes/adapter/Node";
 
 import ORM from "../../classes/ORM";
+import Model from "../../classes/Model";
 import ORMAdapterTest from "./orm/application/classes/ORMAdapterTest";
 
 Central.adapter = CentralAdapterNode;
@@ -21,16 +22,16 @@ describe('orm test', () => {
 
   test('orm', async () => {
     await init();
-    const obj = new ORM();
+    const obj = new Model();
     const className = obj.constructor.name;
 
-    expect(className).toBe('ORM');
-    expect(ORM.tableName).toBe(null);
+    expect(className).toBe('Model');
+    expect(Model.tableName).toBe(null);
     // ORM is abstract class, should not found lowercase and tableName
   });
 
   test('alias model', async () => {
-    const {default : AliasModel} = await import('./orm/application/classes/AliasModel');
+    const {default : AliasModel} = await import('./orm/application/classes/AliasModel.mjs');
 
     expect(AliasModel.tableName).toBe('testmodels');
     expect(AliasModel.joinTablePrefix).toBe('testmodel');
