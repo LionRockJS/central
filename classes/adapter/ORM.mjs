@@ -52,7 +52,7 @@ export default class ORM {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  async read() {/***/}
+  async read(id) {/***/}
 
   /**
    *
@@ -71,11 +71,11 @@ export default class ORM {
   async insert(values) {/***/}
 
   /**
-   *
+   * @param {string} id
    * @returns {Promise<void>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async delete() {/***/}
+  async delete(id) {/***/}
 
   /**
    *
@@ -99,7 +99,7 @@ export default class ORM {
 
   /**
    * add belongsToMany
-   * @param {ORM[]} models
+   * @param {Model[]} models
    * @param {number} weight
    * @param {string} jointTableName
    * @param {string} lk
@@ -173,7 +173,7 @@ export default class ORM {
    * @returns {Promise<number>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async count(kv = null) {
+  async countAll(kv = null) {
     return 0;
   }
 

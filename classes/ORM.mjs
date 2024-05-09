@@ -6,15 +6,13 @@
  *
  */
 import Central from './Central.mjs';
-import ORMAdapter from './adapter/ORM.mjs';
 import Model from './Model.mjs';
 
 export default class ORM {
-  static defaultAdapter = ORMAdapter;
   static classPrefix = 'model/';
 
   /**
-   * @param MClass
+   * @param {Model.} MClass
    * @param options
    * @param options.database
    * @param options.adapter
@@ -27,7 +25,7 @@ export default class ORM {
 
   /**
    * Create and read data from database
-   * @param MClass
+   * @param {Model.} MClass
    * @param id
    * @param options
    * @param options.database
@@ -50,7 +48,7 @@ export default class ORM {
   // Collection methods
   /**
    * read all records from the model
-   * @param {Model.constructor} MClass
+   * @param {Model.} MClass
    * @param {object} options
    * @param options.database
    * @param options.adapter
@@ -70,7 +68,7 @@ export default class ORM {
 
   /**
    *
-   * @param MClass
+   * @param {Model.} MClass
    * @param key
    * @param values
    * @param options
@@ -91,7 +89,7 @@ export default class ORM {
 
   /**
    * Given criterias [['', 'id', SQL.EQUAL, 11], [SQL.AND, 'name', SQL.EQUAL, 'peter']]
-   * @param MClass
+   * @param {Model.} MClass
    * @param criteria
    * @param options
    * @param options.database
@@ -112,21 +110,21 @@ export default class ORM {
 
   /**
    *
-   * @param MClass
+   * @param {Model.} MClass
    * @param options
    * @param options.database
    * @param options.adapter
    * @param options.kv
    * @returns {Promise<*>}
    */
-  static async count(MClass, options = {}) {
+  static async countAll(MClass, options = {}) {
     const m = ORM.create(MClass, options);
-    return m.adapter.count(options.kv);
+    return m.adapter.countAll(options.kv);
   }
 
   /**
    *
-   * @param {Model.constructor} MClass
+   * @param {Model.} MClass
    * @param {string} key
    * @param {[]} values
    * @param options
@@ -139,7 +137,7 @@ export default class ORM {
 
   /**
    * Given criterias [['', 'id', SQL.EQUAL, 11], [SQL.AND, 'name', SQL.EQUAL, 'peter']]
-   * @param {Model.constructor} MClass
+   * @param {Model.} MClass
    * @param {[[string]]}criteria
    * @param options
    * @returns {Promise<void>}
@@ -158,7 +156,7 @@ export default class ORM {
 
   /**
    *
-   * @param {Model.constructor} MClass
+   * @param {Model.} MClass
    * @param {string} key
    * @param {[]} values
    * @param options
@@ -171,7 +169,7 @@ export default class ORM {
 
   /**
    * Given criterias [['', 'id', SQL.EQUAL, 11], [SQL.AND, 'name', SQL.EQUAL, 'peter']]
-   * @param {Model.constructor} MClass
+   * @param {Model.} MClass
    * @param {[[string]]}criteria
    * @param options
    * @returns {Promise<void>}
@@ -184,7 +182,7 @@ export default class ORM {
   }
 
   /**
-   * @param {Model.constructor} MClass
+   * @param {Model.} MClass
    * @param options
    * @param {Map} kv
    * @param {Map} columnValues
@@ -196,7 +194,7 @@ export default class ORM {
 
   /**
    *
-   * @param {Model.constructor} MClass
+   * @param {Model.} MClass
    * @param options
    * @param {string} key
    * @param {[]} values
@@ -210,7 +208,7 @@ export default class ORM {
 
   /**
    * Given criterias [['', 'id', SQL.EQUAL, 11], [SQL.AND, 'name', SQL.EQUAL, 'peter']]
-   * @param {Model.constructor} MClass
+   * @param {Model.} MClass
    * @param options
    * @param {[[string]]}criteria
    * @param {Map} columnValues
@@ -226,7 +224,7 @@ export default class ORM {
 
   /**
    *
-   * @param {Model.constructor} MClass
+   * @param {Model.} MClass
    * @param options
    * @param {string[]} columns
    * @param {[String[]]} values
@@ -260,7 +258,7 @@ export default class ORM {
 
   /**
    *
-   * @param {ORM[]} orms
+   * @param {Model[]} orms
    * @param {Object} eagerLoadOptions
    * @param {Object} ormOptions
    * @returns {Promise<ORM[]>}

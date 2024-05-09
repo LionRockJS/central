@@ -9,7 +9,7 @@ import Model from "../../classes/Model";
 import ORMAdapterTest from "./orm/application/classes/ORMAdapterTest";
 
 Central.adapter = CentralAdapterNode;
-ORM.defaultAdapter = ORMAdapterTest;
+Model.defaultAdapter = ORMAdapterTest;
 
 const init = async () =>{
   await Central.init({
@@ -43,11 +43,16 @@ describe('orm test', () => {
   test('belongsTo', async () => {
     const Address = await ORM.import('Address');
     const Person = await ORM.import('Person');
+    console.log(Person);
+    const peter = new Person(1);
+    console.log(peter);
+    await peter.read();
+    console.log(peter);
 
-    const peter = await new Person(1).read();
     expect(peter.id).toBe(1);
 
-    const home = await new Address(20).read();
+    const home = new Address(20);
+    await home.read();
     home.person_id = 1;
     expect(home.id).toBe(20);
 
@@ -413,7 +418,7 @@ describe('orm test', () => {
     const r7 = await ORM.readWith(Product, [['', 'price', 'EQUAL', '100'], ['AND', 'name', 'EQUAL', 'peter']]);
     expect(r7.length).toBe(2);
 
-    const c = await ORM.count(Product);
+    const c = await ORM.countAll(Product);
     expect(c).toBe(0);
 
     await ORM.deleteAll(Product);

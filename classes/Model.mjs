@@ -28,6 +28,8 @@ export default class Model {
 
   static classPrefix = 'model/';
 
+  static defaultAdapter = ORMAdapter;
+
   uuid = null;
 
   created_at = null;
@@ -45,7 +47,7 @@ export default class Model {
     this.#options = options;
     this.#states = [];
 
-    const Adapter = options.adapter || ORM.defaultAdapter;
+    const Adapter = options.adapter || Model.defaultAdapter;
     this.adapter = new Adapter(this, this.#database);
 
     // list all columns of the model.
@@ -209,7 +211,7 @@ export default class Model {
   }
 
   /**
-   * @return ORM
+   * @return Model
    */
   async write() {
     if (this.id) {
@@ -231,7 +233,7 @@ export default class Model {
   async read() {
     const result = await (
       this.id
-        ? this.#readByID()
+        ? this.adapter.read(this.id)
         : this.#readByValues()
     );
 
@@ -240,11 +242,6 @@ export default class Model {
     }
 
     Object.assign(this, result);
-    return this;
-  }
-
-  async #readByID() {
-    return this.adapter.read();
   }
 
   async #readByValues() {
@@ -260,17 +257,8 @@ export default class Model {
    */
   async delete() {
     if (!this.id) throw new Error('ORM delete Error, no id defined');
-    await this.adapter.delete();
+    await this.adapter.delete(this.id);
   }
-
-  // relation methods
-  /**
-   * belongs to - this table have xxx_id column
-   * @param {string} fk
-   * @param {*} database
-   * @param {string} modelClassPath
-   * @returns {ORM}
-   */
 
   /**
    *
@@ -291,7 +279,7 @@ export default class Model {
 
   /**
    * has many
-   * @param {ORM} MClass
+   * @param {Model.constructor} MClass
    * @param {string} fk
    * @return {[]}
    */
@@ -331,7 +319,7 @@ export default class Model {
 
   /**
    * Get siblings
-   * @param {ORM} MClass
+   * @param {Model.} MClass
    * @return {[]}
    */
   async siblings(MClass) {
@@ -343,7 +331,7 @@ export default class Model {
 
   /**
    * add belongsToMany
-   * @param {ORM | ORM[]} model
+   * @param {Model | Model[]} model
    * @param {number} weight
    * @returns void
    */
@@ -359,7 +347,7 @@ export default class Model {
 
   /**
    * remove
-   * @param {ORM| ORM[]} model
+   * @param {Model| Model[]} model
    */
   async remove(model) {
     if (!this.id) throw new Error(`Cannot remove ${model.constructor.name}. ${this.constructor.name} not have id`);
