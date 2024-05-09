@@ -1,28 +1,34 @@
 @startuml
 class Model {
-  {static} + database
-  {static} + tableName
   {static} + joinTablePrefix
+  {static} + tableName
   {static} + fields : Map
-  {static} + belongsTo : Map
   {static} + hasMany : []
+  {static} + belongsTo : Map
   {static} + belongsToMany : Set
-  {static} + classPrefix = 'model/'
 ---
+  {static} + database
+---
+  + id
   + uuid
   + created_at
   + updated_at
+
+  + dynamic fields
+
   - columns
 ---
   +getColumns()
   +getStates()
 
+  +read()
+  +write()
+  +delete()
+
   +snapshot()
   +eagerLoad()
   +writeRetry()
-  +write()
-  +read()
-  +delete()
+
   +parent(fk)
   +children(fk)
   +siblings(MClass)

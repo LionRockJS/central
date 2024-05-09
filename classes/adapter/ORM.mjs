@@ -1,27 +1,6 @@
 import { randomUUID } from 'node:crypto';
 
 export default class ORM {
-  static OP = {
-    EQUAL: '=',
-    GREATER_THAN: '>',
-    LESS_THAN: '<',
-    GREATER_THAN_EQUAL: '>=',
-    LESS_THAN_EQUAL: '<=',
-    NOT_EQUAL: '<>',
-    BETWEEN: 'BETWEEN',
-    LIKE: 'LIKE',
-    IN: 'IN',
-    AND: 'AND',
-    OR: 'OR',
-    TRUE: 'TRUE',
-    FALSE: 'FALSE',
-    BLANK: "''",
-    START_GROUP: '(',
-    END_GROUP: ')',
-    NULL: 'NULL',
-    IS_NULL: 'IS NULL',
-  };
-
   /**
    *
    * @param {ORM} client
@@ -29,6 +8,7 @@ export default class ORM {
    */
   constructor(client, database) {
     this.client = client;
+    this.id = client.id;
     this.tableName = client.constructor.tableName;
     this.database = database;
   }
@@ -42,17 +22,17 @@ export default class ORM {
     return randomUUID({ disableEntropyCache: true });
   }
 
+  static translateValue(values) {
+    return values;
+  }
+
   processValues() {
     const columns = this.client.getColumns();
     return this.constructor.translateValue(columns.map(x => this.client[x]));
   }
 
-  static translateValue(values) {
-    return values;
-  }
-
   // eslint-disable-next-line class-methods-use-this
-  async read(id) {/***/}
+  async read() {/***/}
 
   /**
    *
@@ -71,11 +51,10 @@ export default class ORM {
   async insert(values) {/***/}
 
   /**
-   * @param {string} id
    * @returns {Promise<void>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async delete(id) {/***/}
+  async delete() {/***/}
 
   /**
    *

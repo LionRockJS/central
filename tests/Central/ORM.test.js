@@ -43,11 +43,8 @@ describe('orm test', () => {
   test('belongsTo', async () => {
     const Address = await ORM.import('Address');
     const Person = await ORM.import('Person');
-    console.log(Person);
     const peter = new Person(1);
-    console.log(peter);
     await peter.read();
-    console.log(peter);
 
     expect(peter.id).toBe(1);
 

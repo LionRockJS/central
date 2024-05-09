@@ -39,8 +39,10 @@ export default class Model {
   #database = null;
   #options = null;
   #states = null;
-  adapter = null;
+  #adapter = null;
   #columns = null;
+
+  #collection = null;
 
   constructor(id = null, options = {}) {
     this.#database = options.database || Model.database;
@@ -48,7 +50,7 @@ export default class Model {
     this.#states = [];
 
     const Adapter = options.adapter || Model.defaultAdapter;
-    this.adapter = new Adapter(this, this.#database);
+    this.#adapter = new Adapter(this, this.#database);
 
     // list all columns of the model.
     this.#columns = Array.from(this.constructor.fields.keys());
@@ -56,6 +58,11 @@ export default class Model {
     Array.from(this.constructor.belongsTo.keys()).forEach(x => this.#columns.push(x));
 
     this.id = id;
+    this.#collection = new ModelCollection(this.#adapter, this.#options);
+  }
+
+  getCollection(){
+    return this.#collection;
   }
 
   /**
@@ -204,7 +211,7 @@ export default class Model {
     if(attempt > retry)return;
 
     try{
-      await this.adapter.insert(data);
+      await this.#adapter.insert(data);
     }catch(e){
       await this.writeRetry(data, retry, attempt + 1);
     }
@@ -215,12 +222,13 @@ export default class Model {
    */
   async write() {
     if (this.id) {
-      await this.adapter.update(this.adapter.processValues());
+      await this.#adapter.update(this.#adapter.processValues());
     } else {
-      const adapterClass = this.adapter.constructor;
+      const adapterClass = this.#adapter.constructor;
       this.id = this.#options.insertID ?? adapterClass.defaultID() ?? ORMAdapter.defaultID();
+      this.#adapter.id = this.id;
       this.uuid = adapterClass.uuid() ?? ORMAdapter.uuid();
-      await this.writeRetry(this.adapter.processValues(), this.#options.retry);
+      await this.writeRetry(this.#adapter.processValues(), this.#options.retry);
     }
 
     return this;
@@ -233,7 +241,7 @@ export default class Model {
   async read() {
     const result = await (
       this.id
-        ? this.adapter.read(this.id)
+        ? this.#adapter.read(this.id)
         : this.#readByValues()
     );
 
@@ -247,7 +255,7 @@ export default class Model {
   async #readByValues() {
     const values = this.#getValues();
     if (values.size === 0) throw new Error(`${this.constructor.name}: No id and no value to read`);
-    const results = await this.adapter.readAll(values, 1);
+    const results = await this.#adapter.readAll(values, 1);
     return results[0];
   }
 
@@ -257,7 +265,7 @@ export default class Model {
    */
   async delete() {
     if (!this.id) throw new Error('ORM delete Error, no id defined');
-    await this.adapter.delete(this.id);
+    await this.#adapter.delete(this.id);
   }
 
   /**
@@ -288,7 +296,7 @@ export default class Model {
     if (modelNames.length > 1 && MClass === null) throw new Error('children fk have multiple Models, please specific which Model will be used');
     const ModelClass = MClass || await ORM.import(modelNames[0][1]);
 
-    const results = await this.adapter.hasMany(ModelClass.tableName, fk);
+    const results = await this.#adapter.hasMany(ModelClass.tableName, fk);
     return results.map(x => Object.assign(new ModelClass(null, { database: this.#database }), x));
   }
 
@@ -325,7 +333,7 @@ export default class Model {
   async siblings(MClass) {
     const { joinTableName, lk, fk } = this.#siblingInfo(ORM.create(MClass));
 
-    const results = await this.adapter.belongsToMany(MClass.tableName, joinTableName, lk, fk);
+    const results = await this.#adapter.belongsToMany(MClass.tableName, joinTableName, lk, fk);
     return results.map(x => Object.assign(ORM.create(MClass, { database: this.#database }), x));
   }
 
@@ -342,7 +350,7 @@ export default class Model {
     if (Array.isArray(model) && model.length <= 0) throw new Error('Error add model, model array cannot be empty');
 
     const { joinTableName, lk, fk } = this.#siblingInfo(model);
-    await this.adapter.add(Array.isArray(model) ? model : [model], weight, joinTableName, lk, fk);
+    await this.#adapter.add(Array.isArray(model) ? model : [model], weight, joinTableName, lk, fk);
   }
 
   /**
@@ -353,7 +361,7 @@ export default class Model {
     if (!this.id) throw new Error(`Cannot remove ${model.constructor.name}. ${this.constructor.name} not have id`);
 
     const { joinTableName, lk, fk } = this.#siblingInfo(model);
-    await this.adapter.remove(Array.isArray(model) ? model : [model], joinTableName, lk, fk);
+    await this.#adapter.remove(Array.isArray(model) ? model : [model], joinTableName, lk, fk);
   }
 
   /**
@@ -365,8 +373,71 @@ export default class Model {
     if (!this.id) throw new Error(`Cannot remove ${MClass.name}. ${this.constructor.name} not have id`);
 
     const { joinTableName, lk } = this.#siblingInfo(ORM.create(MClass));
-    await this.adapter.removeAll(joinTableName, lk);
+    await this.#adapter.removeAll(joinTableName, lk);
+  }
+}
+
+class ModelCollection{
+  #adapter;
+  #options;
+
+  constructor(adapter, options){
+    this.#adapter = adapter;
+    this.#options = options;
+  }
+
+  async readAll(){
+    return await this.#adapter.readAll(this.#options.kv, this.#options.limit, this.#options.offset, this.#options.orderBy);
+  }
+
+  async readBy(key, values){
+    return await this.#adapter.readBy(key, values, this.#options.limit, this.#options.offset, this.#options.orderBy);
+  }
+
+  async readWith(criteria=[]){
+    return await this.#adapter.readWith(criteria, this.#options.limit, this.#options.offset, this.#options.orderBy);
+  }
+
+  async countAll(){
+    return await this.#adapter.countAll(this.#options.kv);
+  }
+
+  async countBy(key, values){
+    return await this.#adapter.countBy(key, values);
+  }
+
+  async countWith(criteria=[]){
+    return await this.#adapter.countWith(criteria);
+  }
+
+  async deleteAll(){
+    await this.#adapter.deleteAll(this.#options.kv);
+  }
+
+  async deleteBy(key, values){
+    await this.#adapter.deleteAll(key, values);
+  }
+
+  async deleteWith(criteria=[]){
+    await this.#adapter.deleteWith(criteria);
+  }
+
+  async updateAll(kv, columnValues){
+    await this.#adapter.updateAll(kv, columnValues);
+  }
+
+  async updateBy(key, values, columnValues){
+    await this.#adapter.updateBy(key, values, columnValues);
+  }
+
+  async updateWith(criteria=[], columnValues){
+    await this.#adapter.updateWith(criteria, columnValues);
+  }
+
+  async insertAll(columns, values){
+    await this.#adapter.insertAll(columns, values, this.#options.insertIDs || []);
   }
 }
 
 Object.freeze(Model.prototype);
+Object.freeze(ModelCollection.prototype);

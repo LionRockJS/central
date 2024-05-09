@@ -38,6 +38,11 @@ export default class ORM {
     return m;
   }
 
+  static #collection(MClass, options = {}) {
+    const m = ORM.create(MClass, options);
+    return m.getCollection();
+  }
+
   static async #readResult(result, m, creator, asArray){
     if (asArray) return result.map(creator);
     if (result.length === 0) return null;
@@ -61,7 +66,7 @@ export default class ORM {
    */
   static async readAll(MClass, options = {}) {
     const m = ORM.create(MClass, options);
-    const result = await m.adapter.readAll(options.kv, options.limit, options.offset, options.orderBy) || [];
+    const result = await m.getCollection().readAll();
 
     return this.#readResult(result, m, x => Object.assign(ORM.create(MClass, options), x), options.asArray);
   }
@@ -82,7 +87,7 @@ export default class ORM {
    */
   static async readBy(MClass, key, values, options = {}) {
     const m = ORM.create(MClass, options);
-    const result = await m.adapter.readBy(key, values, options.limit, options.offset, options.orderBy);
+    const result = await m.getCollection().readBy(key, values) || [];
 
     return this.#readResult(result, m, x => Object.assign(ORM.create(MClass, options), x), options.asArray);
   }
@@ -103,8 +108,7 @@ export default class ORM {
   static async readWith(MClass, criteria = [], options = {}) {
     if (criteria.length === 0) return [];
     const m = ORM.create(MClass, options);
-    const result = await m.adapter.readWith(criteria, options.limit, options.offset, options.orderBy);
-
+    const result = await m.getCollection().readWith(criteria) || [];
     return this.#readResult(result, m, x => Object.assign(ORM.create(MClass, options), x), options.asArray);
   }
 
@@ -118,8 +122,7 @@ export default class ORM {
    * @returns {Promise<*>}
    */
   static async countAll(MClass, options = {}) {
-    const m = ORM.create(MClass, options);
-    return m.adapter.countAll(options.kv);
+    return await this.#collection(MClass, options).countAll();
   }
 
   /**
@@ -131,8 +134,7 @@ export default class ORM {
    * @returns {Promise<void>}
    */
   static async countBy(MClass, key, values, options = {}) {
-    const m = ORM.create(MClass, options);
-    return m.adapter.countBy(key, values);
+    return await this.#collection(MClass, options).countBy(key, values);
   }
 
   /**
@@ -145,13 +147,11 @@ export default class ORM {
   static async countWith(MClass, criteria, options = {}) {
     if (!criteria || criteria.length === 0) throw new Error(`${MClass.name} count with no criteria`);
 
-    const m = ORM.create(MClass, options);
-    return m.adapter.countWith(criteria);
+    return await this.#collection(MClass, options).countWith(criteria);
   }
 
   static async deleteAll(MClass, options = {}) {
-    const m = ORM.create(MClass, options);
-    await m.adapter.deleteAll(options.kv);
+    await this.#collection(MClass, options).deleteAll(options.kv);
   }
 
   /**
@@ -163,8 +163,7 @@ export default class ORM {
    * @returns {Promise<void>}
    */
   static async deleteBy(MClass, key, values, options = {}) {
-    const m = ORM.create(MClass, options);
-    return m.adapter.deleteBy(key, values);
+    await this.#collection(MClass, options).deleteBy(key, values);
   }
 
   /**
@@ -178,7 +177,7 @@ export default class ORM {
     if (!criteria || criteria.length === 0) throw new Error(`${MClass.name} delete with no criteria`);
 
     const m = ORM.create(MClass, options);
-    return m.adapter.deleteWith(criteria);
+    return m.getCollection().deleteWith(criteria);
   }
 
   /**
@@ -189,7 +188,7 @@ export default class ORM {
    */
   static async updateAll(MClass, kv, columnValues, options = {}) {
     const m = ORM.create(MClass, options);
-    await m.adapter.updateAll(kv, columnValues);
+    await m.getCollection().updateAll(kv, columnValues);
   }
 
   /**
@@ -203,7 +202,7 @@ export default class ORM {
    */
   static async updateBy(MClass, key, values, columnValues, options = {}) {
     const m = ORM.create(MClass, options);
-    return m.adapter.updateBy(key, values, columnValues);
+    return m.getCollection().updateBy(key, values, columnValues);
   }
 
   /**
@@ -218,8 +217,7 @@ export default class ORM {
     if (!criteria || criteria.length === 0) throw new Error(`${MClass.name} update with no criteria`);
     if (!columnValues || columnValues.size === 0) throw new Error(`${MClass.name} update without values`);
 
-    const m = ORM.create(MClass, options);
-    return m.adapter.updateWith(criteria, columnValues);
+    await this.#collection(MClass, options).updateWith(criteria, columnValues);
   }
 
   /**
@@ -237,15 +235,14 @@ export default class ORM {
       if (!MClass.fields.has(x) && !MClass.belongsTo.has(x)) throw new Error(`${MClass.name} insert invalid columns ${x}`);
     });
 
-    const m = ORM.create(MClass, options);
-    return m.adapter.insertAll(columns, values, options.insertIDs || []);
+    await this.#collection(MClass, options).insertAll(columns, values);
   }
 
   /**
    *
    * @param modelName
    * @param defaultMClass
-   * @returns {Promise<ORM>}
+   * @returns {Promise<Model>}
    */
   static async import(modelName, defaultMClass=Model){
     try{
