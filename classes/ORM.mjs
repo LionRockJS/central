@@ -12,7 +12,7 @@ export default class ORM {
   static classPrefix = 'model/';
 
   /**
-   * @param {Model.} MClass
+   * @param {typeof Model} MClass
    * @param options
    * @param options.database
    * @param options.adapter
@@ -25,7 +25,7 @@ export default class ORM {
 
   /**
    * Create and read data from database
-   * @param {Model.} MClass
+   * @param {typeof Model} MClass
    * @param id
    * @param options
    * @param options.database
@@ -53,7 +53,7 @@ export default class ORM {
   // Collection methods
   /**
    * read all records from the model
-   * @param {Model.} MClass
+   * @param {typeof Model} MClass
    * @param {object} options
    * @param options.database
    * @param options.adapter
@@ -73,7 +73,7 @@ export default class ORM {
 
   /**
    *
-   * @param {Model.} MClass
+   * @param {typeof Model} MClass
    * @param key
    * @param values
    * @param options
@@ -94,7 +94,7 @@ export default class ORM {
 
   /**
    * Given criterias [['', 'id', SQL.EQUAL, 11], [SQL.AND, 'name', SQL.EQUAL, 'peter']]
-   * @param {Model.} MClass
+   * @param {typeof Model} MClass
    * @param criteria
    * @param options
    * @param options.database
@@ -114,7 +114,7 @@ export default class ORM {
 
   /**
    *
-   * @param {Model.} MClass
+   * @param {typeof Model} MClass
    * @param options
    * @param options.database
    * @param options.adapter
@@ -127,7 +127,7 @@ export default class ORM {
 
   /**
    *
-   * @param {Model.} MClass
+   * @param {typeof Model} MClass
    * @param {string} key
    * @param {[]} values
    * @param options
@@ -139,13 +139,13 @@ export default class ORM {
 
   /**
    * Given criterias [['', 'id', SQL.EQUAL, 11], [SQL.AND, 'name', SQL.EQUAL, 'peter']]
-   * @param {Model.} MClass
+   * @param {typeof Model} MClass
    * @param {[[string]]}criteria
    * @param options
    * @returns {Promise<void>}
    */
   static async countWith(MClass, criteria, options = {}) {
-    if (!criteria || criteria.length === 0) throw new Error(`${MClass.name} count with no criteria`);
+    if (!criteria || criteria.length === 0) throw new Error(`${MClass.constructor.name} count with no criteria`);
 
     return await this.#collection(MClass, options).countWith(criteria);
   }
@@ -156,7 +156,7 @@ export default class ORM {
 
   /**
    *
-   * @param {Model.} MClass
+   * @param {typeof Model} MClass
    * @param {string} key
    * @param {[]} values
    * @param options
@@ -168,7 +168,7 @@ export default class ORM {
 
   /**
    * Given criterias [['', 'id', SQL.EQUAL, 11], [SQL.AND, 'name', SQL.EQUAL, 'peter']]
-   * @param {Model.} MClass
+   * @param {typeof Model} MClass
    * @param {[[string]]}criteria
    * @param options
    * @returns {Promise<void>}
@@ -181,7 +181,7 @@ export default class ORM {
   }
 
   /**
-   * @param {Model.} MClass
+   * @param {typeof Model} MClass
    * @param options
    * @param {Map} kv
    * @param {Map} columnValues
@@ -193,7 +193,7 @@ export default class ORM {
 
   /**
    *
-   * @param {Model.} MClass
+   * @param {typeof Model} MClass
    * @param options
    * @param {string} key
    * @param {[]} values
@@ -207,22 +207,22 @@ export default class ORM {
 
   /**
    * Given criterias [['', 'id', SQL.EQUAL, 11], [SQL.AND, 'name', SQL.EQUAL, 'peter']]
-   * @param {Model.} MClass
+   * @param {typeof Model} MClass
    * @param options
    * @param {[[string]]}criteria
    * @param {Map} columnValues
    * @returns {Promise<*>}
    */
   static async updateWith(MClass, criteria, columnValues, options = {}) {
-    if (!criteria || criteria.length === 0) throw new Error(`${MClass.name} update with no criteria`);
-    if (!columnValues || columnValues.size === 0) throw new Error(`${MClass.name} update without values`);
+    if (!criteria || criteria.length === 0) throw new Error(`${MClass.constructor.name} update with no criteria`);
+    if (!columnValues || columnValues.size === 0) throw new Error(`${MClass.constructor.name} update without values`);
 
     await this.#collection(MClass, options).updateWith(criteria, columnValues);
   }
 
   /**
    *
-   * @param {Model.} MClass
+   * @param {typeof Model} MClass
    * @param options
    * @param {string[]} columns
    * @param {[String[]]} values
@@ -232,7 +232,7 @@ export default class ORM {
     // verify columns
     columns.forEach(x => {
       if (x === 'id') return;
-      if (!MClass.fields.has(x) && !MClass.belongsTo.has(x)) throw new Error(`${MClass.name} insert invalid columns ${x}`);
+      if (!MClass.fields.has(x) && !MClass.belongsTo.has(x)) throw new Error(`${MClass.constructor.name} insert invalid columns ${x}`);
     });
 
     await this.#collection(MClass, options).insertAll(columns, values);
@@ -242,7 +242,7 @@ export default class ORM {
    *
    * @param modelName
    * @param defaultMClass
-   * @returns {Promise<Model>}
+   * @returns {Promise<typeof Model>}
    */
   static async import(modelName, defaultMClass=Model){
     try{
