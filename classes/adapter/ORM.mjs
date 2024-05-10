@@ -1,3 +1,4 @@
+import Central from '../Central.mjs';
 import { randomUUID } from 'node:crypto';
 
 export default class ORM {
@@ -10,6 +11,8 @@ export default class ORM {
     this.client = client;
     this.tableName = client.constructor.tableName;
     this.database = database;
+
+    if(this.constructor === ORM) Central.log('Using Abstract ORM adapter', false);
   }
 
   static defaultID() {
