@@ -25,7 +25,9 @@ describe('Controller Mixin View Test', () => {
     Object.assign(c.state.get(ControllerMixinView.LAYOUT).data, { header: 'head', footer: 'foot' });
 
     const r = await c.execute();
-    expect(JSON.stringify(r.body)).toBe('{"header":"head","footer":"foot","main":""}');
+
+    expect(typeof r.body).toBe('string');
+    expect(r.body).toBe('{"header":"head","footer":"foot","main":""}');
   });
 
   test('set template', async () => {
@@ -42,7 +44,8 @@ describe('Controller Mixin View Test', () => {
     expect(c.state.get('layout').data.header).toBe('head');
 
     const r = await c.execute();
-    expect(JSON.stringify(r.body)).toBe('{"header":"head","footer":"foot","main":{\"content\":\"hello\"}}');
+    expect(typeof r.body).toBe('string');
+    expect(r.body).toBe('{"header":"head","footer":"foot","main":{\"content\":\"hello\"}}');
   });
 
   test('errorTemplate', async () => {
@@ -62,8 +65,9 @@ describe('Controller Mixin View Test', () => {
     const errorTemplate = c.state.get('errorTemplate');
     expect(errorTemplate.data.content).toBe('error');
 
-    const result = await c.execute('test');
-    expect(JSON.stringify(result.body)).toBe('{"header":"head","footer":"foot","main":{\"content\":\"error\",\"body\":\"error throw\"}}');
+    const r = await c.execute('test');
+    expect(typeof r.body).toBe('string');
+    expect(r.body).toBe('{"header":"head","footer":"foot","main":{\"content\":\"error\",\"body\":\"error throw\"}}');
   });
 
   test('errorWithoutTemplate', async () => {
@@ -78,8 +82,9 @@ describe('Controller Mixin View Test', () => {
 
     Object.assign(c.state.get('layout').data, { header: 'head', footer: 'foot' });
 
-    const result = await c.execute('test');
-    expect(JSON.stringify(result.body)).toBe('{"header":"head","footer":"foot","main":"error throw"}');
+    const r = await c.execute('test');
+    expect(typeof r.body).toBe('string');
+    expect(r.body).toBe('{"header":"head","footer":"foot","main":"error throw"}');
     //    const v = c.getView('')
     //    expect(await v.render()).toBe('{}');
   });
@@ -99,7 +104,8 @@ describe('Controller Mixin View Test', () => {
     expect(c.state.get('layout').data.header).toBe('head');
 
     const r = await c.execute();
-    expect(JSON.stringify(r.body)).toBe('{"foo":"bar","header":"head","footer":"foot","main":{\"content\":\"hello\"}}');
+    expect(typeof r.body).toBe('string');
+    expect(r.body).toBe('{"foo":"bar","header":"head","footer":"foot","main":{\"content\":\"hello\"}}');
   });
 
   test('exit with 302', async () => {
@@ -114,7 +120,8 @@ describe('Controller Mixin View Test', () => {
     c.action_test = async () => { await c.exit(302); };
 
     const r = await c.execute();
-    expect(JSON.stringify(r.body)).toBe('{"hello":"world","main":{"content":"wow"}}');
+    expect(typeof r.body).toBe('string');
+    expect(r.body).toBe('{"hello":"world","main":{"content":"wow"}}');
 
     const c2 = new C({});
     ControllerMixinView.setLayout(c2.state,'layout', { hello: 'world' });
@@ -128,7 +135,8 @@ describe('Controller Mixin View Test', () => {
     ControllerMixinView.setTemplate(c3.state,'tpl', { content: 'wow' });
     c3.action_test = async () => { await c3.exit(302); };
     const r3 = await c.execute();
-    expect(JSON.stringify(r3.body)).toBe('{"hello":"world","main":{"content":"wow"}}');
+    expect(typeof r3.body).toBe('string');
+    expect(r3.body).toBe('{"hello":"world","main":{"content":"wow"}}');
   });
 
   test('render json', async () => {
@@ -207,8 +215,9 @@ describe('Controller Mixin View Test', () => {
     }
 
     const c = new C({});
-    const res = await c.execute('test');
-    expect(JSON.stringify(res.body)).toBe('{"main":"template"}');
+    const r = await c.execute('test');
+    expect(typeof r.body).toBe('string');
+    expect(r.body).toBe('{"main":"template"}');
   });
 
   test('direct assign view3', async () => {
@@ -228,8 +237,8 @@ describe('Controller Mixin View Test', () => {
     }
 
     const c = new C({});
-    const res = await c.execute('test');
-    expect(JSON.stringify(res.body)).toBe('{"main":{"foo":"bar"}}');
+    const r = await c.execute('test');
+    expect(r.body).toBe('{"main":{"foo":"bar"}}');
   });
 
 
@@ -250,8 +259,9 @@ describe('Controller Mixin View Test', () => {
     }
 
     const c = new C({});
-    const res = await c.execute('test');
-    expect(JSON.stringify(res.body)).toBe('{"main":"template"}');
+    const r = await c.execute('test');
+    expect(typeof r.body).toBe('string');
+    expect(r.body).toBe('{"main":"template"}');
   });
 
   test('mixin view with assigned properties', async () => {
@@ -275,9 +285,9 @@ describe('Controller Mixin View Test', () => {
       }
     }
     const c = new C({});
-    const res = await c.execute('test');
-
-    expect(JSON.stringify(res.body)).toBe('{"base":{"foo":"bar"}}');
+    const r = await c.execute('test');
+    expect(typeof r.body).toBe('string');
+    expect(r.body).toBe('{"base":{"foo":"bar"}}');
 
   });
 });

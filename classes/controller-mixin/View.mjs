@@ -56,42 +56,56 @@ export default class ControllerMixinView extends ControllerMixin {
   static async setup(state) {
   }
 
-  static async after(state) {
-    const headers = state.get(Controller.STATE_HEADERS);
-
+  static assignJSONView(state){
     // .json return json content;
+    const headers = state.get(Controller.STATE_HEADERS);
     if (/^application\/json/.test(headers['Content-Type'])) {
       state.set(this.LAYOUT, new JSONView(state.get(this.PLACEHOLDER)))
     }
+  }
+
+  // render layout, make sure it's string and put into body.
+  static async renderLayout(state){
+    const layout = state.get(this.LAYOUT);
+    let output = await layout.render();
+
+    if (typeof output === 'object')output = JSON.stringify(output);
+    if (typeof output !== 'string')throw new Error('Layout must be string or object');
+
+    state.set(Controller.STATE_BODY, output);
+  }
+
+  static async after(state) {
+    this.assignJSONView(state);
 
     // render template and put into layout's main output.
     // no template, replace the controller body string into layout.
     const template = state.get(this.TEMPLATE);
     const layout = state.get(this.LAYOUT);
-    layout.data[state.get(this.PLACEHOLDER)] = template ? await template.render() : state.get(Controller.STATE_BODY);
-    state.set(Controller.STATE_BODY, await layout.render());
+
+    // if layout data is string, just render it.
+    if(typeof layout.data !== 'string' ) layout.data[state.get(this.PLACEHOLDER)] = template ? await template.render() : state.get(Controller.STATE_BODY);
+    await this.renderLayout(state);
   }
 
   static async exit(state) {
     if (state.get(Controller.STATE_STATUS) === 302) return;
-
-    const headers = state.get(Controller.STATE_HEADERS);
-    if (/^application\/json/.test(headers['Content-Type'])) {
-      state.set(this.LAYOUT, new JSONView(state.get(this.PLACEHOLDER)))
-    }
+    this.assignJSONView(state);
 
     const errorTemplate = state.get(this.ERROR_TEMPLATE);
     const layout = state.get(this.LAYOUT);
     const placeHolder = state.get(this.PLACEHOLDER);
 
-    if (errorTemplate) {
-      Object.assign(errorTemplate.data, { body: state.get(Controller.STATE_BODY) });
-      layout.data[placeHolder] = await errorTemplate.render();
-    } else {
-      layout.data[placeHolder] = state.get(Controller.STATE_BODY);
+    if(typeof layout.data !== 'string' ){
+      if (errorTemplate) {
+        Object.assign(errorTemplate.data, { body: state.get(Controller.STATE_BODY) });
+        layout.data[placeHolder] = await errorTemplate.render();
+      } else {
+        layout.data[placeHolder] = state.get(Controller.STATE_BODY);
+      }
     }
 
-    state.set(Controller.STATE_BODY, await layout.render());
+    await this.renderLayout(state);
   }
 
   static #getView(path, data, themePath, ViewClass) {
