@@ -1,4 +1,5 @@
 import { ControllerMixin, View, Controller } from '@lionrockjs/mvc';
+import JSONView from '../view/JSONView.mjs';
 
 export default class ControllerMixinView extends ControllerMixin {
   static PLACEHOLDER = 'placeHolder';
@@ -60,8 +61,7 @@ export default class ControllerMixinView extends ControllerMixin {
 
     // .json return json content;
     if (/^application\/json/.test(headers['Content-Type'])) {
-      state.set(Controller.STATE_BODY, JSON.stringify(state.get(Controller.STATE_BODY)));
-      return;
+      state.set(this.LAYOUT, new JSONView(state.get(this.PLACEHOLDER)))
     }
 
     // render template and put into layout's main output.
@@ -76,9 +76,8 @@ export default class ControllerMixinView extends ControllerMixin {
     if (state.get(Controller.STATE_STATUS) === 302) return;
 
     const headers = state.get(Controller.STATE_HEADERS);
-    if (headers && headers['Content-Type'] && /^application\/json/.test(headers['Content-Type'])) {
-      state.set(Controller.STATE_BODY, JSON.stringify(state.get(Controller.STATE_BODY)));
-      return;
+    if (/^application\/json/.test(headers['Content-Type'])) {
+      state.set(this.LAYOUT, new JSONView(state.get(this.PLACEHOLDER)))
     }
 
     const errorTemplate = state.get(this.ERROR_TEMPLATE);
