@@ -53,10 +53,6 @@ export default class ControllerMixinView extends ControllerMixin {
   }
 
   static async setup(state) {
-    const layoutView = state.get(this.LAYOUT);
-    if (state.get(this.LAYOUT_FILE) !== layoutView.file) {
-      state.set(this.LAYOUT, this.#getView(state.get(this.LAYOUT_FILE), layoutView.data, state.get(this.THEME_PATH), state.get(this.VIEW_CLASS)));
-    }
   }
 
   static async after(state) {
