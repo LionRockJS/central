@@ -22,6 +22,8 @@ import CentralAdapterNode from './classes/adapter/Node.mjs';
 import DatabaseAdapter from './classes/adapter/Database.mjs';
 import RouteAdapter from "./classes/adapter/Route.mjs";
 
+import { Controller, ControllerMixin, View } from '@lionrockjs/mvc';
+
 export default Central
 
 export {
@@ -37,5 +39,8 @@ export {
   ORMAdapter,
   DatabaseAdapter,
   RouteAdapter,
-  HelperCrypto
+  HelperCrypto,
+  Controller,
+  ControllerMixin,
+  View
 }
