@@ -17,30 +17,33 @@ import ControllerMixinDatabase from './classes/controller-mixin/Database.mjs';
 import RouteList from "./classes/RouteList.mjs";
 
 import ORMAdapter from './classes/adapter/ORM.mjs';
-import CentralAdapterNoop from './classes/adapter/Noop.mjs';
-import CentralAdapterNode from './classes/adapter/Node.mjs';
 import DatabaseAdapter from './classes/adapter/Database.mjs';
 import RouteAdapter from "./classes/adapter/Route.mjs";
+import JSONView from "./classes/view/JSONView.mjs";
 
 import { Controller, ControllerMixin, View } from '@lionrockjs/mvc';
 
 export default Central
 
 export {
-  Central,
-  ORM,
+//mvc
   Model,
-  ControllerMixinMime,
-  ControllerMixinView,
-  ControllerMixinDatabase,
-  RouteList,
-  CentralAdapterNoop,
-  CentralAdapterNode,
+  View,
+  Controller,
+  ControllerMixin,
+  ORM,
+//adapters
   ORMAdapter,
   DatabaseAdapter,
   RouteAdapter,
+  JSONView,
+//controller mixins
+  ControllerMixinMime,
+  ControllerMixinView,
+  ControllerMixinDatabase,
+//helpers
+  RouteList,
   HelperCrypto,
-  Controller,
-  ControllerMixin,
-  View
+//main class
+  Central,
 }
