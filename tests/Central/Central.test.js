@@ -317,6 +317,12 @@ describe('Central test', () => {
   test('coverage central.mjs', async () => {
     await Central.init({ EXE_PATH: __dirname });
 
+    Central.ENV = Central.ENV_PROD;
+    Central.config.system.debug = true;
+    Central.log('hello', true);
+
+    Central.config.classes.cache = true;
+    await Central.reloadModuleInit();
   });
 
   test('render pdf', async()=>{

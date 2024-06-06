@@ -83,7 +83,7 @@ export default class Central {
   }
 
   static log(args, verbose = true) {
-    if(Central.ENV === Central.ENV_PROD)return args;
+    if(Central.ENV === Central.ENV_PROD && Central.config?.system?.debug !== true)return args;
     if(verbose === false){
       console.log(args);
       return;
