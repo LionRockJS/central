@@ -215,6 +215,7 @@ export default class Model {
     try{
       await this.#adapter.insert(data);
     }catch(e){
+      console.log(e);
       await this.writeRetry(data, retry, attempt + 1);
     }
   }
