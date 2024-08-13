@@ -15,6 +15,8 @@ import HelperBootstrap from "./helper/central/Bootstrap.mjs";
 import HelperConfig from "./helper/central/Config.mjs";
 import HelperPath from "./helper/central/Path.mjs";
 
+import AdapterNode from "./adapter/Node.mjs";
+
 export default class Central {
   static EXE_PATH = null;
   static APP_PATH = null;
@@ -30,6 +32,8 @@ export default class Central {
   static nodePackages = HelperPath.nodePackages;
   static classPath = HelperCache.classPath;
   static viewPath = HelperCache.viewPath;
+
+  static adapter = AdapterNode;
 
   static async init(opts = {}) {
     const options = {
@@ -75,7 +79,7 @@ export default class Central {
     if (c && typeof c !== 'string') return c;
 
     const file = HelperPath.resolve(adjustedPathToFile, 'classes', HelperCache.classPath);
-    return await HelperImport.importAbsolute(file + '?r=' + HelperCache.cacheId);
+    return await HelperImport.importAbsolute(file);
   }
 
   static resolveView(pathToFile) {

@@ -3,7 +3,6 @@ import path from 'node:path';
 
 import * as url from 'node:url';
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url)).replace(/\/$/, '');
-import Os from "node:os";
 
 import Noop from './Noop.mjs';
 
@@ -18,10 +17,7 @@ export default class extends Noop{
   }
 
   static async import(pathToFile, cacheId=0){
-    let qs = `?r=${cacheId}`;
-    if(cacheId === 0)qs = '';
-    const fixWindowsImport = (Os.type() === 'Windows_NT') ? "file://": "";
-    const module = await import(fixWindowsImport + pathToFile + qs);
+    const module = await import(pathToFile);
     return module.default || module;
   }
 }

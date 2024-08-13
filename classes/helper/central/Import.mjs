@@ -1,9 +1,9 @@
-import Os from "node:os";
+import Central from "../../Central.mjs";
+import HelperConfig from "./Config.mjs";
+import HelperCache from "./Cache.mjs";
 
 export default class HelperImport{
   static async importAbsolute(path) {
-    const fixWindowsImport = (Os.type() === 'Windows_NT') ? "file://": "";
-    const module = await import(fixWindowsImport + path);
-    return module.default || module;
+    return Central.adapter.import(path, HelperCache.cacheId);
   }
 }

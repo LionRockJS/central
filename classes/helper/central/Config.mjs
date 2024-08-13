@@ -28,7 +28,7 @@ export default class HelperConfig{
     try{
       const file = HelperPath.resolve(fileName, 'config', this.configPath, true);
 
-      Object.assign(this.config[key], await HelperImport.importAbsolute( file + '?r=' + HelperCache.cacheId ));
+      Object.assign(this.config[key], await HelperImport.importAbsolute( file ));
     }catch(e){
       //config file not found;
     }

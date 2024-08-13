@@ -17,7 +17,7 @@ export default class HelperPath{
     await Promise.all(initFiles.map(async it => {
       //suppress error when package without init.mjs
       try{
-        await HelperImport.importAbsolute(`${it}?r=${HelperCache.cacheId}`);
+        await HelperImport.importAbsolute(it);
       }catch(e){
         Central.log(e);
       }
