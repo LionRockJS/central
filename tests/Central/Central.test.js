@@ -4,9 +4,18 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import Central from "../../classes/Central.mjs";
+import CentralAdapterBun from "../../classes/adapter/Bun.mjs";
 import CentralAdapterNode from "../../classes/adapter/Node.mjs";
+const runtime = (typeof process !== 'undefined') ? ( (process.env._ || '').split('/').pop() ) : "browser";
 
-Central.adapter = CentralAdapterNode;
+switch (runtime) {
+  case 'node':
+    Central.adapter = CentralAdapterNode;
+    break;
+  case 'bun':
+    Central.adapter = CentralAdapterBun;
+    break;
+}
 Central.ENV = Central.ENV_PROD;
 
 describe('Central test', () => {

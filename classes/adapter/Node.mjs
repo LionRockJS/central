@@ -6,8 +6,7 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url)).replace(/\/$/
 import Os from "node:os";
 
 import Noop from './Noop.mjs';
-
-export default class extends Noop{
+export default class Node extends Noop{
   static resolveFetchList(x, store, pathToFile){
     if ( fs.existsSync(path.normalize(x)) !== true ) return false;
     return super.resolveFetchList(x, store, pathToFile);

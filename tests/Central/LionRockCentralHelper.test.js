@@ -2,8 +2,19 @@ import url from "node:url";
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url)).replace(/\/$/, '');
 
 import Central from "../../classes/Central.mjs";
-import KohanaJSAdapterNode from "../../classes/adapter/Node.mjs";
-Central.adapter = KohanaJSAdapterNode;
+import CentralAdapterBun from "../../classes/adapter/Bun.mjs";
+import CentralAdapterNode from "../../classes/adapter/Node.mjs";
+const runtime = (typeof process !== 'undefined') ? ( (process.env._ || '').split('/').pop() ) : "browser";
+
+switch (runtime) {
+  case 'node':
+    Central.adapter = CentralAdapterNode;
+    break;
+  case 'bun':
+    Central.adapter = CentralAdapterBun;
+    break;
+}
+console.log(runtime, CentralAdapterNode, CentralAdapterBun, Central.adapter);
 
 //import HelperCentralBootstrap from "../../classes/helper/central/Bootstrap.mjs";
 import HelperCentralCache from "../../classes/helper/central/Cache.mjs";

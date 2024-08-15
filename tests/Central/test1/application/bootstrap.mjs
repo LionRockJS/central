@@ -1,8 +1,7 @@
 import Central from '../../../../classes/Central.mjs';
 import Test from '../modules/test';
 
-Central.addModules([Test])
-
+Central.addModules([Test]);
 await Central.initConfig(new Map([
-  ['site', await import('./config/site.mjs')],
+  ['site', await import('./config/site.mjs?')],
 ]));
