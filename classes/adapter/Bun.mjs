@@ -1,9 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import * as url from 'node:url';
-const __dirname = url.fileURLToPath(new URL('.', import.meta.url)).replace(/\/$/, '');
-
 import Noop from './Noop.mjs';
 
 export default class Bun extends Noop{
@@ -13,7 +10,7 @@ export default class Bun extends Noop{
   }
 
   static dirname(){
-    return __dirname;
+    return import.meta.dir;
   }
 
   static async import(pathToFile, cacheId=0){
