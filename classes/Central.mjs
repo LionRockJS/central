@@ -6,9 +6,6 @@
  *
  */
 
-
-// KohanaJS is singleton
-
 import HelperCache from "./helper/central/Cache.mjs";
 import HelperImport from "./helper/central/Import.mjs";
 import HelperBootstrap from "./helper/central/Bootstrap.mjs";

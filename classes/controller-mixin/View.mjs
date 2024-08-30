@@ -35,21 +35,21 @@ export default class ControllerMixinView extends ControllerMixin {
     if (!state.get(this.LAYOUT))this.setLayout(state, state.get(this.LAYOUT_FILE), {});
   }
 
-  static setTemplate(state, file, data = {}) {
+  static setTemplate(state, file, data = {}, defaultFile="") {
     state.set(this.TEMPLATE, (typeof file === 'string')
-      ? this.#getView(file, { ...state.get(this.VIEW_DEFAULT_DATA), ...data }, state.get(this.THEME_PATH), state.get(this.VIEW_CLASS))
+      ? this.#getView(state, file, { ...state.get(this.VIEW_DEFAULT_DATA), ...data })
       : file);
   }
 
-  static setLayout(state, file, data = {}) {
+  static setLayout(state, file, data = {}, defaultFile="") {
     state.set(this.LAYOUT, (typeof file === 'string')
-      ? this.#getView(file, { ...state.get(this.VIEW_DEFAULT_DATA), ...state.get(this.LAYOUT_DEFAULT_DATA), ...data }, state.get(this.THEME_PATH), state.get(this.VIEW_CLASS))
+      ? this.#getView(state, file, { ...state.get(this.VIEW_DEFAULT_DATA), ...state.get(this.LAYOUT_DEFAULT_DATA), ...data })
       : file);
   }
 
-  static setErrorTemplate(state, file, data = {}) {
+  static setErrorTemplate(state, file, data = {}, defaultFile="") {
     state.set(this.ERROR_TEMPLATE, (typeof file === 'string')
-      ? this.#getView(file, { ...state.get(this.VIEW_DEFAULT_DATA), ...data }, state.get(this.THEME_PATH), state.get(this.VIEW_CLASS))
+      ? this.#getView(state, file, { ...state.get(this.VIEW_DEFAULT_DATA), ...data })
       : file);
   }
 
@@ -108,7 +108,9 @@ export default class ControllerMixinView extends ControllerMixin {
     await this.renderLayout(state);
   }
 
-  static #getView(path, data, themePath, ViewClass) {
-    return new ViewClass(path, data, themePath);
+  static #getView(state, path, data) {
+    const themePath = state.get(this.THEME_PATH);
+    const ViewClass = state.get(this.VIEW_CLASS);
+    return new ViewClass(path, data);
   }
 }

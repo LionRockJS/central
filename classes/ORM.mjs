@@ -74,8 +74,8 @@ export default class ORM {
   /**
    *
    * @param {typeof Model} MClass
-   * @param key
-   * @param values
+   * @param key {string}
+   * @param {[]} values
    * @param options
    * @param options.database
    * @param options.adapter
