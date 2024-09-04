@@ -92,6 +92,7 @@ export default class Central {
     console.trace(args);
   }
 
+  //add modules to a set of dirname, then run init.mjs in each dirname
   static addModules(modules){
     HelperPath.addModules(modules);
   }

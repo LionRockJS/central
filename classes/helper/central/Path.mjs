@@ -1,5 +1,4 @@
 import Central from "../../Central.mjs";
-import HelperCache from "./Cache.mjs";
 import HelperImport from "./Import.mjs";
 import adapter from "../../adapter/Node.mjs";
 
@@ -51,11 +50,17 @@ export default class HelperPath{
   }
 
   static addModules(modules){
-    modules.forEach(it=>{
-      if(!it)return;
+    modules.forEach((it, idx)=>{
+      if(!it){
+        console.log(`Module ${idx} is not defined.`);
+        return;
+      }
 
       const dirname = it.dirname || it.default?.dirname;
-      if(!dirname)return;
+      if(!dirname){
+        Central.log(`Module ${idx} does not have dirname property`);
+        return;
+      }
       this.nodePackages.add(dirname.replace(/[/\\]+$/, ''));
     });
   }

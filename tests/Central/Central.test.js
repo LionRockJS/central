@@ -347,4 +347,19 @@ describe('Central test', () => {
     Central.ENV = Central.ENV_PROD;
     Central.log('hello');
   });
+
+  test('Config file cascade loading', async()=>{
+    await Central.init({ EXE_PATH: __dirname + '/test17/' });
+    const config1 = await import('./test17/modules/test/config/cftest.mjs');
+    const config2 = await import('./test17/modules/test2/config/cftest.mjs');
+    const config3 = await import('./test17/application/config/cftest.mjs');
+
+    const config = Object.assign({}, config1.default, config2.default, config3.default);
+
+    expect(
+      JSON.stringify(Central.config.cftest)
+    ).toBe(
+      JSON.stringify(config)
+    );
+  })
 });

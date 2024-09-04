@@ -3,7 +3,7 @@ import HelperImport from "./Import.mjs";
 import HelperCache from "./Cache.mjs";
 
 export default class HelperConfig{
-  static configs = new Set();
+  static configs = new Set(); // name of config;
   static configSources = new Map();
   static config = { classes: {}, view: {} };
   static configPath = new Map(); // {'site.mjs       => 'APP_PATH/config/site.mjs'}
