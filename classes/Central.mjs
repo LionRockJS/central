@@ -61,7 +61,7 @@ export default class Central {
   static async flushCache() {
     if (!Central.config.classes.cache) {
       HelperCache.clearImportCache();
-      await HelperConfig.updateAll();
+      await HelperConfig.init();
     }
     if (!Central.config.view.cache) HelperCache.clearViewCache();
     if (!Central.config.classes.cache) await this.reloadModuleInit();

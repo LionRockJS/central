@@ -1,12 +1,12 @@
 import * as url from 'node:url';
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url)).replace(/\/$/, '');
 
-import Central from "../../classes/Central";
-import CentralAdapterNode from "../../classes/adapter/Node";
+import Central from "../../classes/Central.mjs";
+import CentralAdapterNode from "../../classes/adapter/Node.mjs";
 
-import ORM from "../../classes/ORM";
-import Model from "../../classes/Model";
-import ORMAdapterTest from "./orm/application/classes/ORMAdapterTest";
+import ORM from "../../classes/ORM.mjs";
+import Model from "../../classes/Model.mjs";
+import ORMAdapterTest from "./orm/application/classes/ORMAdapterTest.mjs";
 
 Central.adapter = CentralAdapterNode;
 Model.defaultAdapter = ORMAdapterTest;

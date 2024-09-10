@@ -1,4 +1,4 @@
-import Database from '../../classes/adapter/Database';
+import Database from '../../classes/adapter/Database.mjs';
 
 describe('Database Driver test', () => {
   const datasource = ""
