@@ -13,14 +13,15 @@ export default class HelperPath{
 
   static async reloadModuleInit() {
     const initFiles = [...this.nodePackages.keys()].map(x => `${x}/init.mjs`);
-    await Promise.all(initFiles.map(async it => {
-      //suppress error when package without init.mjs
+
+    for(let i=0; i< initFiles.length; i++){
+      const file = initFiles[i];
       try{
-        await HelperImport.importAbsolute(it);
+        await HelperImport.importAbsolute(file);
       }catch(e){
         Central.log(e);
       }
-    }));
+    }
   }
 
   static setCentralDefaultPaths(EXE_PATH=null, APP_PATH=null, VIEW_PATH=null){

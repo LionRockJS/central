@@ -353,12 +353,6 @@ describe('Central test', () => {
 
     const config = Object.assign({}, config1.default, config2.default, config3.default);
 
-    console.log(
-      config1,
-      config2,
-      config3,
-    )
-
     expect(
       JSON.stringify(Central.config.cftest)
     ).toBe(
