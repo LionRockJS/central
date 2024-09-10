@@ -178,12 +178,13 @@ describe('Central test', () => {
 
     if (fs.existsSync(`${Central.APP_PATH}/config/salt.js`)) fs.unlinkSync(`${Central.APP_PATH}/config/salt.js`);
 
-    Central.initConfig(new Map([['salt', {value:'hello'}]]));
+    await Central.initConfig(new Map([['salt', {value:'hello'}]]));
 
     expect(Central.config.salt.value).toBe('hello');
 
     fs.copyFileSync(path.normalize(`${Central.APP_PATH}/config/salt.default.mjs`), path.normalize(`${Central.APP_PATH}/config/salt.mjs`));
     await Central.flushCache();
+
     expect(Central.config.salt.value).toBe('default salt 1');
 
     Central.config.salt.value = 'default salt 2';
@@ -193,14 +194,9 @@ describe('Central test', () => {
     Central.config.classes.cache = false;
 
     fs.unlinkSync(`${Central.APP_PATH}/config/salt.mjs`);
+    await Central.flushCache();
 
-    try {
-      await Central.flushCache();
-    } catch (e) {
-      expect(e.message).toBe('Resolve path error: path salt.js not found. config , {} ');
-    }
-
-    expect(Central.config.salt.value).toBe('hello');
+    expect(Central.config.salt.value).toBe(undefined);
   });
 
   test('config path, init config with null value', async ()=>{
@@ -350,11 +346,18 @@ describe('Central test', () => {
 
   test('Config file cascade loading', async()=>{
     await Central.init({ EXE_PATH: __dirname + '/test17/' });
+
     const config1 = await import('./test17/modules/test/config/cftest.mjs');
     const config2 = await import('./test17/modules/test2/config/cftest.mjs');
     const config3 = await import('./test17/application/config/cftest.mjs');
 
     const config = Object.assign({}, config1.default, config2.default, config3.default);
+
+    console.log(
+      config1,
+      config2,
+      config3,
+    )
 
     expect(
       JSON.stringify(Central.config.cftest)

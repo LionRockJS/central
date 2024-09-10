@@ -46,8 +46,24 @@ export default class Central {
     await HelperConfig.init();
     await HelperBootstrap.init();
     await this.reloadModuleInit(true);
+    await this.applyApplicationConfigs();
 
     return Central;
+  }
+
+  static async applyApplicationConfigs(){
+    //apply application configs
+    await Promise.all(
+      Object.keys(Central.config).map(async key => {
+        //fs check file exist in ${APP_PATH}/config/${key}.mjs
+        //if exists, apply to Central.config[key]
+        const exist = this.adapter.fileExists(`${Central.APP_PATH}/config/${key}.mjs`);
+        if(exist){
+          const config = await this.adapter.import(`${Central.APP_PATH}/config/${key}.mjs?r=${HelperCache.cacheId}`);
+          Object.assign(Central.config[key], config);
+        }
+      })
+    );
   }
 
   /**
@@ -64,7 +80,10 @@ export default class Central {
       await HelperConfig.init();
     }
     if (!Central.config.view.cache) HelperCache.clearViewCache();
-    if (!Central.config.classes.cache) await this.reloadModuleInit();
+    if (!Central.config.classes.cache){
+      await this.reloadModuleInit();
+      await this.applyApplicationConfigs();
+    }
   }
 
   static async import(pathToFile) {

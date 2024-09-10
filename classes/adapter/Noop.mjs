@@ -14,4 +14,8 @@ export default class Noop {
     const module = await import(pathToFile + qs);
     return module.default || module;
   }
+
+  static fileExists(pathToFile){
+    return false;
+  }
 }

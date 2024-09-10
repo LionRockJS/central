@@ -8,8 +8,21 @@ import Os from "node:os";
 import Noop from './Noop.mjs';
 export default class Node extends Noop{
   static resolveFetchList(x, store, pathToFile){
-    if ( fs.existsSync(path.normalize(x)) !== true ) return false;
+    try{
+      if ( fs.statSync(path.normalize(x)).isFile() !== true ) return false;
+    }catch(e){
+      return false;
+    }
+
     return super.resolveFetchList(x, store, pathToFile);
+  }
+
+  static fileExists(pathToFile){
+    try{
+      return fs.statSync(pathToFile).isFile();
+    }catch(e){
+      return false;
+    }
   }
 
   static dirname(){

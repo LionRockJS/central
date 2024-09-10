@@ -24,6 +24,7 @@ export default class HelperConfig{
         const v = it[1] || {};
         const config = this.config[key] || {};
         Object.assign(config, v.default || v);
+        this.config[key] = config;
       })
     );
   }

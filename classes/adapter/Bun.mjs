@@ -9,6 +9,10 @@ export default class Bun extends Noop{
     return super.resolveFetchList(x, store, pathToFile);
   }
 
+  static fileExists(pathToFile){
+    return fs.existsSync(pathToFile);
+  }
+
   static dirname(){
     return import.meta.dir;
   }
