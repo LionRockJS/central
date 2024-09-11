@@ -92,15 +92,10 @@ const execute_debug = async (Controller, request) => {
   debugText += '<hr style="border-color:#666"/>';
   debugText += DevUtils.printList([...Central.viewPath.values()], 'Views');
   debugText += '<hr style="border-color:#666"/>';
-  debugText += DevUtils.printTable(HelperConfig.configPath, 'Config files');
-  debugText += '<hr style="border-color:#666"/>';
 
-  const config = {
-    classes: Central.config.classes,
-    view: Central.config.view,
-  };
+  const config = Central.config;
 
-  debugText += `<details><summary>Core Config Values</summary><pre style="color:#777; display:inline;">${JSON.stringify(config, undefined, 2)}</pre></details>`;
+  debugText += `<details><summary>Core Config Values</summary><pre style="color:#777; display:inline; height: 5rem; overflow-y:scroll">${JSON.stringify(config, undefined, 2)}</pre></details>`;
 
   debugText += '<hr style="border-color:#666"/>';
 
