@@ -18,4 +18,8 @@ export default class Noop {
   static fileExists(pathToFile){
     return false;
   }
+
+  static process(){
+    return process;
+  }
 }
