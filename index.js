@@ -15,6 +15,7 @@ import Model from './classes/Model.mjs';
 import ControllerMixinMime from './classes/controller-mixin/Mime.mjs';
 import ControllerMixinView from './classes/controller-mixin/View.mjs';
 import ControllerMixinDatabase from './classes/controller-mixin/Database.mjs';
+import ControllerMixinViewData from './classes/controller-mixin/ViewData.mjs';
 import RouteList from "./classes/RouteList.mjs";
 
 import ORMAdapter from './classes/adapter/ORM.mjs';
@@ -42,6 +43,7 @@ export {
   ControllerMixinMime,
   ControllerMixinView,
   ControllerMixinDatabase,
+  ControllerMixinViewData,
 //helpers
   RouteList,
   HelperCrypto,
