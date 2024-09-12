@@ -8,6 +8,7 @@
 
 import Central from './classes/Central.mjs';
 import HelperCrypto from './classes/helper/Crypto.mjs';
+import HelperCache from "./classes/helper/central/Cache.mjs";
 
 import ORM from './classes/ORM.mjs';
 import Model from './classes/Model.mjs';
@@ -44,6 +45,7 @@ export {
 //helpers
   RouteList,
   HelperCrypto,
+  HelperCache,
 //main class
   Central,
 }
