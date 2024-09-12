@@ -46,7 +46,6 @@ export default class Central {
     await HelperConfig.init();
     await HelperBootstrap.init();
     await this.reloadModuleInit(true);
-    await this.applyApplicationConfigs();
 
     return Central;
   }
@@ -72,6 +71,7 @@ export default class Central {
    */
   static async initConfig(configMap) {
     await HelperConfig.addConfig(configMap);
+    await this.applyApplicationConfigs();
   }
 
   static async flushCache() {
@@ -82,7 +82,6 @@ export default class Central {
     if (!Central.config.view.cache) HelperCache.clearViewCache();
     if (!Central.config.classes.cache){
       await this.reloadModuleInit();
-      await this.applyApplicationConfigs();
     }
   }
 
