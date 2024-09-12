@@ -7,8 +7,6 @@ export default class ControllerMixinViewData extends ControllerMixin {
     const cookies = state.get(Controller.STATE_REQUEST_COOKIES);
 
     const languageNames = Central.config.language.names;
-    const domain = state.get(Controller.STATE_HOSTNAME).split(':')[0];
-    console.log(request);
 
     const dataRequest = {
       host: request.headers.host,

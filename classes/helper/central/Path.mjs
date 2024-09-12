@@ -53,7 +53,7 @@ export default class HelperPath{
   static addModules(modules){
     modules.forEach((it, idx)=>{
       if(!it){
-        console.log(`Module ${idx} is not defined.`);
+        Central.log(`Module ${idx} is not defined.`);
         return;
       }
 

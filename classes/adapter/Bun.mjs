@@ -21,7 +21,6 @@ export default class Bun extends Noop{
     let qs = `?r=${cacheId}`;
     if(cacheId === 0)qs = '?';
     const fileURL = pathToFile + qs;
-    console.log(fileURL);
     const module = await import(fileURL);
     return module.default || module;
   }
