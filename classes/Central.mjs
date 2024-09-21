@@ -82,6 +82,7 @@ export default class Central {
     if (!Central.config.view.cache) HelperCache.clearViewCache();
     if (!Central.config.classes.cache){
       await this.reloadModuleInit();
+      await this.applyApplicationConfigs();
     }
   }
 

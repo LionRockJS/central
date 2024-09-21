@@ -1,6 +1,6 @@
 import * as url from 'node:url';
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url)).replace(/\/$/, '');
-import fs from 'node:fs';
+import { access, unlink, constants, copyFile } from 'node:fs/promises';
 import path from 'node:path';
 
 import Central from "../../classes/Central.mjs";
@@ -17,6 +17,15 @@ switch (runtime) {
     break;
 }
 Central.ENV = Central.ENV_PROD;
+
+async function deleteFile(file){
+  try {
+    await access(file, constants.F_OK);
+    await unlink(file);
+  } catch(e){
+  // file not exist
+  }
+}
 
 describe('Central test', () => {
   test('default APP Path', async () => {
@@ -174,15 +183,16 @@ describe('Central test', () => {
   });
 
   test('config path', async() => {
+    //load test app
     await Central.init({ EXE_PATH: `${__dirname}/test8` });
+    //delete salt.js if exist
+    await deleteFile(`${Central.APP_PATH}/config/salt.mjs`);
 
-    if (fs.existsSync(`${Central.APP_PATH}/config/salt.js`)) fs.unlinkSync(`${Central.APP_PATH}/config/salt.js`);
-
+    //try to initial salt value
     await Central.initConfig(new Map([['salt', {value:'hello'}]]));
-
     expect(Central.config.salt.value).toBe('hello');
 
-    fs.copyFileSync(path.normalize(`${Central.APP_PATH}/config/salt.default.mjs`), path.normalize(`${Central.APP_PATH}/config/salt.mjs`));
+    await copyFile(path.normalize(`${Central.APP_PATH}/config/salt.default.mjs`), path.normalize(`${Central.APP_PATH}/config/salt.mjs`));
     await Central.flushCache();
 
     expect(Central.config.salt.value).toBe('default salt 1');
@@ -193,7 +203,7 @@ describe('Central test', () => {
     expect(Central.config.salt.value).toBe('default salt 2');
     Central.config.classes.cache = false;
 
-    fs.unlinkSync(`${Central.APP_PATH}/config/salt.mjs`);
+    await deleteFile(`${Central.APP_PATH}/config/salt.mjs`);
     await Central.flushCache();
 
     expect(Central.config.salt.value).toBe(undefined);
@@ -201,13 +211,10 @@ describe('Central test', () => {
 
   test('config path, init config with null value', async ()=>{
     await Central.init({ EXE_PATH: `${__dirname}/test8` });
-
-    if (fs.existsSync(`${Central.APP_PATH}/config/salt.js`)) {
-      fs.unlinkSync(`${Central.APP_PATH}/config/salt.js`);
-    }
+    await deleteFile(`${Central.APP_PATH}/config/salt.js`);
 
     Central.configForceUpdate = true;
-    Central.initConfig(new Map([['salt', {value:'hello'}], ['test', null]]));
+    await Central.initConfig(new Map([['salt', {value:'hello'}], ['test', null]]));
 
     expect(Central.config.salt.value).toBe('hello');
     expect(JSON.stringify(Central.config.test)).toBe("{}");
