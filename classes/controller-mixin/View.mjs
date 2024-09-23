@@ -32,7 +32,6 @@ export default class ControllerMixinView extends ControllerMixin {
     if (!state.get(this.VIEW_CLASS))state.set(this.VIEW_CLASS, View.DefaultViewClass);
     if (!state.get(this.LAYOUT_DEFAULT_DATA))state.set(this.LAYOUT_DEFAULT_DATA, defaultLayoutData);
     if (!state.get(this.VIEW_DEFAULT_DATA))state.set(this.VIEW_DEFAULT_DATA, defaultViewData);
-    if (!state.get(this.LAYOUT))this.setLayout(state, state.get(this.LAYOUT_FILE), {});
   }
 
   static setTemplate(state, file, data = {}, defaultFile="") {
@@ -54,6 +53,10 @@ export default class ControllerMixinView extends ControllerMixin {
   }
 
   static async setup(state) {
+  }
+
+  static async before(state) {
+    if (!state.get(this.LAYOUT))this.setLayout(state, state.get(this.LAYOUT_FILE), {});
   }
 
   static assignJSONView(state){
