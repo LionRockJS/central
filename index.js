@@ -16,11 +16,9 @@ import ControllerMixinMime from './classes/controller-mixin/Mime.mjs';
 import ControllerMixinView from './classes/controller-mixin/View.mjs';
 import ControllerMixinDatabase from './classes/controller-mixin/Database.mjs';
 import ControllerMixinViewData from './classes/controller-mixin/ViewData.mjs';
-import RouteList from "./classes/RouteList.mjs";
 
 import ORMAdapter from './classes/adapter/ORM.mjs';
 import DatabaseAdapter from './classes/adapter/Database.mjs';
-import RouteAdapter from "./classes/adapter/Route.mjs";
 import JSONView from "./classes/view/JSONView.mjs";
 
 import { Controller, ControllerMixin, View } from '@lionrockjs/mvc';
@@ -37,7 +35,6 @@ export {
 //adapters
   ORMAdapter,
   DatabaseAdapter,
-  RouteAdapter,
   JSONView,
 //controller mixins
   ControllerMixinMime,
@@ -45,7 +42,6 @@ export {
   ControllerMixinDatabase,
   ControllerMixinViewData,
 //helpers
-  RouteList,
   HelperCrypto,
   HelperCache,
 //main class
