@@ -99,6 +99,8 @@ export default class ControllerMixinView extends ControllerMixin {
     const layout = state.get(this.LAYOUT);
     const placeHolder = state.get(this.PLACEHOLDER);
 
+    if(!layout)return;
+
     if(typeof layout.data !== 'string' ){
       if (errorTemplate) {
         Object.assign(errorTemplate.data, { body: state.get(Controller.STATE_BODY) });
