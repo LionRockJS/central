@@ -1,6 +1,8 @@
 import HelperPath from "./Path.mjs";
 import HelperImport from "./Import.mjs";
 import HelperCache from "./Cache.mjs";
+import adapter from "../../adapter/Node.mjs";
+import Central from "../../Central.mjs";
 
 export default class HelperConfig{
   static config = { classes: {}, view: {} };
@@ -15,6 +17,20 @@ export default class HelperConfig{
       ['database', await import('../../../config/database.mjs')],
       ['language', await import('../../../config/language.mjs')],
     ]));
+  }
+
+  static async addConfigs(dirname, configs=[]){
+    const configMap = new Map();
+
+    await Promise.all(
+      configs.map(async configName => {
+        const configPath = `${dirname}/config/${configName}.mjs`;
+        if(adapter.fileExists(configPath)){
+          configMap.set(configName, await adapter.import(configPath));
+        }
+      })
+    );
+    await this.addConfig(configMap);
   }
 
   static async addConfig(configMap) {

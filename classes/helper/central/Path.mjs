@@ -1,6 +1,8 @@
 import Central from "../../Central.mjs";
+import HelperConfig from "./Config.mjs";
 import HelperImport from "./Import.mjs";
 import adapter from "../../adapter/Node.mjs";
+
 
 export default class HelperPath{
   static nodePackages = new Set();
@@ -50,19 +52,25 @@ export default class HelperPath{
     return store.get(pathToFile);
   }
 
-  static addModules(modules){
-    modules.forEach((it, idx)=>{
-      if(!it){
-        Central.log(`Module ${idx} is not defined.`);
-        return;
-      }
+  static async addModules(modules){
+    await Promise.all(
+      modules.map(async (it, idx)=>{
+        if(!it){
+          Central.log(`Module ${idx} is not defined.`);
+          return;
+        }
 
-      const dirname = it.dirname || it.default?.dirname;
-      if(!dirname){
-        Central.log(`Module ${idx} does not have dirname property`);
-        return;
-      }
-      this.nodePackages.add(dirname.replace(/[/\\]+$/, ''));
-    });
+        const filename = it.filename || it.default?.filename;
+        if(!filename){
+          Central.log(`Module ${idx} does not have filename property`);
+          return;
+        }
+
+        const dirname = adapter.dirname(filename);
+        this.nodePackages.add(dirname);
+
+        await HelperConfig.addConfigs(dirname, it.configs || it.default?.configs || []);
+      })
+    );
   }
 }

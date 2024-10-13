@@ -7,6 +7,7 @@
  */
 
 import Central from './classes/Central.mjs';
+import HelperConfig from './classes/helper/central/Config.mjs';
 import HelperCrypto from './classes/helper/Crypto.mjs';
 import HelperCache from "./classes/helper/central/Cache.mjs";
 
@@ -44,6 +45,7 @@ export {
 //helpers
   HelperCrypto,
   HelperCache,
+  HelperConfig,
 //main class
   Central,
 }
