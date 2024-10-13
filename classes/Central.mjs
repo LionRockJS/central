@@ -82,6 +82,7 @@ export default class Central {
     if (!Central.config.view.cache) HelperCache.clearViewCache();
     if (!Central.config.classes.cache){
       await this.reloadModuleInit();
+      await this.reloadConfig();
       await this.applyApplicationConfigs();
     }
   }
@@ -111,14 +112,32 @@ export default class Central {
     console.trace(args);
   }
 
-  //add modules to a set of dirname, then run init.mjs in each dirname
-  static addModules(modules){
-    HelperPath.addModules(modules);
+  //add modules to a set of filename, then run init.mjs in each dirname
+  static async addModules(modules){
+    await HelperPath.addModules(modules);
   }
 
   //module may add after init, so we need to force reload module init
   static async reloadModuleInit(force=false){
     if(force === false && Central.config.classes.cache)return;
     await HelperPath.reloadModuleInit();
+  }
+
+  static async reloadConfig(){
+    const configKeys = Object.keys(Central.config);
+    for(let i = 0; i < configKeys.length; i++){
+      const configKey = configKeys[i];
+      const packages = [...HelperPath.nodePackages.values()];
+
+      for(let j= 0; j< packages.length; j++){
+        const dir = packages[j];
+        const configFile = `${dir}/config/${configKey}.mjs`;
+        const exist = this.adapter.fileExists(configFile);
+        if (exist) {
+          const config = await this.adapter.import(configFile, HelperCache.cacheId);
+          Central[configKey] = Object.assign(Central.config[configKey], config.default || config);
+        }
+      }
+    }
   }
 }
