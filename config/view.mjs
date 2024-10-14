@@ -1,3 +1,4 @@
+import Central from '../classes/Central.mjs';
 export default {
-  cache: false,
+  cache : Central.ENV !== Central.ENV_DEVE
 };
