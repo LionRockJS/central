@@ -27,6 +27,10 @@ async function deleteFile(file){
   }
 }
 
+async function wait(ms){
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 describe('Central test', () => {
   test('default APP Path', async () => {
     await Central.init({ EXE_PATH : __dirname });
@@ -193,8 +197,8 @@ describe('Central test', () => {
     expect(Central.config.salt.value).toBe('hello');
 
     await copyFile(path.normalize(`${Central.APP_PATH}/config/salt.default.mjs`), path.normalize(`${Central.APP_PATH}/config/salt.mjs`));
-    await Central.flushCache();
 
+    await Central.flushCache();
     expect(Central.config.salt.value).toBe('default salt 1');
 
     Central.config.salt.value = 'default salt 2';

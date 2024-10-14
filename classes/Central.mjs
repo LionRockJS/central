@@ -44,6 +44,7 @@ export default class Central {
     await HelperPath.init(options.EXE_PATH, options.APP_PATH, options.VIEW_PATH, options.modules);
     await HelperCache.init();
     await HelperConfig.init();
+    await this.applyApplicationConfigs();
     await HelperBootstrap.init();
     await this.reloadModuleInit(true);
 
@@ -56,9 +57,11 @@ export default class Central {
       Object.keys(Central.config).map(async key => {
         //fs check file exist in ${APP_PATH}/config/${key}.mjs
         //if exists, apply to Central.config[key]
-        const exist = this.adapter.fileExists(`${Central.APP_PATH}/config/${key}.mjs`);
+        const source = `${Central.APP_PATH}/config/${key}.mjs`;
+        const exist = this.adapter.fileExists(source);
+
         if(exist){
-          const config = await this.adapter.import(`${Central.APP_PATH}/config/${key}.mjs?r=${HelperCache.cacheId}`);
+          const config = await this.adapter.import(source, HelperCache.cacheId);
           Object.assign(Central.config[key], config);
         }
       })
@@ -75,16 +78,13 @@ export default class Central {
   }
 
   static async flushCache() {
-    if (!Central.config.classes.cache) {
+    if (Central.config.classes.cache !== true) {
       HelperCache.clearImportCache();
       await HelperConfig.init();
-    }
-    if (!Central.config.view.cache) HelperCache.clearViewCache();
-    if (!Central.config.classes.cache){
-      await this.reloadModuleInit();
       await this.reloadConfig();
-      await this.applyApplicationConfigs();
+      await this.reloadModuleInit();
     }
+    if (Central.config.view.cache !== true) HelperCache.clearViewCache();
   }
 
   static async import(pathToFile) {
@@ -112,9 +112,10 @@ export default class Central {
     console.trace(args);
   }
 
-  //add modules to a set of filename, then run init.mjs in each dirname
+  //add modules to a set of filename, load config, then run init.mjs in each dirname
   static async addModules(modules){
     await HelperPath.addModules(modules);
+    await this.applyApplicationConfigs();
   }
 
   //module may add after init, so we need to force reload module init
@@ -139,5 +140,7 @@ export default class Central {
         }
       }
     }
+
+    await this.applyApplicationConfigs();
   }
 }
