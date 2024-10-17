@@ -13,7 +13,7 @@ describe('test mixin database', () => {
     }
 
     const c = new C({});
-    await c.execute();
+    await c.execute(null, true);
     expect(c.state.get('databases').get('session')).not.toBe(null);
   });
 
@@ -34,7 +34,7 @@ describe('test mixin database', () => {
     }
 
     const d = new D({});
-    await d.execute();
+    await d.execute(null, true);
 
     expect(Array.from(d.state.get('databases').keys()).join(',')).toBe('session,foo,createdAt');
   });

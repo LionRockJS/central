@@ -134,7 +134,7 @@ describe('Controller Mixin View Test', () => {
     ControllerMixinView.setLayout(c3.state,'layout', { hello: 'world' });
     ControllerMixinView.setTemplate(c3.state,'tpl', { content: 'wow' });
     c3.action_test = async () => { await c3.exit(302); };
-    const r3 = await c.execute();
+    const r3 = await c3.execute();
     expect(typeof r3.body).toBe('string');
     expect(r3.body).toBe('{"hello":"world","main":{"content":"wow"}}');
   });
@@ -155,7 +155,7 @@ describe('Controller Mixin View Test', () => {
     const c2 = new C({});
     c2.state.get(Controller.STATE_HEADERS)['Content-Type'] = 'application/json; charset=utf-8';
 
-    const res2 = await c.execute('test');
+    const res2 = await c2.execute('test');
     expect(res2.body).toBe('{"foo":"bar"}');
   });
 
