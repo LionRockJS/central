@@ -1,3 +1,4 @@
+import {fileURLToPath} from 'node:url';
 import fs from 'node:fs';
 import path from 'node:path';
 import Os from "node:os";
@@ -5,13 +6,10 @@ import Os from "node:os";
 import Noop from './Noop.mjs';
 export default class Node extends Noop{
   static resolveFetchList(x, store, pathToFile){
-    try{
-      if ( fs.statSync(path.normalize(x)).isFile() !== true ) return false;
-    }catch(e){
-      return false;
-    }
+    if(this.fileExists(x) !== true)return false;
 
-    return super.resolveFetchList(x, store, pathToFile);
+    store.set(pathToFile, x);
+    return true;
   }
 
   static fileExists(pathToFile){
@@ -23,9 +21,7 @@ export default class Node extends Noop{
   }
 
   static dirname(file=null){
-    const name = path.dirname(file || import.meta.url);
-    //remove protocol
-    return name.replace(/^[^:]+:\/\//i, '');
+    return path.dirname(fileURLToPath(file || import.meta.url));
   }
 
   static async import(pathToFile, cacheId=0){
@@ -34,5 +30,9 @@ export default class Node extends Noop{
     const fixWindowsImport = (Os.type() === 'Windows_NT') ? "file://": "";
     const module = await import(fixWindowsImport + pathToFile + qs);
     return module.default || module;
+  }
+
+  static process(){
+    return process;
   }
 }

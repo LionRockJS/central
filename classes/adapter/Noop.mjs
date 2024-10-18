@@ -1,25 +1,26 @@
 export default class Noop {
   static resolveFetchList(x, store, pathToFile){
-    store.set(pathToFile, x);
+    console.log('running central adapter noop, resolveFetchList');
     return true;
   }
 
   static dirname(){
+    console.log('running central adapter noop, dirname');
     return './';
   }
 
   static async import(pathToFile, cacheId=0){
-    let qs = `?r=${cacheId}`;
-    if(cacheId === 0)qs = '';
-    const module = await import(pathToFile + qs);
-    return module.default || module;
+    console.log('running central adapter noop, import');
+    return {};
   }
 
   static fileExists(pathToFile){
+    console.log('running central adapter noop, fileExists');
     return false;
   }
 
   static process(){
-    return process;
+    console.log('running central adapter noop, process');
+    return {};
   }
 }

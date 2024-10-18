@@ -1,6 +1,5 @@
 import Central from "../../Central.mjs";
 import HelperConfig from "./Config.mjs";
-import HelperImport from "./Import.mjs";
 import adapter from "../../adapter/Node.mjs";
 
 
@@ -10,7 +9,7 @@ export default class HelperPath{
   static async init(EXE_PATH=null, APP_PATH=null, VIEW_PATH=null, modules=[]){
     this.nodePackages.clear();
     this.setCentralDefaultPaths(EXE_PATH, APP_PATH, VIEW_PATH);
-    this.addModules(modules);
+    await this.addModules(modules);
   }
 
   static async reloadModuleInit() {
@@ -19,7 +18,7 @@ export default class HelperPath{
     for(let i=0; i< initFiles.length; i++){
       const file = initFiles[i];
       try{
-        await HelperImport.importAbsolute(file);
+        await Central.import(file);
       }catch(e){
         Central.log(e);
       }

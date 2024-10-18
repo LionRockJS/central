@@ -7,7 +7,6 @@
  */
 
 import HelperCache from "./helper/central/Cache.mjs";
-import HelperImport from "./helper/central/Import.mjs";
 import HelperBootstrap from "./helper/central/Bootstrap.mjs";
 import HelperConfig from "./helper/central/Config.mjs";
 import HelperPath from "./helper/central/Path.mjs";
@@ -96,7 +95,7 @@ export default class Central {
     if (c && typeof c !== 'string') return c;
 
     const file = HelperPath.resolve(adjustedPathToFile, 'classes', HelperCache.classPath);
-    return await HelperImport.importAbsolute(file);
+    return await this.adapter.import(file, HelperCache.cacheId);
   }
 
   static resolveView(pathToFile) {

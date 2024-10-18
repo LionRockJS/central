@@ -1,7 +1,8 @@
-import * as url from 'node:url';
-const __dirname = url.fileURLToPath(new URL('.', import.meta.url)).replace(/\/$/, '');
 import { access, unlink, constants, copyFile } from 'node:fs/promises';
 import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 
 import Central from "../../classes/Central.mjs";
 import CentralAdapterBun from "../../classes/adapter/Bun.mjs";
