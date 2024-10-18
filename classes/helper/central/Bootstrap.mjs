@@ -4,7 +4,8 @@ export default class HelperBootstrap{
   static loadID = 0;
   static async init(){
     try{
-      await Central.adapter.import(`${Central.APP_PATH}/bootstrap.mjs`, this.loadID++);
+      await import(`file:///${Central.APP_PATH}/bootstrap.mjs?r=${this.loadID++}`);
+//      await Central.adapter.import(`${Central.APP_PATH}/bootstrap.mjs`, this.loadID++);
     }catch(e){
       //suppress error when bootstrap.mjs not found
       if(e.constructor.name === 'ModuleNotFoundError')return;

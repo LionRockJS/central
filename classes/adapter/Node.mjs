@@ -1,4 +1,4 @@
-import {fileURLToPath} from 'node:url';
+import {fileURLToPath, pathToFileURL} from 'node:url';
 import fs from 'node:fs';
 import path from 'node:path';
 import Os from "node:os";
@@ -27,8 +27,7 @@ export default class Node extends Noop{
   static async import(pathToFile, cacheId=0){
     let qs = `?r=${cacheId}`;
     if(cacheId === 0)qs = '';
-    const fixWindowsImport = (Os.type() === 'Windows_NT') ? "file://": "";
-    const module = await import(fixWindowsImport + pathToFile + qs);
+    const module = await import(pathToFileURL(pathToFile) + qs);
     return module.default || module;
   }
 

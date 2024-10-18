@@ -20,8 +20,8 @@ export default class Bun extends Node{
   static async import(pathToFile, cacheId=0){
     let qs = `?r=${cacheId}`;
     if(cacheId === 0)qs = '?'; //bun import always need ?
-    const fixWindowsImport = (Os.type() === 'Windows_NT') ? "file://": "";
-    const module = await import(fixWindowsImport + pathToFile + qs);
+//    const fixWindowsImport = (Os.type() === 'Windows_NT') ? "file://": "";
+    const module = await import(pathToFile + qs);
     return module.default || module;
   }
 }
