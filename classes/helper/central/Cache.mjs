@@ -24,6 +24,5 @@ export default class HelperCache{
 
   static clearViewCache(){
     this.viewPath.clear();
-    View.DefaultViewClass.clearCache();
   }
 }
