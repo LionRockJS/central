@@ -27,7 +27,8 @@ export default class Node extends Noop{
   static async import(pathToFile, cacheId=0){
     let qs = `?r=${cacheId}`;
     if(cacheId === 0)qs = '';
-    const module = await import(pathToFileURL(pathToFile) + qs);
+    if(Os.platform() === 'win32')pathToFile = pathToFileURL(pathToFile);
+    const module = await import(pathToFile + qs);
     return module.default || module;
   }
 
