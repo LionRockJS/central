@@ -22,7 +22,7 @@ class DatabaseStatement {
   async all(arg) { return []; }
 }
 
-export default class Database {
+export default class DatabaseAdapter {
   /**
    *
    * @param {string} datasource
@@ -72,6 +72,6 @@ export default class Database {
    * @returns {function | Object | Database}
    */
   static create(datasource) {
-    return new Database(datasource);
+    return new DatabaseAdapter(datasource);
   }
 }
