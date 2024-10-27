@@ -45,7 +45,9 @@ describe('Controller Mixin View Test', () => {
 
     const r = await c.execute();
     expect(typeof r.body).toBe('string');
-    expect(r.body).toBe('{"header":"head","footer":"foot","main":{\"content\":\"hello\"}}');
+
+    const result = {header: 'head', footer: 'foot', main: {content: 'hello', header: "head", footer:"foot"}, "content": "hello"};
+    expect(r.body).toBe(JSON.stringify(result));
   });
 
   test('errorTemplate', async () => {
@@ -105,7 +107,19 @@ describe('Controller Mixin View Test', () => {
 
     const r = await c.execute();
     expect(typeof r.body).toBe('string');
-    expect(r.body).toBe('{"foo":"bar","header":"head","footer":"foot","main":{\"content\":\"hello\"}}');
+    const expectedResult = {
+      foo: "bar",
+      header: "head",
+      footer: "foot",
+      main:{
+        content: "hello",
+        foo: "bar",
+        header: "head",
+        footer: "foot",
+      },
+      content: "hello"
+    }
+    expect(r.body).toBe(JSON.stringify(expectedResult));
   });
 
   test('exit with 302', async () => {
@@ -121,7 +135,15 @@ describe('Controller Mixin View Test', () => {
 
     const r = await c.execute();
     expect(typeof r.body).toBe('string');
-    expect(r.body).toBe('{"hello":"world","main":{"content":"wow"}}');
+    const expectedResult = {
+      hello: "world",
+      main:{
+        content: "wow",
+        hello: "world"
+      },
+      content: "wow"
+    }
+    expect(r.body).toBe(JSON.stringify(expectedResult));
 
     const c2 = new C({});
     ControllerMixinView.setLayout(c2.state,'layout', { hello: 'world' });
@@ -136,7 +158,16 @@ describe('Controller Mixin View Test', () => {
     c3.action_test = async () => { await c3.exit(302); };
     const r3 = await c3.execute();
     expect(typeof r3.body).toBe('string');
-    expect(r3.body).toBe('{"hello":"world","main":{"content":"wow"}}');
+
+    const result = {
+      hello: "world",
+      main: {
+        content: "wow",
+        hello: "world"
+      },
+      content: "wow"
+    }
+    expect(r3.body).toBe(JSON.stringify(result));
   });
 
   test('render json', async () => {

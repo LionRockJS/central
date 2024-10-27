@@ -94,7 +94,22 @@ export default class ControllerMixinView extends ControllerMixin {
     const layout = state.get(this.LAYOUT);
 
     // if layout data is string, just render it.
-    if(typeof layout.data !== 'string' ) layout.data[state.get(this.PLACEHOLDER)] = template ? await template.render() : state.get(Controller.STATE_BODY);
+    if(typeof layout.data !== 'string' ) {
+      if(template){
+        //copy layout data to template data;
+        const templateData = Object.assign({}, template.data);
+        const layoutData = Object.assign({}, layout.data);
+        delete layoutData[state.get(this.PLACEHOLDER)];//remove placeholder data from layout data.
+
+        Object.assign(template.data, layoutData);
+        layout.data[state.get(this.PLACEHOLDER)] = await template.render();
+
+        //copy template data back to layout data;
+        Object.assign(layout.data, templateData);
+      }else{
+        layout.data[state.get(this.PLACEHOLDER)] = state.get(Controller.STATE_BODY);
+      }
+    }
     await this.renderLayout(state);
   }
 
