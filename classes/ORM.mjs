@@ -11,14 +11,14 @@ import Model from './Model.mjs';
 /**
  * ORM option.
  * @typedef {object} ORMOption
- * @property {Database} database - The database to use.
- * @property {DatabaseAdapter} adapter - Database adapter for SQLite, MariaDB, postgresql, etc.
- * @property {string} insertID - The ID of the record will be inserted.
- * @property {number} limit - The limit of the record to read.
- * @property {number} offset - The offset of the record to read.
- * @property {string} orderBy - The order of the record to read.
- * @property {boolean} asArray - Return the result as an array.
- * @property {string[]} columns - The columns to read.
+ * @property {Database} [database] - The database to use.
+ * @property {DatabaseAdapter} [adapter] - Database adapter for SQLite, MariaDB, postgresql, etc.
+ * @property {string} [insertID] - The ID of the record will be inserted.
+ * @property {number} [limit] - The limit of the record to read.
+ * @property {number} [offset] - The offset of the record to read.
+ * @property {string} [orderBy] - The order of the record to read.
+ * @property {boolean} [asArray] - Return the result as an array.
+ * @property {string[]} [columns] - The columns to read.
  */
 
 export default class ORM {
@@ -76,8 +76,8 @@ export default class ORM {
    *
    * @param {typeof Model} MClass
    * @param key {string}
-   * @param {string[]} values
-   * @param {...ORMOption} options
+   * @param {string[] | number[]} values
+   * @param {{database: *, asArray: boolean}} options
    * @returns {Promise<[]|object>}
    */
   static async readBy(MClass, key, values, options = {}) {
