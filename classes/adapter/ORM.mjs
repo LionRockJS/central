@@ -34,7 +34,7 @@ export default class ORM {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  async read() {/***/}
+  async read(columns=['id', 'name']) {/***/}
 
   /**
    *
@@ -112,13 +112,14 @@ export default class ORM {
    *
    * @param {Map} kv
    * @returns {[]}
+   * @param {string[]} columns
    * @param {number} limit
    * @param {number} offset
    * @param {Map} orderBy
    * @returns {Promise<[]>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async readAll(kv, limit = 1000, offset = 0, orderBy = new Map([['id', 'ASC']])) {
+  async readAll(kv,columns=['id', 'name'], limit = 1000, offset = 0, orderBy = new Map([['id', 'ASC']])) {
     return [];
   }
 
@@ -126,13 +127,14 @@ export default class ORM {
    *
    * @param {string} key
    * @param {[]} values
+   * @param {string[]} columns
    * @param {number} limit
    * @param {number} offset
    * @param {Map} orderBy
    * @returns {Promise<[]>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async readBy(key, values, limit = 1000, offset = 0, orderBy = new Map([['id', 'ASC']])) {
+  async readBy(key, values,columns=['id', 'name'], limit = 1000, offset = 0, orderBy = new Map([['id', 'ASC']])) {
     return [];
   }
 
@@ -140,12 +142,13 @@ export default class ORM {
    *
    * @param {[[string]]}criteria
    * @param {number} limit
+   * @param {string[]} columns
    * @param {number} offset
    * @param {Map} orderBy
    * @returns {Promise<[]>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async readWith(criteria, limit = 1000, offset = 0, orderBy = new Map([['id', 'ASC']])) {
+  async readWith(criteria, columns=['id', 'name'], limit = 1000, offset = 0, orderBy = new Map([['id', 'ASC']])) {
     return [];
   }
 

@@ -5,8 +5,10 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
+
 import ORM from './ORM.mjs';
 import ORMAdapter from './adapter/ORM.mjs';
+import ModelCollection from './ModelCollection.mjs';
 
 export default class Model {
   // ORM is abstract, joinTablePrefix and tableName is null.
@@ -37,13 +39,18 @@ export default class Model {
   updated_at = null;
 
   #database = null;
-  #options = null;
+  /** @type ORMOption */
+  #options = {};
   #states = null;
   #adapter = null;
   #columns = null;
 
   #collection = null;
 
+  /**
+   * @param {string | null} id
+   * @param {...ORMOption} options
+   * */
   constructor(id = null, options = {}) {
     this.#database = options.database || Model.database;
     this.#options = options;
@@ -61,6 +68,10 @@ export default class Model {
     this.#collection = new ModelCollection(this.#adapter, this.#options);
   }
 
+  /**
+   *
+   * @returns {ModelCollection}
+   */
   getCollection(){
     return this.#collection;
   }
@@ -91,7 +102,7 @@ export default class Model {
    *
    * @param {object} option
    * @param {String[]|*} option.with
-   * @param {object} option.*
+   * @param {...ORMOption} option
    * @returns {Promise<void>}
    */
   async eagerLoad(option = {}) {
@@ -131,7 +142,14 @@ export default class Model {
 
     await Promise.all(
       parents.map(async p => {
-        const instance = await this.parent(p.key);
+        const parentOptions = Object.assign({}, this.#options)
+        if(option.columns){
+          parentOptions.columns = option.columns;
+        }
+        if(option.database){
+          parentOptions.database = option.database;
+        }
+        const instance = await this.parent(p.key, parentOptions);
         this[p.name] = instance;
         if (!instance) return; // parent can be null
         if(p.opt)await instance.eagerLoad(p.opt);
@@ -240,11 +258,11 @@ export default class Model {
    *
    * @returns {Promise<ORM>}
    */
-  async read() {
+  async read(columns = ['id', 'name']) {
     const result = await (
       this.id
-        ? this.#adapter.read()
-        : this.#readByValues()
+        ? this.#adapter.read(columns)
+        : this.#readByValues(columns)
     );
 
     if (!result) {
@@ -254,10 +272,10 @@ export default class Model {
     Object.assign(this, result);
   }
 
-  async #readByValues() {
+  async #readByValues(columns) {
     const values = this.#getValues();
     if (values.size === 0) throw new Error(`${this.constructor.name}: No id and no value to read`);
-    const results = await this.#adapter.readAll(values, 1);
+    const results = await this.#adapter.readAll(values, columns, 1);
     return results[0];
   }
 
@@ -273,9 +291,10 @@ export default class Model {
   /**
    *
    * @param fk
+   * @param {...ORMOption} options
    * @returns {Promise<*>}
    */
-  async parent(fk) {
+  async parent(fk, options) {
     // this fk is null or *, but not undefined
     if (this[fk] === null) return null;
     if (this[fk] === undefined) {
@@ -284,7 +303,7 @@ export default class Model {
 
     const modelName = this.constructor.belongsTo.get(fk);
     const ModelClass = await ORM.import(modelName);
-    return ORM.factory(ModelClass, this[fk], { database: this.#database });
+    return ORM.factory(ModelClass, this[fk], options);
   }
 
   /**
@@ -379,67 +398,4 @@ export default class Model {
   }
 }
 
-class ModelCollection{
-  #adapter;
-  #options;
-
-  constructor(adapter, options){
-    this.#adapter = adapter;
-    this.#options = options;
-  }
-
-  async readAll(){
-    return await this.#adapter.readAll(this.#options.kv, this.#options.limit, this.#options.offset, this.#options.orderBy);
-  }
-
-  async readBy(key, values){
-    return await this.#adapter.readBy(key, values, this.#options.limit, this.#options.offset, this.#options.orderBy);
-  }
-
-  async readWith(criteria=[]){
-    return await this.#adapter.readWith(criteria, this.#options.limit, this.#options.offset, this.#options.orderBy);
-  }
-
-  async countAll(){
-    return await this.#adapter.countAll(this.#options.kv);
-  }
-
-  async countBy(key, values){
-    return await this.#adapter.countBy(key, values);
-  }
-
-  async countWith(criteria=[]){
-    return await this.#adapter.countWith(criteria);
-  }
-
-  async deleteAll(){
-    await this.#adapter.deleteAll(this.#options.kv);
-  }
-
-  async deleteBy(key, values){
-    await this.#adapter.deleteBy(key, values);
-  }
-
-  async deleteWith(criteria=[]){
-    await this.#adapter.deleteWith(criteria);
-  }
-
-  async updateAll(kv, columnValues){
-    await this.#adapter.updateAll(kv, columnValues);
-  }
-
-  async updateBy(key, values, columnValues){
-    await this.#adapter.updateBy(key, values, columnValues);
-  }
-
-  async updateWith(criteria=[], columnValues){
-    await this.#adapter.updateWith(criteria, columnValues);
-  }
-
-  async insertAll(columns, values){
-    await this.#adapter.insertAll(columns, values, this.#options.insertIDs || []);
-  }
-}
-
 Object.freeze(Model.prototype);
-Object.freeze(ModelCollection.prototype);

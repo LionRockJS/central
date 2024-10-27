@@ -8,15 +8,25 @@
 import Central from './Central.mjs';
 import Model from './Model.mjs';
 
+/**
+ * ORM option.
+ * @typedef {object} ORMOption
+ * @property {Database} database - The database to use.
+ * @property {DatabaseAdapter} adapter - Database adapter for SQLite, MariaDB, postgresql, etc.
+ * @property {string} insertID - The ID of the record will be inserted.
+ * @property {number} limit - The limit of the record to read.
+ * @property {number} offset - The offset of the record to read.
+ * @property {string} orderBy - The order of the record to read.
+ * @property {boolean} asArray - Return the result as an array.
+ * @property {string[]} columns - The columns to read.
+ */
+
 export default class ORM {
   static classPrefix = 'model/';
 
   /**
    * @param {typeof Model} MClass
-   * @param options
-   * @param options.database
-   * @param options.adapter
-   * @param options.insertID
+   * @param {...ORMOption} options
    * @returns {Model}
    */
   static create(MClass, options = {}) {
@@ -27,14 +37,12 @@ export default class ORM {
    * Create and read data from database
    * @param {typeof Model} MClass
    * @param id
-   * @param options
-   * @param options.database
-   * @param options.adapter
+   * @param {...ORMOption} options
    * @returns {Promise<*>}
    */
   static async factory(MClass, id, options = {}) {
     const m = new MClass(id, options);
-    await m.read();
+    await m.read(options.columns);
     return m;
   }
 
@@ -54,19 +62,12 @@ export default class ORM {
   /**
    * read all records from the model
    * @param {typeof Model} MClass
-   * @param {object} options
-   * @param options.database
-   * @param options.adapter
-   * @param options.kv
-   * @param options.limit
-   * @param options.offset
-   * @param options.orderBy
-   * @param options.asArray
+   * @param {...ORMOption} options
    * @returns {Promise<[]|object>}
    */
   static async readAll(MClass, options = {}) {
     const m = ORM.create(MClass, options);
-    const result = await m.getCollection().readAll();
+    const result = await m.getCollection().readAll(options.columns);
 
     return this.#readResult(result, m, x => Object.assign(ORM.create(MClass, options), x), options.asArray);
   }
@@ -75,19 +76,13 @@ export default class ORM {
    *
    * @param {typeof Model} MClass
    * @param key {string}
-   * @param {[]} values
-   * @param options
-   * @param options.database
-   * @param options.adapter
-   * @param options.limit
-   * @param options.offset
-   * @param options.orderBy
-   * @param options.asArray
+   * @param {string[]} values
+   * @param {...ORMOption} options
    * @returns {Promise<[]|object>}
    */
   static async readBy(MClass, key, values, options = {}) {
     const m = ORM.create(MClass, options);
-    const result = await m.getCollection().readBy(key, values) || [];
+    const result = await m.getCollection().readBy(key, values, options.columns) || [];
 
     return this.#readResult(result, m, x => Object.assign(ORM.create(MClass, options), x), options.asArray);
   }
@@ -96,29 +91,20 @@ export default class ORM {
    * Given criterias [['', 'id', SQL.EQUAL, 11], [SQL.AND, 'name', SQL.EQUAL, 'peter']]
    * @param {typeof Model} MClass
    * @param criteria
-   * @param options
-   * @param options.database
-   * @param options.adapter
-   * @param options.limit
-   * @param options.offset
-   * @param options.orderBy
-   * @param options.asArray
+   * @param {...ORMOption} options
    * @returns {Promise<[]|object>}
    */
   static async readWith(MClass, criteria = [], options = {}) {
     if (criteria.length === 0) return [];
     const m = ORM.create(MClass, options);
-    const result = await m.getCollection().readWith(criteria) || [];
+    const result = await m.getCollection().readWith(criteria, options.columns) || [];
     return this.#readResult(result, m, x => Object.assign(ORM.create(MClass, options), x), options.asArray);
   }
 
   /**
    *
    * @param {typeof Model} MClass
-   * @param options
-   * @param options.database
-   * @param options.adapter
-   * @param options.kv
+   * @param {...ORMOption} options
    * @returns {Promise<*>}
    */
   static async countAll(MClass, options = {}) {
@@ -129,8 +115,8 @@ export default class ORM {
    *
    * @param {typeof Model} MClass
    * @param {string} key
-   * @param {[]} values
-   * @param options
+   * @param {string[]} values
+   * @param {...ORMOption} options
    * @returns {Promise<void>}
    */
   static async countBy(MClass, key, values, options = {}) {
@@ -141,7 +127,7 @@ export default class ORM {
    * Given criterias [['', 'id', SQL.EQUAL, 11], [SQL.AND, 'name', SQL.EQUAL, 'peter']]
    * @param {typeof Model} MClass
    * @param {[[string]]}criteria
-   * @param options
+   * @param {...ORMOption} options
    * @returns {Promise<void>}
    */
   static async countWith(MClass, criteria, options = {}) {
@@ -159,7 +145,7 @@ export default class ORM {
    * @param {typeof Model} MClass
    * @param {string} key
    * @param {[]} values
-   * @param options
+   * @param {...ORMOption} options
    * @returns {Promise<void>}
    */
   static async deleteBy(MClass, key, values, options = {}) {
@@ -170,7 +156,7 @@ export default class ORM {
    * Given criterias [['', 'id', SQL.EQUAL, 11], [SQL.AND, 'name', SQL.EQUAL, 'peter']]
    * @param {typeof Model} MClass
    * @param {[[string]]}criteria
-   * @param options
+   * @param {...ORMOption} options
    * @returns {Promise<void>}
    */
   static async deleteWith(MClass, criteria, options = {}) {
@@ -182,9 +168,9 @@ export default class ORM {
 
   /**
    * @param {typeof Model} MClass
-   * @param options
    * @param {Map} kv
    * @param {Map} columnValues
+   * @param {...ORMOption} options
    */
   static async updateAll(MClass, kv, columnValues, options = {}) {
     const m = ORM.create(MClass, options);
@@ -194,7 +180,7 @@ export default class ORM {
   /**
    *
    * @param {typeof Model} MClass
-   * @param options
+   * @param {...ORMOption} options
    * @param {string} key
    * @param {[]} values
    * @param {Map} columnValues
@@ -208,14 +194,15 @@ export default class ORM {
   /**
    * Given criterias [['', 'id', SQL.EQUAL, 11], [SQL.AND, 'name', SQL.EQUAL, 'peter']]
    * @param {typeof Model} MClass
-   * @param options
+   * @param {...ORMOption} options
    * @param {[[string]]}criteria
    * @param {Map} columnValues
    * @returns {Promise<*>}
    */
   static async updateWith(MClass, criteria, columnValues, options = {}) {
-    if (!criteria || criteria.length === 0) throw new Error(`${MClass.constructor.name} update with no criteria`);
-    if (!columnValues || columnValues.size === 0) throw new Error(`${MClass.constructor.name} update without values`);
+
+    if (!criteria || criteria.length === 0) throw new Error(`${MClass.name} update with no criteria`);
+    if (!columnValues || columnValues.size === 0) throw new Error(`${MClass.name} update without values`);
 
     await this.#collection(MClass, options).updateWith(criteria, columnValues);
   }
@@ -223,7 +210,7 @@ export default class ORM {
   /**
    *
    * @param {typeof Model} MClass
-   * @param options
+   * @param {...ORMOption} options
    * @param {string[]} columns
    * @param {[String[]]} values
    * @returns {Promise<void>}
@@ -232,7 +219,7 @@ export default class ORM {
     // verify columns
     columns.forEach(x => {
       if (x === 'id') return;
-      if (!MClass.fields.has(x) && !MClass.belongsTo.has(x)) throw new Error(`${MClass.constructor.name} insert invalid columns ${x}`);
+      if (!MClass.fields.has(x) && !MClass.belongsTo.has(x)) throw new Error(`${MClass.name} insert invalid columns ${x}`);
     });
 
     await this.#collection(MClass, options).insertAll(columns, values);
