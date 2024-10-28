@@ -38,7 +38,7 @@ export default class ORM {
    * @param {typeof Model} MClass
    * @param id
    * @param {...ORMOption} options
-   * @returns {Promise<*>}
+   * @returns {Promise< Model | null >}
    */
   static async factory(MClass, id, options = {}) {
     const m = new MClass(id, options);
@@ -63,7 +63,7 @@ export default class ORM {
    * read all records from the model
    * @param {typeof Model} MClass
    * @param {...ORMOption} options
-   * @returns {Promise<[]|object>}
+   * @returns {Promise< Model[] | Model | null >}
    */
   static async readAll(MClass, options = {}) {
     const m = ORM.create(MClass, options);
@@ -75,10 +75,10 @@ export default class ORM {
   /**
    *
    * @param {typeof Model} MClass
-   * @param key {string}
+   * @param {string} key
    * @param {string[] | number[]} values
    * @param {{database: *, asArray: boolean}} options
-   * @returns {Promise<[]|object>}
+   * @returns {Promise< Model[] | Model | null >}
    */
   static async readBy(MClass, key, values, options = {}) {
     const m = ORM.create(MClass, options);
@@ -90,9 +90,9 @@ export default class ORM {
   /**
    * Given criterias [['', 'id', SQL.EQUAL, 11], [SQL.AND, 'name', SQL.EQUAL, 'peter']]
    * @param {typeof Model} MClass
-   * @param criteria
+   * @param {[string[]]} criteria
    * @param {...ORMOption} options
-   * @returns {Promise<[]|object>}
+   * @returns {Promise< Model[] | Model | null >}
    */
   static async readWith(MClass, criteria = [], options = {}) {
     if (criteria.length === 0) return [];
@@ -105,7 +105,7 @@ export default class ORM {
    *
    * @param {typeof Model} MClass
    * @param {...ORMOption} options
-   * @returns {Promise<*>}
+   * @returns {Promise<number>}
    */
   static async countAll(MClass, options = {}) {
     return await this.#collection(MClass, options).countAll();
@@ -117,7 +117,7 @@ export default class ORM {
    * @param {string} key
    * @param {string[]} values
    * @param {...ORMOption} options
-   * @returns {Promise<void>}
+   * @returns {Promise<number>}
    */
   static async countBy(MClass, key, values, options = {}) {
     return await this.#collection(MClass, options).countBy(key, values);
@@ -126,9 +126,9 @@ export default class ORM {
   /**
    * Given criterias [['', 'id', SQL.EQUAL, 11], [SQL.AND, 'name', SQL.EQUAL, 'peter']]
    * @param {typeof Model} MClass
-   * @param {[[string]]}criteria
+   * @param {[string[]]} criteria
    * @param {...ORMOption} options
-   * @returns {Promise<void>}
+   * @returns {Promise<number>}
    */
   static async countWith(MClass, criteria, options = {}) {
     if (!criteria || criteria.length === 0) throw new Error(`${MClass.constructor.name} count with no criteria`);
@@ -136,6 +136,12 @@ export default class ORM {
     return await this.#collection(MClass, options).countWith(criteria);
   }
 
+  /**
+   *
+   * @param {typeof Model} MClass
+   * @param {...ORMOption} options
+   * @returns {Promise<void>}
+   */
   static async deleteAll(MClass, options = {}) {
     await this.#collection(MClass, options).deleteAll(options.kv);
   }
@@ -144,7 +150,7 @@ export default class ORM {
    *
    * @param {typeof Model} MClass
    * @param {string} key
-   * @param {[]} values
+   * @param {string|number[]} values
    * @param {...ORMOption} options
    * @returns {Promise<void>}
    */
@@ -155,7 +161,7 @@ export default class ORM {
   /**
    * Given criterias [['', 'id', SQL.EQUAL, 11], [SQL.AND, 'name', SQL.EQUAL, 'peter']]
    * @param {typeof Model} MClass
-   * @param {[[string]]}criteria
+   * @param {[string[]]}criteria
    * @param {...ORMOption} options
    * @returns {Promise<void>}
    */

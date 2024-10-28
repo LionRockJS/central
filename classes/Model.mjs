@@ -65,7 +65,7 @@ export default class Model {
     Array.from(this.constructor.belongsTo.keys()).forEach(x => this.#columns.push(x));
 
     this.id = id;
-    this.#collection = new ModelCollection(this.#adapter, this.#options);
+    this.#collection = new ModelCollection(this.#adapter, this.#options, this.#columns);
   }
 
   /**
@@ -258,7 +258,7 @@ export default class Model {
    *
    * @returns {Promise<ORM>}
    */
-  async read(columns = ['id', 'name']) {
+  async read(columns = this.#columns) {
     const result = await (
       this.id
         ? this.#adapter.read(columns)

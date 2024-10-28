@@ -1,21 +1,23 @@
 export default class ModelCollection{
   #adapter;
   #options;
+  #columns;
 
-  constructor(adapter, options){
+  constructor(adapter, options, columns){
     this.#adapter = adapter;
     this.#options = options;
+    this.#columns = columns;
   }
 
-  async readAll(columns=['id', 'name']){
+  async readAll(columns = this.#columns){
     return await this.#adapter.readAll(this.#options.kv, columns, this.#options.limit, this.#options.offset, this.#options.orderBy);
   }
 
-  async readBy(key, values, columns=['id', 'name']){
+  async readBy(key, values, columns = this.#columns){
     return await this.#adapter.readBy(key, values, columns, this.#options.limit, this.#options.offset, this.#options.orderBy);
   }
   x
-  async readWith(criteria, columns=['id', 'name']){
+  async readWith(criteria, columns= this.#columns){
     return await this.#adapter.readWith(criteria, columns, this.#options.limit, this.#options.offset, this.#options.orderBy);
   }
 
