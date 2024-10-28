@@ -63,6 +63,7 @@ export default class Model {
     this.#columns = Array.from(this.constructor.fields.keys());
     // add belongsTo to columns
     Array.from(this.constructor.belongsTo.keys()).forEach(x => this.#columns.push(x));
+    this.#columns.push('id', 'created_at', 'updated_at');
 
     this.id = id;
     this.#collection = new ModelCollection(this.#adapter, this.#options, this.#columns);

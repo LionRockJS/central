@@ -34,7 +34,7 @@ export default class ORM {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  async read(columns=['id', 'name']) {/***/}
+  async read(columns= this.client.getColumns()) {/***/}
 
   /**
    *
@@ -119,7 +119,7 @@ export default class ORM {
    * @returns {Promise<[]>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async readAll(kv,columns=['id', 'name'], limit = 1000, offset = 0, orderBy = new Map([['id', 'ASC']])) {
+  async readAll(kv,columns=this.client.getColumns(), limit = 1000, offset = 0, orderBy = new Map([['id', 'ASC']])) {
     return [];
   }
 
@@ -134,7 +134,7 @@ export default class ORM {
    * @returns {Promise<[]>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async readBy(key, values,columns=['id', 'name'], limit = 1000, offset = 0, orderBy = new Map([['id', 'ASC']])) {
+  async readBy(key, values,columns=this.client.getColumns(), limit = 1000, offset = 0, orderBy = new Map([['id', 'ASC']])) {
     return [];
   }
 
@@ -148,7 +148,7 @@ export default class ORM {
    * @returns {Promise<[]>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async readWith(criteria, columns=['id', 'name'], limit = 1000, offset = 0, orderBy = new Map([['id', 'ASC']])) {
+  async readWith(criteria, columns=this.client.getColumns(), limit = 1000, offset = 0, orderBy = new Map([['id', 'ASC']])) {
     return [];
   }
 
