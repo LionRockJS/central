@@ -77,7 +77,7 @@ export default class ORM {
    * @param {typeof Model} MClass
    * @param {string} key
    * @param {string[] | number[]} values
-   * @param {{database: *, asArray: boolean}} options
+   * @param {...ORMOption} options
    * @returns {Promise< Model[] | Model | null >}
    */
   static async readBy(MClass, key, values, options = {}) {
