@@ -44,6 +44,7 @@ export default class Model {
   #states = null;
   #adapter = null;
   #columns = null;
+  #defaultSelectColumns = null;
 
   #collection = null;
 
@@ -63,10 +64,11 @@ export default class Model {
     this.#columns = Array.from(this.constructor.fields.keys());
     // add belongsTo to columns
     Array.from(this.constructor.belongsTo.keys()).forEach(x => this.#columns.push(x));
-    this.#columns.push('id', 'created_at', 'updated_at');
+
+    this.#defaultSelectColumns = ['id', 'created_at', 'updated_at', ...this.#columns];
 
     this.id = id;
-    this.#collection = new ModelCollection(this.#adapter, this.#options, this.#columns);
+    this.#collection = new ModelCollection(this.#adapter, this.#options, this.#defaultSelectColumns);
   }
 
   /**
@@ -249,6 +251,7 @@ export default class Model {
       const adapterClass = this.#adapter.constructor;
       this.id = this.#options.insertID ?? adapterClass.defaultID() ?? ORMAdapter.defaultID();
       this.uuid = adapterClass.uuid() ?? ORMAdapter.uuid();
+      this.created_at = Math.floor(Date.now() / 1000);
       await this.writeRetry(this.#adapter.processValues(), this.#options.retry);
     }
 
@@ -259,7 +262,7 @@ export default class Model {
    *
    * @returns {Promise<ORM>}
    */
-  async read(columns = this.#columns) {
+  async read(columns = this.#defaultSelectColumns) {
     const result = await (
       this.id
         ? this.#adapter.read(columns)
