@@ -85,7 +85,19 @@ export default class ControllerMixinView extends ControllerMixin {
     state.set(Controller.STATE_BODY, output);
   }
 
+  static isSkipLayout(state){
+    const mime = state.get(Controller.STATE_HEADERS)['Content-Type'];
+    if (!mime)return false;
+    if (state.get(Controller.STATE_BODY) === null)return false;
+    if (/^json/.test(mime))return false;
+    if (/^text/.test(mime))return false;
+
+    return true;
+  }
+
   static async after(state) {
+    if(this.isSkipLayout(state))return;
+
     this.assignJSONView(state);
 
     // render template and put into layout's main output.
