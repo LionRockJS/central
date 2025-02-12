@@ -261,6 +261,15 @@ export default class ORM {
       })
     );
   }
+
+  /**
+   *
+   * @param {Model} model
+   * @returns {Promise<Model>}
+   */
+  static async write(model){
+    return model.write();
+  }
 }
 
 Object.freeze(ORM.prototype);

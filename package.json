@@ -38,6 +38,6 @@
   },
   "homepage": "https://github.com/LionRockJS/central#readme",
   "dependencies": {
-    "mime": "^4.0.3"
+    "mime": "^4.0.6"
   }
 }
