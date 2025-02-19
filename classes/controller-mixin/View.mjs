@@ -91,6 +91,7 @@ export default class ControllerMixinView extends ControllerMixin {
     if (state.get(Controller.STATE_BODY) === null)return false;
     if (/\/json/.test(mime))return false;
     if (/^text/.test(mime))return false;
+    if (/xml/.test(mime))return false;
 
     return true;
   }
