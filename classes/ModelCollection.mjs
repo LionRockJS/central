@@ -16,7 +16,7 @@ export default class ModelCollection{
   async readBy(key, values, columns = this.#columns){
     return await this.#adapter.readBy(key, values, columns, this.#options.limit, this.#options.offset, this.#options.orderBy);
   }
-  x
+
   async readWith(criteria, columns= this.#columns){
     return await this.#adapter.readWith(criteria, columns, this.#options.limit, this.#options.offset, this.#options.orderBy);
   }
