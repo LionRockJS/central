@@ -106,23 +106,32 @@ export default class ControllerMixinView extends ControllerMixin {
     const template = state.get(this.TEMPLATE);
     const layout = state.get(this.LAYOUT);
 
-    // if layout data is string, just render it.
-    if(typeof layout.data !== 'string' ) {
-      if(template){
-        //copy layout data to template data;
-        const templateData = Object.assign({}, template.data);
-        const layoutData = Object.assign({}, layout.data);
-        delete layoutData[state.get(this.PLACEHOLDER)];//remove placeholder data from layout data.
-
-        Object.assign(template.data, layoutData);
-        layout.data[state.get(this.PLACEHOLDER)] = await template.render();
-
-        //copy template data back to layout data;
-        Object.assign(layout.data, templateData);
-      }else{
-        layout.data[state.get(this.PLACEHOLDER)] = state.get(Controller.STATE_BODY);
-      }
+    // if layout data is string or no template, just render it.
+    if(!template || typeof layout.data === 'string' ){
+      layout.data[state.get(this.PLACEHOLDER)] = state.get(Controller.STATE_BODY);
+      await this.renderLayout(state);
+      return;
     }
+
+    //copy layout data to template data;
+    const templateData = Object.assign({}, template.data);
+    const layoutData = Object.assign({}, layout.data);
+    delete layoutData[state.get(this.PLACEHOLDER)];//remove placeholder data from layout data.
+
+    Object.assign(template.data, layoutData);
+    layout.data[state.get(this.PLACEHOLDER)] = await template.render();
+    Object.assign(layout.data, templateData);
+
+    //after template render, template.data.meta is filled with data from json templates;
+    //copy template data back to layout data;
+    const metaKeys = Object.keys(template.data?.meta || {});
+    if(metaKeys.length > 0){
+      layout.data.meta = {};
+      metaKeys.forEach(key => {
+        layout.data.meta[key] = [...template.data.meta[key].values()];
+      })
+    }
+
     await this.renderLayout(state);
   }
 
