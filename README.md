@@ -102,3 +102,8 @@ class ControllerView extends Controller{
 }
 
 ```
+
+## Read ORM with specific columns
+```
+const result = await ORM.readBy(Page, 'page_type', [key], {database: liveDatabase, asArray:true, limit: 10000, columns:['id', 'name', 'slug', 'weight']});
+```
