@@ -19,10 +19,10 @@ export default class Central {
   static VIEW_PATH = null;
 
   static ENV = '';
-  static ENV_DEVE = 'dev';
+  static ENV_DEV = 'dev';
   static ENV_TEST = 'uat';
-  static ENV_STAG = 'stg';
-  static ENV_PROD = 'prd';
+  static ENV_STAGING = 'stg';
+  static ENV_PRODUCTION = 'prd';
 
   static config = HelperConfig.config;
   static nodePackages = HelperPath.nodePackages;
@@ -103,7 +103,7 @@ export default class Central {
   }
 
   static log(args, verbose = true) {
-    if(Central.ENV === Central.ENV_PROD && Central.config?.system?.debug !== true)return args;
+    if(Central.ENV === Central.ENV_PRODUCTION && Central.config?.system?.debug !== true)return args;
     if(verbose === false){
       console.log(args);
       return;

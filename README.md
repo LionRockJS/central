@@ -4,6 +4,13 @@ With ORM using better-sqlite3
 View with LiquidJS
 
 ### Getting started
+download start project from GitHub
+- https://github.com/LionRockJS/example/tree/bare-node
+
+Install dependencies
+``` 
+npm i
+```
 
 
 The file structure
