@@ -1,5 +1,5 @@
 export default {
-  route: '/:language(en|zh-hant|zh-hans)',
-  default: 'en',
-  names: new Map([['en', 'English'], ['zh-hans', '简体中文']]),
+  route: '/:language(mis|en|zh-hant|zh-hans)',
+  default: 'mis',
+  names: new Map([['mis', '-'], ['en', 'English'], ['zh-hans', '简体中文']]),
 };
