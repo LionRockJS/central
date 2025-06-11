@@ -30,6 +30,7 @@ export default class Central {
   static viewPath = HelperCache.viewPath;
 
   static adapter = AdapterNode;
+  static port = "";
 
   static async init(opts = {}) {
     const options = {
