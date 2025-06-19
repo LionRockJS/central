@@ -23,11 +23,13 @@ export default class ControllerMixinViewData extends ControllerMixin {
     }
 
     Object.assign(state.get(ControllerMixinView.LAYOUT_DEFAULT_DATA), {
-      request: dataRequest
+      request: dataRequest,
+      config: Central.config,
     });
 
     Object.assign(state.get(ControllerMixinView.VIEW_DEFAULT_DATA), {
-      request: dataRequest
+      request: dataRequest,
+      config: Central.config,
     });
   }
 }
