@@ -66,6 +66,9 @@ export default class DatabaseAdapter {
   // eslint-disable-next-line class-methods-use-this
   async checkpoint(){/***/}
 
+  // eslint-disable-next-line class-methods-use-this
+  async audit(sql, values, type, result_size = 0){}
+
   /**
    *
    * @param {string} datasource
