@@ -17,6 +17,7 @@ import HelperCache from "./classes/helper/central/Cache.mjs";
 import ORM from './classes/ORM.mjs';
 import Model from './classes/Model.mjs';
 import ControllerMixinMime from './classes/controller-mixin/Mime.mjs';
+import ControllerMixinActionLogger from './classes/controller-mixin/ActionLogger.mjs';
 import ControllerMixinView from './classes/controller-mixin/View.mjs';
 import ControllerMixinDatabase from './classes/controller-mixin/Database.mjs';
 import ControllerMixinViewData from './classes/controller-mixin/ViewData.mjs';
@@ -47,6 +48,7 @@ export {
   ControllerMixinView,
   ControllerMixinDatabase,
   ControllerMixinViewData,
+  ControllerMixinActionLogger,
 //helpers
   HelperCrypto,
   HelperCache,
