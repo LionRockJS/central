@@ -1,4 +1,4 @@
-import Central from '../../../../classes/Central.mjs';
+import Central from '../../../../dist/Central.mjs';
 import Test from '../modules/test';
 
 Central.addModules([Test]);

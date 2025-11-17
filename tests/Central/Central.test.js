@@ -1,12 +1,12 @@
 import { access, unlink, constants, copyFile } from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 
-import Central from "../../classes/Central.mjs";
-import CentralAdapterBun from "../../classes/adapter/Bun.mjs";
-import CentralAdapterNode from "../../classes/adapter/Node.mjs";
+
+import Central from '../../dist/Central.mjs';
+import CentralAdapterBun from '../../dist/adapter/Bun.mjs';
+import CentralAdapterNode from '../../dist/adapter/Node.mjs';
 const runtime = (typeof process !== 'undefined') ? ( (process.env._ || '').split('/').pop() ) : "browser";
 
 switch (runtime) {
@@ -227,7 +227,7 @@ describe('Central test', () => {
 
   test('setPath default value', async() => {
     await Central.init();
-    expect(path.normalize(`${Central.EXE_PATH}/`)).toBe(path.normalize(`${__dirname}/../../classes/adapter/`));
+    expect(path.normalize(`${Central.EXE_PATH}/`)).toBe(path.normalize(`${__dirname}/../../dist/adapter/`));
   });
 
   test('set all init value', async () => {

@@ -1,5 +1,5 @@
 import {Controller} from '@lionrockjs/mvc';
-import ControllerMixinMime from '../../classes/controller-mixin/Mime.mjs';
+import ControllerMixinMime from '../../dist/controller-mixin/Mime.mjs';
 
 class C extends Controller {
   static mixins = [ControllerMixinMime];

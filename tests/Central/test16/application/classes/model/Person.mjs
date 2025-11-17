@@ -1,4 +1,4 @@
-import Model from '../../../../../classes/Model';
+import Model from '../../../../../dist/Model';
 
 export default class Person extends Model{
   constructor(id, options) {

@@ -1,4 +1,4 @@
-import Model from '../../../../../classes/Model.mjs';
+import Model from '../../../../../dist/Model.mjs';
 
 export default class AliasModel extends Model{
 }

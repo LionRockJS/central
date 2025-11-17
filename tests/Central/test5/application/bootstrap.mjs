@@ -1,4 +1,4 @@
-import Central from '../../../../classes/Central.mjs';
+import Central from '../../../../dist/Central.mjs';
 Central.addModules([
   await import('../npm/test/index.js'),
 ]);

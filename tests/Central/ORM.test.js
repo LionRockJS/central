@@ -1,11 +1,11 @@
 import * as url from 'node:url';
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url)).replace(/\/$/, '');
 
-import Central from "../../classes/Central.mjs";
-import CentralAdapterNode from "../../classes/adapter/Node.mjs";
+import Central from '../../dist/Central.mjs';
+import CentralAdapterNode from '../../dist/adapter/Node.mjs';
 
-import ORM from "../../classes/ORM.mjs";
-import Model from "../../classes/Model.mjs";
+import ORM from '../../dist/ORM.mjs';
+import Model from '../../dist/Model.mjs';
 import ORMAdapterTest from "./orm/application/classes/ORMAdapterTest.mjs";
 
 Central.adapter = CentralAdapterNode;
@@ -166,7 +166,7 @@ describe('orm test', () => {
 
   test('abstract ORM adapter function coverage', async () => {
     const Person = await Central.import('model/Person');
-    const {default: Adapter} = await import('../../classes/adapter/ORM');
+    const {default: Adapter} = await import('../../dist/adapter/ORM');
     const p = ORM.create(Person);
     const a = new Adapter(p, null);
     Adapter.defaultID();
