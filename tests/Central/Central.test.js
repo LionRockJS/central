@@ -9,14 +9,6 @@ import CentralAdapterBun from '../../dist/adapter/Bun.mjs';
 import CentralAdapterNode from '../../dist/adapter/Node.mjs';
 const runtime = (typeof process !== 'undefined') ? ( (process.env._ || '').split('/').pop() ) : "browser";
 
-switch (runtime) {
-  case 'node':
-    Central.adapter = CentralAdapterNode;
-    break;
-  case 'bun':
-    Central.adapter = CentralAdapterBun;
-    break;
-}
 Central.ENV = Central.ENV_PROD;
 
 async function deleteFile(file){
@@ -39,8 +31,11 @@ describe('Central test', () => {
     expect(Central.VIEW_PATH).toBe(`${__dirname}/views`);
   });
 
+
   test('nodePackages after re-init', async () => {
-    await Central.init({ EXE_PATH: `${__dirname}/test1/`});
+    await Central.init({ EXE_PATH: `${__dirname}/test1`});
+    expect(Central.APP_PATH).toBe(`${__dirname}/test1/application`);
+    expect(Central.VIEW_PATH).toBe(`${__dirname}/test1/views`);
     expect(JSON.stringify([...Central.nodePackages.keys()])).toBe(JSON.stringify([path.normalize(`${__dirname}/test1/modules/test`)]));
 
     await Central.init({ EXE_PATH: `${__dirname}/test1/`});

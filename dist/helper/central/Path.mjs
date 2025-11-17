@@ -1,6 +1,5 @@
 import Central from '../../Central.mjs';
 import HelperConfig from './Config.mjs';
-import adapter from '../../adapter/Node.mjs';
 export default class HelperPath {
     static nodePackages = new Set();
     static async init(EXE_PATH = null, APP_PATH = null, VIEW_PATH = null, modules = []) {
@@ -21,7 +20,7 @@ export default class HelperPath {
         }
     }
     static setCentralDefaultPaths(EXE_PATH = null, APP_PATH = null, VIEW_PATH = null) {
-        Central.EXE_PATH = (EXE_PATH || adapter.dirname()).replace(/\/$/, '');
+        Central.EXE_PATH = (EXE_PATH || Central.adapter.dirname()).replace(/\/$/, '');
         Central.APP_PATH = (APP_PATH || `${Central.EXE_PATH}/application`).replace(/\/$/, '');
         Central.VIEW_PATH = (VIEW_PATH || `${Central.EXE_PATH}/views`).replace(/\/$/, '');
     }
@@ -38,7 +37,7 @@ export default class HelperPath {
         fetchPaths.push(pathToFile);
         // load from node_modules and modules
         [...this.nodePackages].reverse().forEach(x => fetchPaths.push(`${x}/${prefixPath}/${pathToFile}`));
-        fetchPaths.some(path => adapter.resolveFetchList(path, store, pathToFile));
+        fetchPaths.some(path => Central.adapter.resolveFetchList(path, store, pathToFile));
         if (!store.get(pathToFile))
             throw new Error(`Resolve path error: path ${pathToFile} not found. prefixPath: ${prefixPath} , store: ${JSON.stringify(store)} `);
         return store.get(pathToFile);
@@ -54,7 +53,7 @@ export default class HelperPath {
                 Central.log(`Module ${idx} does not have filename property`);
                 return;
             }
-            const dirname = adapter.dirname(filename);
+            const dirname = Central.adapter.dirname(filename);
             this.nodePackages.add(dirname);
             await HelperConfig.addConfigs(dirname, it.configs || it.default?.configs || []);
         }));

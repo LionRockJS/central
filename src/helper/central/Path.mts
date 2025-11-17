@@ -1,6 +1,5 @@
 import Central from '../../Central.mjs';
 import HelperConfig from './Config.mjs';
-import adapter from '../../adapter/Node.mjs';
 
 
 export default class HelperPath{
@@ -26,7 +25,7 @@ export default class HelperPath{
   }
 
   static setCentralDefaultPaths(EXE_PATH: string | null = null, APP_PATH: string | null = null, VIEW_PATH: string | null = null): void {
-    Central.EXE_PATH  = (EXE_PATH  || adapter.dirname()).replace(/\/$/, '');
+    Central.EXE_PATH  = (EXE_PATH  || Central.adapter.dirname()).replace(/\/$/, '');
     Central.APP_PATH  = (APP_PATH  || `${Central.EXE_PATH}/application`).replace(/\/$/, '');
     Central.VIEW_PATH = (VIEW_PATH || `${Central.EXE_PATH}/views`).replace(/\/$/, '');
   }
@@ -45,7 +44,7 @@ export default class HelperPath{
     // load from node_modules and modules
     [...this.nodePackages].reverse().forEach(x => fetchPaths.push(`${x}/${prefixPath}/${pathToFile}`));
 
-    fetchPaths.some(path => adapter.resolveFetchList(path, store, pathToFile));
+    fetchPaths.some(path => Central.adapter.resolveFetchList(path, store, pathToFile));
 
     if (!store.get(pathToFile)) throw new Error(`Resolve path error: path ${pathToFile} not found. prefixPath: ${prefixPath} , store: ${JSON.stringify(store)} `);
     return store.get(pathToFile);
@@ -65,7 +64,7 @@ export default class HelperPath{
           return;
         }
 
-        const dirname = adapter.dirname(filename);
+        const dirname = Central.adapter.dirname(filename);
         this.nodePackages.add(dirname);
 
         await HelperConfig.addConfigs(dirname, it.configs || it.default?.configs || []);

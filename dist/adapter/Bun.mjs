@@ -10,7 +10,10 @@ export default class Bun extends Node {
         return super.dirname(file);
     }
     static async import(pathToFile, cacheId = 0) {
-        const module = await import(pathToFile);
+        let qs = `?r=${cacheId}`;
+        if (cacheId === 0)
+            qs = '';
+        const module = await import(pathToFile + qs);
         return module.default || module;
     }
 }
