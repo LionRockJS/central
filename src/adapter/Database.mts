@@ -6,35 +6,35 @@
  *
  */
 
-import Central from '../Central.mts';
+import Central from '../Central.mjs';
 
 class DatabaseStatement {
   // eslint-disable-next-line no-useless-constructor,no-empty-function
-  constructor(sql) {/***/}
+  constructor(sql: string) {/***/}
 
   // eslint-disable-next-line class-methods-use-this
-  async run(arg) {/***/}
+  async run(arg: any): Promise<any> {/***/}
 
   // eslint-disable-next-line class-methods-use-this
-  async get(arg) { return {}; }
+  async get(arg: any): Promise<any> { return {}; }
 
   // eslint-disable-next-line class-methods-use-this
-  async all(arg) { return []; }
+  async all(arg: any): Promise<any[]> { return []; }
 }
 
 export default class DatabaseAdapter {
   /**
    *
-   * @param {string} datasource
+   * @param datasource
    */
   // eslint-disable-next-line no-useless-constructor,no-empty-function
-  constructor(datasource) {/***/}
+  constructor(datasource: string) {/***/}
 
   // eslint-disable-next-line class-methods-use-this
-  prepare(sql) { return new DatabaseStatement(sql); }
+  prepare(sql: string): DatabaseStatement { return new DatabaseStatement(sql); }
 
   // eslint-disable-next-line class-methods-use-this
-  async transaction(fn) {
+  async transaction(fn: () => Promise<void>): Promise<void> {
     await this.transactionStart();
     try{
       await fn();
@@ -46,32 +46,32 @@ export default class DatabaseAdapter {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  async exec(sql) {
+  async exec(sql: string): Promise<void> {
     Central.log('Database exec using Abstract DatabaseAdapter', false);
     Central.log(sql, false);
   }
 
   // eslint-disable-next-line class-methods-use-this
-  async close() {/***/}
+  async close(): Promise<void> {/***/}
 
   // eslint-disable-next-line class-methods-use-this
-  async transactionStart(){/***/}
+  async transactionStart(): Promise<void> {/***/}
 
   // eslint-disable-next-line class-methods-use-this
-  async transactionRollback(){/***/}
+  async transactionRollback(): Promise<void> {/***/}
 
   // eslint-disable-next-line class-methods-use-this
-  async transactionCommit(){/***/}
+  async transactionCommit(): Promise<void> {/***/}
 
   // eslint-disable-next-line class-methods-use-this
-  async checkpoint(){/***/}
+  async checkpoint(): Promise<void> {/***/}
 
   /**
    *
-   * @param {string} datasource
+   * @param datasource
    * @returns {function | Object | Database}
    */
-  static create(datasource) {
+  static create(datasource: string): DatabaseAdapter {
     return new DatabaseAdapter(datasource);
   }
 }

@@ -1,8 +1,8 @@
-import Central from "../../Central.mts";
+import Central from '../../Central.mjs';
 
 export default class HelperBootstrap{
   static loadID: number = 0;
-  static async init(){
+  static async init(): Promise<void> {
     try{
       await Central.adapter.import(`${Central.APP_PATH}/bootstrap.mjs`, this.loadID++);
     }catch(e){

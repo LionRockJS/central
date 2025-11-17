@@ -1,83 +1,75 @@
 import Central from '../Central.mjs';
 import { randomUUID } from 'node:crypto';
-
 export default class ORM {
+  client;
+  tableName;
+  database;
   /**
    *
-   * @param {Model} client
-   * @param {*} database
+   * @param client
+   * @param database
    */
   constructor(client, database) {
     this.client = client;
-    this.tableName = client.constructor.tableName;
+    const ClientClass = client.constructor;
+    this.tableName = ClientClass.tableName;
     this.database = database;
-
-    if(this.constructor === ORM) Central.log('Using Abstract ORM adapter', false);
+    if (this.constructor === ORM)
+      Central.log('Using Abstract ORM adapter', false);
   }
-
   static defaultID() {
     // eslint-disable-next-line no-bitwise
     return (Math.floor((Date.now() - 1563741060000) / 1000)) * 100000 + ((Math.random() * 100000) & 65535);
   }
-
   static uuid() {
     return randomUUID({ disableEntropyCache: true });
   }
-
   static translateValue(values) {
     return values;
   }
-
   processValues() {
     const columns = this.client.getColumns();
     return this.constructor.translateValue(columns.map(x => this.client[x]));
   }
-
   // eslint-disable-next-line class-methods-use-this
-  async read(columns= this.client.getColumns()) {/***/}
-
+  async read(columns = this.client.getColumns()) { }
   /**
    *
    * @param {[]} values
    * @returns {Promise<void>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async update(values) {/***/}
-
+  async update(values) { }
   /**
    *
    * @param {[]} values
    * @returns {Promise<void>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async insert(values) {/***/}
-
+  async insert(values) { }
   /**
    * @returns {Promise<void>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async delete() {/***/}
-
+  async delete() { }
   /**
    *
-   * @param {string} tableName
-   * @param {string} key
+   * @param tableName
+   * @param key
    * @returns {Promise<void>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async hasMany(tableName, key) {/***/}
-
+  async hasMany(tableName, key) { return []; }
   /**
    *
-   * @param {string} modelTableName
-   * @param {string} jointTableName
-   * @param {string} lk
-   * @param {string} fk
+   * @param modelTableName
+   * @param jointTableName
+   * @param lk
+   * @param fk
    * @returns {Promise<void>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async belongsToMany(modelTableName, jointTableName, lk, fk) {/***/}
-
+  async belongsToMany(modelTableName, jointTableName, lk, fk) { return []; }
   /**
    * add belongsToMany
    * @param {Model[]} models
@@ -87,8 +79,7 @@ export default class ORM {
    * @param {string} fk
    */
   // eslint-disable-next-line class-methods-use-this
-  async add(models, weight, jointTableName, lk, fk) {/***/}
-
+  async add(models, weight, jointTableName, lk, fk) { }
   /**
    * remove
    * @param {ORM[]} models
@@ -97,8 +88,7 @@ export default class ORM {
    * @param {string} fk
    */
   // eslint-disable-next-line class-methods-use-this
-  async remove(models, jointTableName, lk, fk) {/***/}
-
+  async remove(models, jointTableName, lk, fk) { }
   /**
    *
    * @param {string} jointTableName
@@ -106,8 +96,7 @@ export default class ORM {
    * @returns {Promise<void>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async removeAll(jointTableName, lk) {/***/}
-
+  async removeAll(jointTableName, lk) { }
   /**
    *
    * @param {Map} kv
@@ -119,10 +108,9 @@ export default class ORM {
    * @returns {Promise<[]>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async readAll(kv,columns=this.client.getColumns(), limit = 1000, offset = 0, orderBy = new Map([['id', 'ASC']])) {
+  async readAll(kv, columns = this.client.getColumns(), limit = 1000, offset = 0, orderBy = new Map([['id', 'ASC']])) {
     return [];
   }
-
   /**
    *
    * @param {string} key
@@ -134,10 +122,9 @@ export default class ORM {
    * @returns {Promise<[]>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async readBy(key, values,columns=this.client.getColumns(), limit = 1000, offset = 0, orderBy = new Map([['id', 'ASC']])) {
+  async readBy(key, values, columns = this.client.getColumns(), limit = 1000, offset = 0, orderBy = new Map([['id', 'ASC']])) {
     return [];
   }
-
   /**
    *
    * @param {[[string]]}criteria
@@ -148,10 +135,9 @@ export default class ORM {
    * @returns {Promise<[]>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async readWith(criteria, columns=this.client.getColumns(), limit = 1000, offset = 0, orderBy = new Map([['id', 'ASC']])) {
+  async readWith(criteria, columns = this.client.getColumns(), limit = 1000, offset = 0, orderBy = new Map([['id', 'ASC']])) {
     return [];
   }
-
   /**
    * @param {Map|null} kv
    * @returns {Promise<number>}
@@ -160,7 +146,6 @@ export default class ORM {
   async countAll(kv = null) {
     return 0;
   }
-
   /**
    *
    * @param {string} key
@@ -171,7 +156,6 @@ export default class ORM {
   async countBy(key, values) {
     return 0;
   }
-
   /**
    *
    * @param {[[string]]}criteria
@@ -181,15 +165,13 @@ export default class ORM {
   async countWith(criteria) {
     return 0;
   }
-
   /**
    *
    * @param {Map|null} kv
    * @returns {Promise<void>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async deleteAll(kv = null) {/***/}
-
+  async deleteAll(kv = null) { }
   /**
    *
    * @param {string} key
@@ -197,16 +179,14 @@ export default class ORM {
    * @returns {Promise<void>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async deleteBy(key, values) {/***/}
-
+  async deleteBy(key, values) { }
   /**
    *
    * @param {[[string]]}criteria
    * @returns {Promise<void>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async deleteWith(criteria) {/***/}
-
+  async deleteWith(criteria) { }
   /**
    *
    * @param {Map} kv
@@ -214,8 +194,7 @@ export default class ORM {
    * @returns {Promise<void>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async updateAll(kv, columnValues) {/***/}
-
+  async updateAll(kv, columnValues) { }
   /**
    *
    * @param {string} key
@@ -224,8 +203,7 @@ export default class ORM {
    * @returns {Promise<void>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async updateBy(key, values, columnValues) {/***/}
-
+  async updateBy(key, values, columnValues) { }
   /**
    *
    * @param {[[string]]}criteria
@@ -233,8 +211,7 @@ export default class ORM {
    * @returns {Promise<void>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async updateWith(criteria, columnValues) {/***/}
-
+  async updateWith(criteria, columnValues) { }
   /**
    *
    * @param {[]} columns
@@ -243,6 +220,5 @@ export default class ORM {
    * @returns {Promise<void>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async insertAll(columns, valueGroups, ids) {/***/}
-
+  async insertAll(columns, valueGroups, ids) { }
 }

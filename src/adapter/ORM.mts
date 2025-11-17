@@ -1,44 +1,46 @@
-import Central from '../Central.mts';
+import Central from '../Central.mjs';
 import { randomUUID } from 'node:crypto';
+import type Model from '../Model.mjs';
 
 export default class ORM {
-  client: any;
-  tableName: string;
+  client: Model;
+  tableName: string | null;
   database: any;
 
   /**
    *
-   * @param {Model} client
-   * @param {*} database
+   * @param client
+   * @param database
    */
-  constructor(client: any, database: any) {
+  constructor(client: Model, database: any) {
     this.client = client;
-    this.tableName = client.constructor.tableName;
+    const ClientClass = client.constructor as typeof Model;
+    this.tableName = ClientClass.tableName;
     this.database = database;
 
     if(this.constructor === ORM) Central.log('Using Abstract ORM adapter', false);
   }
 
-  static defaultID() {
+  static defaultID(): number {
     // eslint-disable-next-line no-bitwise
     return (Math.floor((Date.now() - 1563741060000) / 1000)) * 100000 + ((Math.random() * 100000) & 65535);
   }
 
-  static uuid() {
+  static uuid(): string {
     return randomUUID({ disableEntropyCache: true });
   }
 
-  static translateValue(values) {
+  static translateValue(values: any[]): any[] {
     return values;
   }
 
-  processValues() {
+  processValues(): any[] {
     const columns = this.client.getColumns();
-    return this.constructor.translateValue(columns.map(x => this.client[x]));
+    return (this.constructor as typeof ORM).translateValue(columns.map(x => (this.client as any)[x]));
   }
 
   // eslint-disable-next-line class-methods-use-this
-  async read(columns= this.client.getColumns()) {/***/}
+  async read(columns: string[] = this.client.getColumns()): Promise<any> {/***/}
 
   /**
    *
@@ -64,23 +66,23 @@ export default class ORM {
 
   /**
    *
-   * @param {string} tableName
-   * @param {string} key
+   * @param tableName
+   * @param key
    * @returns {Promise<void>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async hasMany(tableName, key) {/***/}
+  async hasMany(tableName: string, key: string): Promise<any[]> {return [];}
 
   /**
    *
-   * @param {string} modelTableName
-   * @param {string} jointTableName
-   * @param {string} lk
-   * @param {string} fk
+   * @param modelTableName
+   * @param jointTableName
+   * @param lk
+   * @param fk
    * @returns {Promise<void>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async belongsToMany(modelTableName, jointTableName, lk, fk) {/***/}
+  async belongsToMany(modelTableName: string, jointTableName: string, lk: string, fk: string): Promise<any[]> {return [];}
 
   /**
    * add belongsToMany

@@ -1,9 +1,9 @@
-import adapter from "../../adapter/Node.mts";
+import adapter from '../../adapter/Node.mjs';
 
 export default class HelperConfig{
   static config: any = { classes: {}, view: {} };
 
-  static async init(){
+  static async init(): Promise<void> {
     // Clear all config
     Object.keys(this.config).forEach(it => this.config[it] = {});
 
@@ -16,7 +16,7 @@ export default class HelperConfig{
     ]));
   }
 
-  static async addConfigs(dirname, configNames=[]){
+  static async addConfigs(dirname: string, configNames: string[] = []): Promise<void> {
     const configMap = new Map();
 
     await Promise.all(
@@ -30,7 +30,7 @@ export default class HelperConfig{
     await this.addConfig(configMap);
   }
 
-  static async addConfig(configMap) {
+  static async addConfig(configMap: Map<string, any>): Promise<void> {
     await Promise.all(
       [...configMap.entries()].map(async it =>{
         const key = it[0];

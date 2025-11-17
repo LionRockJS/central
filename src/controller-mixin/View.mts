@@ -1,5 +1,5 @@
 import { ControllerMixin, View, Controller } from '@lionrockjs/mvc';
-import JSONView from '../view/JSONView.mts';
+import JSONView from '../view/JSONView.mjs';
 
 export default class ControllerMixinView extends ControllerMixin {
   static PLACEHOLDER = 'placeHolder';

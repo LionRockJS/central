@@ -1,16 +1,17 @@
 import fs from 'node:fs';
-import { Controller, ControllerMixin, Central } from '@lionrockjs/central';
+import { Controller, ControllerMixin } from '@lionrockjs/mvc';
+import Central from '../Central.mjs';
 
 export default class ActionLogger extends ControllerMixin{
-    static LOG_ACTIONS = 'logActions';
-    static LOG_ACTIONS_ALL = 'logActionsAll';
+    static LOG_ACTIONS: string = 'logActions';
+    static LOG_ACTIONS_ALL: string = 'logActionsAll';
 
-    static init(state){
+    static init(state: Map<string, any>): void {
       if(!state.get(this.LOG_ACTIONS)) state.set(this.LOG_ACTIONS, new Set(['update', 'delete', 'read', 'import', 'export', 'upload_post']));
     }
 
     //log need to read session, it create in mixinSession.before()
-    static async before(state){
+    static async before(state: Map<string, any>): Promise<void> {
       const logActions = state.get(this.LOG_ACTIONS);
       const request = state.get(Controller.STATE_REQUEST);
       const action  = state.get(Controller.STATE_ACTION);
@@ -30,7 +31,7 @@ export default class ActionLogger extends ControllerMixin{
 
         //create folder if not exist
         if(!fs.existsSync(logDir)){
-          fs.mkdirSync(logDir, { recursive: true }, err => {if (err) throw err;});
+          fs.mkdirSync(logDir, { recursive: true });
         }
 
         const session    = request.session || {};

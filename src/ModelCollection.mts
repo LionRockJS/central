@@ -9,55 +9,55 @@ export default class ModelCollection{
     this.#columns = columns;
   }
 
-  async readAll(columns = this.#columns){
+  async readAll(columns: string[] = this.#columns): Promise<any[]> {
     return await this.#adapter.readAll(this.#options.kv, columns, this.#options.limit, this.#options.offset, this.#options.orderBy);
   }
 
-  async readBy(key, values, columns = this.#columns){
+  async readBy(key: string, values: any[], columns: string[] = this.#columns): Promise<any[]> {
     return await this.#adapter.readBy(key, values, columns, this.#options.limit, this.#options.offset, this.#options.orderBy);
   }
 
-  async readWith(criteria, columns= this.#columns){
+  async readWith(criteria: any[][], columns: string[] = this.#columns): Promise<any[]> {
     return await this.#adapter.readWith(criteria, columns, this.#options.limit, this.#options.offset, this.#options.orderBy);
   }
 
-  async countAll(){
+  async countAll(): Promise<number> {
     return await this.#adapter.countAll(this.#options.kv);
   }
 
-  async countBy(key, values){
+  async countBy(key: string, values: any[]): Promise<number> {
     return await this.#adapter.countBy(key, values);
   }
 
-  async countWith(criteria=[]){
+  async countWith(criteria: any[][] = []): Promise<number> {
     return await this.#adapter.countWith(criteria);
   }
 
-  async deleteAll(){
+  async deleteAll(): Promise<void> {
     await this.#adapter.deleteAll(this.#options.kv);
   }
 
-  async deleteBy(key, values){
+  async deleteBy(key: string, values: any[]): Promise<void> {
     await this.#adapter.deleteBy(key, values);
   }
 
-  async deleteWith(criteria=[]){
+  async deleteWith(criteria: any[][] = []): Promise<void> {
     await this.#adapter.deleteWith(criteria);
   }
 
-  async updateAll(kv, columnValues){
+  async updateAll(kv: any, columnValues: any): Promise<void> {
     await this.#adapter.updateAll(kv, columnValues);
   }
 
-  async updateBy(key, values, columnValues){
+  async updateBy(key: string, values: any[], columnValues: any): Promise<void> {
     await this.#adapter.updateBy(key, values, columnValues);
   }
 
-  async updateWith(criteria=[], columnValues){
+  async updateWith(criteria: any[][] = [], columnValues: any): Promise<void> {
     await this.#adapter.updateWith(criteria, columnValues);
   }
 
-  async insertAll(columns, values){
+  async insertAll(columns: string[], values: any[]): Promise<void> {
     await this.#adapter.insertAll(columns, values, this.#options.insertIDs || []);
   }
 }

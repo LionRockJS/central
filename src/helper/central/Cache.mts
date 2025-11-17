@@ -5,11 +5,11 @@ export default class HelperCache{
   static classPath: Map<string, any> = new Map(); // {'ORM'          => 'APP_PATH/classes/ORM.mjs'}
   static viewPath: Map<string, string> = new Map(); // {'layout/index' => 'APP_PATH/views/layout/index'}
 
-  static async init(){
+  static async init(): Promise<void> {
     this.clearImportCache();
   }
 
-  static clearClassPathStrings(){
+  static clearClassPathStrings(): void {
     //remove all cached classPath that is string
     this.classPath.forEach((v, k) => {
       if (typeof v !== 'string')return;
@@ -17,12 +17,12 @@ export default class HelperCache{
     });
   }
 
-  static clearImportCache(){
+  static clearImportCache(): void {
     this.cacheId++;
     this.clearClassPathStrings();
   }
 
-  static clearViewCache(){
+  static clearViewCache(): void {
     this.viewPath.clear();
   }
 }

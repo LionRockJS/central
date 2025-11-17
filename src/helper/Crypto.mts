@@ -27,15 +27,17 @@ const defaultSignAlgorithm = { name: CRYPTO_ALGORITHMS.HMAC, hash: CRYPTO_ALGORI
 export default class HelperCrypto {
   static CRYPTO_ALGORITHMS = CRYPTO_ALGORITHMS;
 
-  static async makeSignKey(filePath, algorithm = defaultSignAlgorithm) {
-    const key = await subtle.generateKey(algorithm, true, ['sign', 'verify']);
-    const jwk = await subtle.exportKey('jwk', key);
+  static async makeSignKey(filePath: string, algorithm: any = defaultSignAlgorithm): Promise<any> {
+    const keyResult = await subtle.generateKey(algorithm, true, ['sign', 'verify']);
+    // Handle both CryptoKey and CryptoKeyPair
+    const key = 'privateKey' in keyResult ? keyResult.privateKey : keyResult;
+    const jwk = await subtle.exportKey('jwk', key as CryptoKey);
 
     await fs.writeFile(filePath, /.json$/.test(filePath)? JSON.stringify(jwk) : `export default ${JSON.stringify(jwk)}`);
     return jwk;
   }
 
-  static async sign(jwk, data, algorithm = defaultSignAlgorithm, expire=0, timestamp= 0) {
+  static async sign(jwk: any, data: string, algorithm: any = defaultSignAlgorithm, expire: number = 0, timestamp: number = 0): Promise<string> {
     const key = await subtle.importKey('jwk', jwk, algorithm, true, ['sign', 'verify']);
     const expire_ms = expire * 1000;
 
@@ -47,7 +49,7 @@ export default class HelperCrypto {
     return Buffer.from(sign).toString('base64') + strExpire;
   }
 
-  static async verify(jwk, sign, data, algorithm = defaultSignAlgorithm, timestamp=0) {
+  static async verify(jwk: any, sign: string, data: string, algorithm: any = defaultSignAlgorithm, timestamp: number = 0): Promise<boolean> {
     const signs = sign.split('::');
     if(signs[1]){
       const expire_ms = parseInt(signs[1]) * 1000;

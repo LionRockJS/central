@@ -5,7 +5,7 @@ import Central from "../../classes/Central.mjs";
 import CentralAdapterBun from "../../classes/adapter/Bun.mjs";
 import CentralAdapterNode from "../../classes/adapter/Node.mjs";
 const runtime = (typeof process !== 'undefined') ? ( (process.env._ || '').split('/').pop() ) : "browser";
-
+/*
 switch (runtime) {
   case 'node':
     Central.adapter = CentralAdapterNode;
@@ -13,7 +13,7 @@ switch (runtime) {
   case 'bun':
     Central.adapter = CentralAdapterBun;
     break;
-}
+}*/
 console.log(runtime, CentralAdapterNode, CentralAdapterBun, Central.adapter);
 
 //import HelperCentralBootstrap from "../../classes/helper/central/Bootstrap.mjs";

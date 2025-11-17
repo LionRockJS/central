@@ -5,70 +5,56 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
-
 import Central from '../Central.mjs';
-
 class DatabaseStatement {
   // eslint-disable-next-line no-useless-constructor,no-empty-function
-  constructor(sql) {/***/}
-
+  constructor(sql) { }
   // eslint-disable-next-line class-methods-use-this
-  async run(arg) {/***/}
-
+  async run(arg) { }
   // eslint-disable-next-line class-methods-use-this
   async get(arg) { return {}; }
-
   // eslint-disable-next-line class-methods-use-this
   async all(arg) { return []; }
 }
-
 export default class DatabaseAdapter {
   /**
    *
-   * @param {string} datasource
+   * @param datasource
    */
   // eslint-disable-next-line no-useless-constructor,no-empty-function
-  constructor(datasource) {/***/}
-
+  constructor(datasource) { }
   // eslint-disable-next-line class-methods-use-this
   prepare(sql) { return new DatabaseStatement(sql); }
-
   // eslint-disable-next-line class-methods-use-this
   async transaction(fn) {
     await this.transactionStart();
-    try{
+    try {
       await fn();
-    }catch(e){
+    }
+    catch (e) {
       await this.transactionRollback();
       throw e;
     }
     await this.transactionCommit();
   }
-
   // eslint-disable-next-line class-methods-use-this
   async exec(sql) {
     Central.log('Database exec using Abstract DatabaseAdapter', false);
     Central.log(sql, false);
   }
-
   // eslint-disable-next-line class-methods-use-this
-  async close() {/***/}
-
+  async close() { }
   // eslint-disable-next-line class-methods-use-this
-  async transactionStart(){/***/}
-
+  async transactionStart() { }
   // eslint-disable-next-line class-methods-use-this
-  async transactionRollback(){/***/}
-
+  async transactionRollback() { }
   // eslint-disable-next-line class-methods-use-this
-  async transactionCommit(){/***/}
-
+  async transactionCommit() { }
   // eslint-disable-next-line class-methods-use-this
-  async checkpoint(){/***/}
-
+  async checkpoint() { }
   /**
    *
-   * @param {string} datasource
+   * @param datasource
    * @returns {function | Object | Database}
    */
   static create(datasource) {

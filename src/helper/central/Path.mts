@@ -1,18 +1,17 @@
-import Central from "../../Central.mts";
-import HelperConfig from "./Config.mts";
-import adapter from "../../adapter/Node.mts";
+import Central from '../../Central.mjs';
+import HelperConfig from './Config.mjs';
 
 
 export default class HelperPath{
   static nodePackages: Set<string> = new Set();
 
-  static async init(EXE_PATH=null, APP_PATH=null, VIEW_PATH=null, modules=[]){
+  static async init(EXE_PATH: string | null = null, APP_PATH: string | null = null, VIEW_PATH: string | null = null, modules: any[] = []): Promise<void> {
     this.nodePackages.clear();
     this.setCentralDefaultPaths(EXE_PATH, APP_PATH, VIEW_PATH);
     await this.addModules(modules);
   }
 
-  static async reloadModuleInit() {
+  static async reloadModuleInit(): Promise<void> {
     const initFiles = [...this.nodePackages.keys()].map(x => `${x}/init.mjs`);
 
     for(let i=0; i< initFiles.length; i++){
@@ -25,13 +24,13 @@ export default class HelperPath{
     }
   }
 
-  static setCentralDefaultPaths(EXE_PATH=null, APP_PATH=null, VIEW_PATH=null){
-    Central.EXE_PATH  = (EXE_PATH  || adapter.dirname()).replace(/\/$/, '');
+  static setCentralDefaultPaths(EXE_PATH: string | null = null, APP_PATH: string | null = null, VIEW_PATH: string | null = null): void {
+    Central.EXE_PATH  = (EXE_PATH  || Central.adapter.dirname()).replace(/\/$/, '');
     Central.APP_PATH  = (APP_PATH  || `${Central.EXE_PATH}/application`).replace(/\/$/, '');
     Central.VIEW_PATH = (VIEW_PATH || `${Central.EXE_PATH}/views`).replace(/\/$/, '');
   }
 
-  static resolve(pathToFile, prefixPath, store, forceUpdate = false) {
+  static resolve(pathToFile: string, prefixPath: string, store: Map<string, any>, forceUpdate: boolean = false): string {
     if (/\.\./.test(pathToFile)) throw new Error('invalid require path');
     if( store.get(pathToFile) && !forceUpdate )return store.get(pathToFile);
 
@@ -45,13 +44,13 @@ export default class HelperPath{
     // load from node_modules and modules
     [...this.nodePackages].reverse().forEach(x => fetchPaths.push(`${x}/${prefixPath}/${pathToFile}`));
 
-    fetchPaths.some(path => adapter.resolveFetchList(path, store, pathToFile));
+    fetchPaths.some(path => Central.adapter.resolveFetchList(path, store, pathToFile));
 
     if (!store.get(pathToFile)) throw new Error(`Resolve path error: path ${pathToFile} not found. prefixPath: ${prefixPath} , store: ${JSON.stringify(store)} `);
     return store.get(pathToFile);
   }
 
-  static async addModules(modules){
+  static async addModules(modules: any[]): Promise<void> {
     await Promise.all(
       modules.map(async (it, idx)=>{
         if(!it){
@@ -65,7 +64,7 @@ export default class HelperPath{
           return;
         }
 
-        const dirname = adapter.dirname(filename);
+        const dirname = Central.adapter.dirname(filename);
         this.nodePackages.add(dirname);
 
         await HelperConfig.addConfigs(dirname, it.configs || it.default?.configs || []);

@@ -6,12 +6,19 @@
  *
  */
 
-import HelperCache from "./helper/central/Cache.mts";
-import HelperBootstrap from "./helper/central/Bootstrap.mts";
-import HelperConfig from "./helper/central/Config.mts";
-import HelperPath from "./helper/central/Path.mts";
+import HelperCache from './helper/central/Cache.mjs';
+import HelperBootstrap from './helper/central/Bootstrap.mjs';
+import HelperConfig from './helper/central/Config.mjs';
+import HelperPath from './helper/central/Path.mjs';
 
-import AdapterNode from "./adapter/Node.mts";
+import AdapterNode from './adapter/Node.mjs';
+
+interface CentralInitOptions {
+  EXE_PATH?: string | null;
+  APP_PATH?: string | null;
+  VIEW_PATH?: string | null;
+  modules?: any[];
+}
 
 export default class Central {
   static EXE_PATH: string | null = null;
@@ -24,15 +31,15 @@ export default class Central {
   static ENV_STAGING: string = 'stg';
   static ENV_PRODUCTION: string = 'prd';
 
-  static config: any = HelperConfig.config;
-  static nodePackages: Set<string> = HelperPath.nodePackages;
-  static classPath: Map<string, any> = HelperCache.classPath;
-  static viewPath: Map<string, string> = HelperCache.viewPath;
+  static config = HelperConfig.config;
+  static nodePackages = HelperPath.nodePackages;
+  static classPath = HelperCache.classPath;
+  static viewPath = HelperCache.viewPath;
 
-  static adapter: typeof AdapterNode = AdapterNode;
+  static adapter = AdapterNode;
   static port: string = "";
 
-  static async init(opts = {}) {
+  static async init(opts: CentralInitOptions = {}): Promise<typeof Central> {
     const options = {
       EXE_PATH: null,
       APP_PATH: null,
@@ -51,7 +58,7 @@ export default class Central {
     return Central;
   }
 
-  static async applyApplicationConfigs(){
+  static async applyApplicationConfigs(): Promise<void> {
     //apply application configs
     await Promise.all(
       Object.keys(Central.config).map(async key => {
@@ -70,14 +77,14 @@ export default class Central {
 
   /**
    *
-   * @param {Map} configMap
+   * @param configMap
    */
-  static async initConfig(configMap) {
+  static async initConfig(configMap: Map<string, any>): Promise<void> {
     await HelperConfig.addConfig(configMap);
     await this.applyApplicationConfigs();
   }
 
-  static async flushCache() {
+  static async flushCache(): Promise<void> {
     if (Central.config.classes.cache !== true) {
       HelperCache.clearImportCache();
       await HelperConfig.init();
@@ -87,7 +94,7 @@ export default class Central {
     if (Central.config.view.cache !== true) HelperCache.clearViewCache();
   }
 
-  static async import(pathToFile) {
+  static async import(pathToFile: string): Promise<any> {
     // pathToFile may include file extension;
     const adjustedPathToFile = /\..*$/.test(pathToFile) ? pathToFile : `${pathToFile}.mjs`;
 
@@ -99,11 +106,11 @@ export default class Central {
     return await this.adapter.import(file, HelperCache.cacheId);
   }
 
-  static resolveView(pathToFile) {
+  static resolveView(pathToFile: string): string {
     return HelperPath.resolve(pathToFile, 'views', HelperCache.viewPath);
   }
 
-  static log(args, verbose = true) {
+  static log(args: any, verbose: boolean = true): any {
     if(Central.ENV === Central.ENV_PRODUCTION && Central.config?.system?.debug !== true)return args;
     if(verbose === false){
       console.log(args);
@@ -113,18 +120,18 @@ export default class Central {
   }
 
   //add modules to a set of filename, load config, then run init.mjs in each dirname
-  static async addModules(modules){
+  static async addModules(modules: any[]): Promise<void> {
     await HelperPath.addModules(modules);
     await this.applyApplicationConfigs();
   }
 
   //module may add after init, so we need to force reload module init
-  static async reloadModuleInit(force=false){
+  static async reloadModuleInit(force: boolean = false): Promise<void> {
     if(force === false && Central.config.classes.cache)return;
     await HelperPath.reloadModuleInit();
   }
 
-  static async reloadConfig(){
+  static async reloadConfig(): Promise<void> {
     const configKeys = Object.keys(Central.config);
     for(let i = 0; i < configKeys.length; i++){
       const configKey = configKeys[i];

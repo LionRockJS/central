@@ -1,7 +1,10 @@
-import {Central, Controller, ControllerMixin, ControllerMixinView} from '@lionrockjs/central';
+import {Controller, ControllerMixin} from '@lionrockjs/mvc';
+
+import Central from '../Central.mjs';
+import ControllerMixinView from './View.mjs';
 
 export default class ControllerMixinViewData extends ControllerMixin {
-  static init(state) {
+  static init(state: Map<string, any>): void {
     const request = state.get(Controller.STATE_REQUEST);
     const client = state.get(Controller.STATE_CLIENT);
     const cookies = state.get(Controller.STATE_REQUEST_COOKIES);

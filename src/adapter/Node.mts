@@ -3,16 +3,16 @@ import fs from 'node:fs';
 import path from 'node:path';
 import Os from "node:os";
 
-import Noop from './Noop.mts';
+import Noop from './Noop.mjs';
 export default class Node extends Noop{
-  static resolveFetchList(x, store, pathToFile){
+  static resolveFetchList(x: string, store: Map<string, any>, pathToFile: string): boolean {
     if(this.fileExists(x) !== true)return false;
 
     store.set(pathToFile, x);
     return true;
   }
 
-  static fileExists(pathToFile){
+  static fileExists(pathToFile: string): boolean {
     try{
       return fs.statSync(pathToFile).isFile();
     }catch(e){
@@ -20,19 +20,20 @@ export default class Node extends Noop{
     }
   }
 
-  static dirname(file=null){
+  static dirname(file: string | null = null): string {
     return path.dirname(fileURLToPath(file || import.meta.url));
   }
 
-  static async import(pathToFile, cacheId=0){
+  static async import(pathToFile: string, cacheId: number = 0): Promise<any> {
     let qs = `?r=${cacheId}`;
     if(cacheId === 0)qs = '';
-    if(Os.platform() === 'win32')pathToFile = pathToFileURL(pathToFile);
-    const module = await import(pathToFile + qs);
+    let importPath: string | URL = pathToFile;
+    if(Os.platform() === 'win32')importPath = pathToFileURL(pathToFile);
+    const module = await import(importPath + qs);
     return module.default || module;
   }
 
-  static process(){
+  static process(): NodeJS.Process {
     return process;
   }
 }

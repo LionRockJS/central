@@ -6,9 +6,23 @@
  *
  */
 
-import ORM from './ORM.mts';
-import ORMAdapter from './adapter/ORM.mts';
-import ModelCollection from './ModelCollection.mts';
+import ORM from './ORM.mjs';
+import ORMAdapter from './adapter/ORM.mjs';
+import ModelCollection from './ModelCollection.mjs';
+
+interface ORMOption {
+  database?: any;
+  adapter?: typeof ORMAdapter;
+  insertID?: string | number;
+  limit?: number;
+  offset?: number;
+  orderBy?: Map<string, string>;
+  asArray?: boolean;
+  columns?: string[];
+  kv?: Map<string, any>;
+  retry?: number;
+  insertIDs?: (string | number)[];
+}
 
 export default class Model {
   // ORM is abstract, joinTablePrefix and tableName is null.
@@ -30,7 +44,7 @@ export default class Model {
 
   static classPrefix: string = 'model/';
 
-  static defaultAdapter: typeof ORMAdapter = ORMAdapter;
+  static defaultAdapter = ORMAdapter;
 
   uuid: string | null = null;
 
@@ -38,23 +52,22 @@ export default class Model {
 
   updated_at: number | null = null;
 
-  id?: string | number | null;
+  id: string | number | null = null;
 
   #database: any = null;
-  /** @type ORMOption */
-  #options: any = {};
+  #options: ORMOption = {};
   #states: any[] = [];
-  #adapter: any = null;
+  #adapter: ORMAdapter;
   #columns: string[] = [];
   #defaultSelectColumns: string[] = [];
 
-  #collection: ModelCollection | null = null;
+  #collection: ModelCollection;
 
   /**
-   * @param {string | null} id
-   * @param {...ORMOption} options
+   * @param id
+   * @param options
    * */
-  constructor(id = null, options = {}) {
+  constructor(id: string | number | null = null, options: ORMOption = {}) {
     this.#database = options.database || Model.database;
     this.#options = options;
     this.#states = [];
@@ -63,9 +76,10 @@ export default class Model {
     this.#adapter = new Adapter(this, this.#database);
 
     // list all columns of the model.
-    this.#columns = Array.from(this.constructor.fields.keys());
+    const ConcreteModel = this.constructor as typeof Model;
+    this.#columns = Array.from(ConcreteModel.fields.keys());
     // add belongsTo to columns
-    Array.from(this.constructor.belongsTo.keys()).forEach(x => this.#columns.push(x));
+    Array.from((this.constructor as typeof Model).belongsTo.keys()).forEach(x => this.#columns.push(x));
 
     this.#defaultSelectColumns = ['id', 'created_at', 'updated_at', ...this.#columns];
 
@@ -77,7 +91,7 @@ export default class Model {
    *
    * @returns {ModelCollection}
    */
-  getCollection(){
+  getCollection(): ModelCollection {
     return this.#collection;
   }
 
@@ -86,7 +100,7 @@ export default class Model {
    *
    * @returns {Array}
    */
-  getColumns(){
+  getColumns(): string[] {
     return this.#columns;
   }
 
@@ -95,22 +109,20 @@ export default class Model {
    *
    * @returns {Array}
    */
-  getStates(){
+  getStates(): any[] {
     return this.#states;
   }
 
-  snapshot() {
+  snapshot(): void {
     this.#states.push({ ...this });
   }
 
   /**
    *
-   * @param {object} option
-   * @param {String[]|*} option.with
-   * @param {...ORMOption} option
+   * @param option
    * @returns {Promise<void>}
    */
-  async eagerLoad(option = {}) {
+  async eagerLoad(option: any = {}): Promise<void> {
     /* options format, eg product
     * {
     * with:['Product'], //1. only with Classes will be loaded, 2. pass null to skip all classses and 3. undefined will load all classes
@@ -137,8 +149,8 @@ export default class Model {
     }) : option.with;
     const allowClasses = (optWith !== undefined) ? new Set(optWith) : null;
 
-    const parents = [];
-    this.constructor.belongsTo.forEach((v, k) => {
+    const parents: any[] = [];
+    (this.constructor as typeof Model).belongsTo.forEach((v, k) => {
       if (!allowClasses.has(v)) return;
 
       const name = k.replace('_id', '');
@@ -161,10 +173,10 @@ export default class Model {
       }),
     );
 
-    const props = [];
+    const props: any[] = [];
 
     await Promise.all(
-    this.constructor.hasMany.map(async x => {
+    (this.constructor as typeof Model).hasMany.map(async x => {
       const k = x[0];
       const v = x[1];
 
@@ -192,9 +204,9 @@ export default class Model {
       }),
     );
 
-    const siblings = [];
+    const siblings: any[] = [];
     await Promise.all(
-      [...this.constructor.belongsToMany.keys()].map(async x => {
+      [...(this.constructor as typeof Model).belongsToMany.keys()].map(async x => {
         if (!allowClasses || !allowClasses.has(x)) return;
 
         const ModelClass = optWithClasses.get(x) || await ORM.import(x);
@@ -222,17 +234,17 @@ export default class Model {
    * get instance values which is not null
    * @returns {Map<any, any>}
    */
-  #getValues() {
+  #getValues(): Map<string, any> {
     const values = new Map();
-    this.constructor.fields.forEach((v, k) => {
-      if (this[k])values.set(k, this[k]);
+    (this.constructor as typeof Model).fields.forEach((v, k) => {
+      if ((this as any)[k])values.set(k, (this as any)[k]);
     });
     return values;
   }
 
   // instance methods
 
-  async writeRetry(data, retry=10, attempt=0){
+  async writeRetry(data: any[], retry: number = 10, attempt: number = 0): Promise<void> {
     if(attempt > retry)return;
 
     try{
@@ -246,15 +258,15 @@ export default class Model {
   /**
    * @return Model
    */
-  async write() {
+  async write(): Promise<Model> {
     if (this.id) {
       await this.#adapter.update(this.#adapter.processValues());
     } else {
-      const adapterClass = this.#adapter.constructor;
+      const adapterClass = this.#adapter.constructor as typeof ORMAdapter;
       this.id = this.#options.insertID ?? adapterClass.defaultID() ?? ORMAdapter.defaultID();
       this.uuid = adapterClass.uuid() ?? ORMAdapter.uuid();
       this.created_at = Math.floor(Date.now() / 1000);
-      await this.writeRetry(this.#adapter.processValues(), this.#options.retry);
+      await this.writeRetry(this.#adapter.processValues(), this.#options.retry ?? 10);
     }
 
     return this;
@@ -264,7 +276,7 @@ export default class Model {
    *
    * @returns {Promise<ORM>}
    */
-  async read(columns = this.#defaultSelectColumns) {
+  async read(columns: string[] = this.#defaultSelectColumns): Promise<void> {
     const result = await (
       this.id
         ? this.#adapter.read(columns)
@@ -278,9 +290,9 @@ export default class Model {
     Object.assign(this, result);
   }
 
-  async #readByValues(columns) {
+  async #readByValues(columns: string[]): Promise<any> {
     const values = this.#getValues();
-    if (values.size === 0) throw new Error(`${this.constructor.name}: No id and no value to read`);
+    if (values.size === 0) throw new Error(`${(this.constructor as typeof Model).name}: No id and no value to read`);
     const results = await this.#adapter.readAll(values, columns, 1);
     return results[0];
   }
@@ -289,7 +301,7 @@ export default class Model {
    *
    * @returns {Promise<void>}
    */
-  async delete() {
+  async delete(): Promise<void> {
     if (!this.id) throw new Error('ORM delete Error, no id defined');
     await this.#adapter.delete();
   }
@@ -297,56 +309,56 @@ export default class Model {
   /**
    *
    * @param fk
-   * @param {...ORMOption} options
+   * @param options
    * @returns {Promise<*>}
    */
-  async parent(fk, options) {
+  async parent(fk: string, options?: ORMOption): Promise<Model | null> {
     // this fk is null or *, but not undefined
-    if (this[fk] === null) return null;
-    if (this[fk] === undefined) {
-      throw new Error(`${fk} is not foreign key in ${this.constructor.name}`);
+    if ((this as any)[fk] === null) return null;
+    if ((this as any)[fk] === undefined) {
+      throw new Error(`${fk} is not foreign key in ${(this.constructor as typeof Model).name}`);
     }
 
-    const modelName = this.constructor.belongsTo.get(fk);
-    const ModelClass = await ORM.import(modelName);
-    return ORM.factory(ModelClass, this[fk], options);
+    const modelName = (this.constructor as typeof Model).belongsTo.get(fk);
+    const ModelClass = await ORM.import(modelName!);
+    return ORM.factory(ModelClass, (this as any)[fk], options);
   }
 
   /**
    * has many
-   * @param {Model.constructor} MClass
-   * @param {string} fk
+   * @param MClass
+   * @param fk
    * @return {[]}
    */
-  async children(fk, MClass = null) {
-    const modelNames = this.constructor.hasMany.filter(value => (value[0] === fk));
+  async children(fk: string, MClass: typeof Model | null = null): Promise<Model[]> {
+    const modelNames = (this.constructor as typeof Model).hasMany.filter(value => (value[0] === fk));
     if (modelNames.length > 1 && MClass === null) throw new Error('children fk have multiple Models, please specific which Model will be used');
     const ModelClass = MClass || await ORM.import(modelNames[0][1]);
 
-    const results = await this.#adapter.hasMany(ModelClass.tableName, fk);
+    const results = await this.#adapter.hasMany(ModelClass.tableName!, fk);
     return results.map(x => Object.assign(new ModelClass(null, { database: this.#database }), x));
   }
 
-  #siblingInfo(model) {
+  #siblingInfo(model: Model | Model[]): { joinTableName: string; lk: string; fk: string } {
     const m = Array.isArray(model) ? model[0] : model;
-    const M = m.constructor;
-    const lk = `${this.constructor.joinTablePrefix}_id`;
+    const M = m.constructor as typeof Model;
+    const lk = `${(this.constructor as typeof Model).joinTablePrefix}_id`;
     const fk = `${M.joinTablePrefix}_id`;
 
-    if (!this.constructor.belongsToMany.has(M.name)) {
-      if (!M.belongsToMany.has(this.constructor.name)) {
-        throw new Error(`${this.constructor.name} and ${M.name} not have many to many relationship`);
+    if (!(this.constructor as typeof Model).belongsToMany.has(M.name)) {
+      if (!M.belongsToMany.has((this.constructor as typeof Model).name)) {
+        throw new Error(`${(this.constructor as typeof Model).name} and ${M.name} not have many to many relationship`);
       }
 
       return {
-        joinTableName: `${M.joinTablePrefix}_${this.constructor.tableName}`,
+        joinTableName: `${M.joinTablePrefix}_${(this.constructor as typeof Model).tableName}`,
         lk,
         fk,
       };
     }
 
     return {
-      joinTableName: `${this.constructor.joinTablePrefix}_${M.tableName}`,
+      joinTableName: `${(this.constructor as typeof Model).joinTablePrefix}_${M.tableName}`,
       lk,
       fk,
     };
@@ -354,24 +366,25 @@ export default class Model {
 
   /**
    * Get siblings
-   * @param {Model.} MClass
+   * @param MClass
    * @return {[]}
    */
-  async siblings(MClass) {
-    const { joinTableName, lk, fk } = this.#siblingInfo(ORM.create(MClass));
+  async siblings(MClass: typeof Model): Promise<Model[]> {
+    const instance = ORM.create(MClass, { database: this.#database });
+    const { joinTableName, lk, fk } = this.#siblingInfo(instance);
 
-    const results = await this.#adapter.belongsToMany(MClass.tableName, joinTableName, lk, fk);
+    const results = await this.#adapter.belongsToMany(MClass.tableName!, joinTableName, lk, fk);
     return results.map(x => Object.assign(ORM.create(MClass, { database: this.#database }), x));
   }
 
   /**
    * add belongsToMany
-   * @param {Model | Model[]} model
-   * @param {number} weight
+   * @param model
+   * @param weight
    * @returns void
    */
-  async add(model, weight = 0) {
-    if (!this.id) throw new Error(`Cannot add ${model.constructor.name}. ${this.constructor.name} not have id`);
+  async add(model: Model | Model[], weight: number = 0): Promise<void> {
+    if (!this.id) throw new Error(`Cannot add ${(model as any).constructor.name}. ${(this.constructor as typeof Model).name} not have id`);
     // check model is not empty
     if (!model) throw new Error('Error add model, model cannot be null or undefined');
     if (Array.isArray(model) && model.length <= 0) throw new Error('Error add model, model array cannot be empty');
@@ -382,10 +395,10 @@ export default class Model {
 
   /**
    * remove
-   * @param {Model| Model[]} model
+   * @param model
    */
-  async remove(model) {
-    if (!this.id) throw new Error(`Cannot remove ${model.constructor.name}. ${this.constructor.name} not have id`);
+  async remove(model: Model | Model[]): Promise<void> {
+    if (!this.id) throw new Error(`Cannot remove ${(model as any).constructor.name}. ${(this.constructor as typeof Model).name} not have id`);
 
     const { joinTableName, lk, fk } = this.#siblingInfo(model);
     await this.#adapter.remove(Array.isArray(model) ? model : [model], joinTableName, lk, fk);
@@ -396,12 +409,14 @@ export default class Model {
    * @param MClass
    * @returns {Promise<void>}
    */
-  async removeAll(MClass) {
-    if (!this.id) throw new Error(`Cannot remove ${MClass.name}. ${this.constructor.name} not have id`);
+  async removeAll(MClass: typeof Model): Promise<void> {
+    if (!this.id) throw new Error(`Cannot remove ${MClass.name}. ${(this.constructor as typeof Model).name} not have id`);
 
     const { joinTableName, lk } = this.#siblingInfo(ORM.create(MClass));
     await this.#adapter.removeAll(joinTableName, lk);
   }
 }
+
+export type { ORMOption };
 
 Object.freeze(Model.prototype);

@@ -1,27 +1,27 @@
 import crypto from 'node:crypto';
 
 import { ControllerMixin } from '@lionrockjs/mvc';
-import DatabaseAdapter from '../adapter/Database.mts';
-import Central from "../Central.mts";
+import DatabaseAdapter from '../adapter/Database.mjs';
+import Central from '../Central.mjs';
 
 export default class ControllerMixinDatabase extends ControllerMixin {
   static #dbConnection: Map<string, any> = new Map();
 
-  static DATABASE_MAP = 'databaseMap';
+  static DATABASE_MAP: string = 'databaseMap';
 
-  static DATABASE_ADAPTER = 'databaseAdapter';
+  static DATABASE_ADAPTER: string = 'databaseAdapter';
 
-  static DATABASES = 'databases';
+  static DATABASES: string = 'databases';
 
   static defaultAdapter = DatabaseAdapter;
 
-  static init(state) {
+  static init(state: Map<string, any>): void {
     if (!state.get(this.DATABASE_MAP))state.set(this.DATABASE_MAP, new Map());
     if (!state.get(this.DATABASES))state.set(this.DATABASES, new Map());
     if (!state.get(this.DATABASE_ADAPTER))state.set(this.DATABASE_ADAPTER, this.defaultAdapter);
   }
 
-  static async setup(state) {
+  static async setup(state: Map<string, any>): Promise<void> {
     const conn = this.#getConnections(state.get(this.DATABASE_MAP), state.get(this.DATABASE_ADAPTER));
     conn.forEach((v, k) => {
       state.get(this.DATABASES).set(k, v);
@@ -30,11 +30,11 @@ export default class ControllerMixinDatabase extends ControllerMixin {
 
   /**
    *
-   * @param {Map} databaseMap
-   * @param {Database.} driverClass
+   * @param databaseMap
+   * @param driverClass
    * @returns {Map}
    */
-  static #getConnections(databaseMap, driverClass) {
+  static #getConnections(databaseMap: Map<string, any>, driverClass: typeof DatabaseAdapter): Map<string, any> {
     const hash = crypto.createHash('sha256');
     hash.update(Array.from(databaseMap.keys()).join('') + Array.from(databaseMap.values()).join(''));
     const key = hash.digest('hex');
@@ -47,7 +47,9 @@ export default class ControllerMixinDatabase extends ControllerMixin {
       try {
         connections.set(k, driverClass.create(v));
       } catch (e) {
-        Central.log(e, v, driverClass);
+        Central.log(e);
+        Central.log(v);
+        Central.log(driverClass);
         throw e;
       }
     });
