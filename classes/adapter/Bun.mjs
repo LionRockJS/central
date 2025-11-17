@@ -10,7 +10,7 @@ export default class Bun extends Node{
   }
 
   static fileExists(pathToFile){
-    return super.existsSync(pathToFile);
+    return super.fileExists(pathToFile);
   }
 
   static dirname(file=null){
@@ -18,10 +18,7 @@ export default class Bun extends Node{
   }
 
   static async import(pathToFile, cacheId=0){
-    let qs = `?r=${cacheId}`;
-    if(cacheId === 0)qs = '?'; //bun import always need ?
-//    const fixWindowsImport = (Os.type() === 'Windows_NT') ? "file://": "";
-    const module = await import(pathToFile + qs);
+    const module = await import(pathToFile);
     return module.default || module;
   }
 }
