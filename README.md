@@ -2,6 +2,70 @@
 
 LionRockJS is a Node.js MVC framework inspired by the Kohana Framework. It features a robust ORM, a flexible View system (compatible with LiquidJS), and a modular architecture.
 
+## Features
+
+### Core Architecture
+- **MVC Pattern**: Strict separation of Model, View, and Controller.
+- **Modular Design**: extensible architecture allowing code reuse across projects via modules.
+- **Multi-Runtime Support**: Designed to run seamlessly on **Node.js** and **Bun**.
+- **TypeScript**: Built with TypeScript for type safety and modern JavaScript features.
+- **Environment Management**: Built-in support for `DEV`, `TEST`, `STAGING`, and `PRODUCTION` environments.
+
+### Configuration & System
+- **Cascading Configuration**: Merges configs from system, modules, and application levels.
+- **Smart Caching**:
+  - Class path caching for faster resolution.
+  - View path caching.
+  - Hot-reload capabilities via cache clearing.
+- **Path Management**: Centralized handling of execution, application, and view paths.
+
+### ORM (Object Relational Mapping)
+- **Active Record Implementation**: Intuitive data access patterns.
+- **Relationships**:
+  - One-to-One (`belongsTo`)
+  - One-to-Many (`hasMany`)
+  - Many-to-Many (`belongsToMany`)
+- **Advanced Querying**:
+  - `readBy` / `countBy`: Simple key-value lookups.
+  - `readWith` / `countWith`: Complex criteria-based queries.
+  - `updateAll` / `deleteAll`: Batch operations.
+- **Database Agnostic**: Abstract adapter layer allowing support for various SQL databases.
+
+### Controller System
+- **Lifecycle Hooks**: `before()` and `after()` hooks for request processing.
+- **Mixin Architecture**: Composition over inheritance using mixins:
+  - **ActionLogger**: 
+    - Automatically logs critical actions (create, read, update, delete, import, export).
+    - Rotates logs by date (YYYY/MM/DD).
+    - Captures user context, IP, and request parameters.
+  - **Database**: 
+    - Manages multiple database connections.
+    - Connection pooling/caching based on configuration hash.
+    - Supports dependency injection for database adapters.
+  - **View**: 
+    - Manages the rendering pipeline (Layouts -> Templates).
+    - Supports "Placeholders" for dynamic content injection.
+    - Handles error templates and default view data.
+  - **Mime**: 
+    - Automatic `Content-Type` detection based on file extension/URL.
+    - Defaults to `text/html; charset=utf-8`.
+  - **ViewData**: 
+    - Automatically injects global context into views.
+    - Exposes `request` object (host, locale, path, query, cookies).
+- **State Management**: Centralized `ControllerState` for request/response context.
+
+### View Engine
+- **Layouts & Templates**: Support for nested layouts and reusable templates.
+- **Content Negotiation**: Automatic JSON rendering for API requests (`application/json`).
+- **LiquidJS Support**: Compatible with LiquidJS for logic-less templates.
+
+### Security & Helpers
+- **Crypto Helper**:
+  - Web Crypto API integration (`node:crypto`).
+  - Key generation (HMAC, RSA, ECDSA).
+  - Data signing and verification.
+- **Utilities**: Built-in helpers for path resolution, bootstrapping, and configuration.
+
 ## Getting Started
 
 Download the starter project from GitHub:
