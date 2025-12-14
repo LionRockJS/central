@@ -1,7 +1,11 @@
 .idea
 .gitlab-ci.yml
+.gitignore
 tests
 coverage
 node_modules
 spec
 concept
+src
+tsconfig.json
+.DS_Store
