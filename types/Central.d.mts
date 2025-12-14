@@ -12,15 +12,17 @@ interface CentralInitOptions {
     VIEW_PATH?: string | null;
     modules?: any[];
 }
+export declare enum CentralEnv {
+    DEV = "dev",
+    TEST = "uat",
+    STAGING = "stg",
+    PRODUCTION = "prd"
+}
 export default class Central {
     static EXE_PATH: string | null;
     static APP_PATH: string | null;
     static VIEW_PATH: string | null;
     static ENV: string;
-    static ENV_DEV: string;
-    static ENV_TEST: string;
-    static ENV_STAGING: string;
-    static ENV_PRODUCTION: string;
     static config: any;
     static nodePackages: Set<string>;
     static classPath: Map<string, any>;

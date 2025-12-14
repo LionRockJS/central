@@ -10,15 +10,18 @@ import HelperBootstrap from './helper/central/Bootstrap.mjs';
 import HelperConfig from './helper/central/Config.mjs';
 import HelperPath from './helper/central/Path.mjs';
 import AdapterNode from './adapter/Node.mjs';
+export var CentralEnv;
+(function (CentralEnv) {
+    CentralEnv["DEV"] = "dev";
+    CentralEnv["TEST"] = "uat";
+    CentralEnv["STAGING"] = "stg";
+    CentralEnv["PRODUCTION"] = "prd";
+})(CentralEnv || (CentralEnv = {}));
 export default class Central {
     static EXE_PATH = null;
     static APP_PATH = null;
     static VIEW_PATH = null;
     static ENV = '';
-    static ENV_DEV = 'dev';
-    static ENV_TEST = 'uat';
-    static ENV_STAGING = 'stg';
-    static ENV_PRODUCTION = 'prd';
     static config = HelperConfig.config;
     static nodePackages = HelperPath.nodePackages;
     static classPath = HelperCache.classPath;
@@ -86,7 +89,7 @@ export default class Central {
         return HelperPath.resolve(pathToFile, 'views', HelperCache.viewPath);
     }
     static log(args, verbose = true) {
-        if (Central.ENV === Central.ENV_PRODUCTION && Central.config?.system?.debug !== true)
+        if (Central.ENV === CentralEnv.PRODUCTION && Central.config?.system?.debug !== true)
             return args;
         if (verbose === false) {
             console.log(args);

@@ -20,16 +20,19 @@ interface CentralInitOptions {
   modules?: any[];
 }
 
+export enum CentralEnv {
+  DEV = 'dev',
+  TEST = 'uat',
+  STAGING = 'stg',
+  PRODUCTION = 'prd'
+}
+
 export default class Central {
   static EXE_PATH: string | null = null;
   static APP_PATH: string | null = null;
   static VIEW_PATH: string | null = null;
 
   static ENV: string = '';
-  static ENV_DEV: string = 'dev';
-  static ENV_TEST: string = 'uat';
-  static ENV_STAGING: string = 'stg';
-  static ENV_PRODUCTION: string = 'prd';
 
   static config = HelperConfig.config;
   static nodePackages = HelperPath.nodePackages;
@@ -111,7 +114,7 @@ export default class Central {
   }
 
   static log(args: any, verbose: boolean = true): any {
-    if(Central.ENV === Central.ENV_PRODUCTION && Central.config?.system?.debug !== true)return args;
+    if(Central.ENV === CentralEnv.PRODUCTION && Central.config?.system?.debug !== true)return args;
     if(verbose === false){
       console.log(args);
       return;

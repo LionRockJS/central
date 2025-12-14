@@ -1,20 +1,23 @@
 import fs from 'node:fs';
 import { ControllerMixin, ControllerState } from '@lionrockjs/mvc';
 import Central from '../Central.mjs';
+export var ActionLoggerState;
+(function (ActionLoggerState) {
+    ActionLoggerState["LOG_ACTIONS"] = "logActions";
+    ActionLoggerState["LOG_ACTIONS_ALL"] = "logActionsAll";
+})(ActionLoggerState || (ActionLoggerState = {}));
 export default class ActionLogger extends ControllerMixin {
-    static LOG_ACTIONS = 'logActions';
-    static LOG_ACTIONS_ALL = 'logActionsAll';
     static init(state) {
-        if (!state.get(this.LOG_ACTIONS))
-            state.set(this.LOG_ACTIONS, new Set(['update', 'delete', 'read', 'import', 'export', 'upload_post']));
+        if (!state.get(ActionLoggerState.LOG_ACTIONS))
+            state.set(ActionLoggerState.LOG_ACTIONS, new Set(['update', 'delete', 'read', 'import', 'export', 'upload_post']));
     }
     //log need to read session, it create in mixinSession.before()
     static async before(state) {
-        const logActions = state.get(this.LOG_ACTIONS);
+        const logActions = state.get(ActionLoggerState.LOG_ACTIONS);
         const request = state.get(ControllerState.REQUEST);
         const action = state.get(ControllerState.ACTION);
         // If logActions is null, log all actions. Otherwise, only log actions in the set.
-        if (logActions === this.LOG_ACTIONS_ALL || (logActions && logActions.has(action))) {
+        if (logActions === ActionLoggerState.LOG_ACTIONS_ALL || (logActions && logActions.has(action))) {
             const now = new Date();
             const YYYY = now.getFullYear();
             const MONTH = String(now.getMonth() + 1).padStart(2, '0');

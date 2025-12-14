@@ -1,5 +1,5 @@
 import {Controller, View, ControllerState} from '@lionrockjs/mvc';
-import ControllerMixinView from '../../classes/controller-mixin/View.mjs';
+import ControllerMixinView, { ControllerMixinViewState } from '../../classes/controller-mixin/View.mjs';
 
 describe('Controller Mixin View Test', () => {
   test('constructor', async () => {
@@ -11,9 +11,9 @@ describe('Controller Mixin View Test', () => {
     expect(typeof ControllerMixinView.setLayout).toBe('function');
     expect(typeof ControllerMixinView.setTemplate).toBe('function');
     expect(typeof ControllerMixinView.setErrorTemplate).toBe('function');
-    expect(typeof c.state.get(ControllerMixinView.TEMPLATE)).toBe('undefined');
-    expect(typeof c.state.get(ControllerMixinView.ERROR_TEMPLATE)).toBe('undefined');
-    expect(typeof c.state.get(ControllerMixinView.LAYOUT)).toBe('object');
+    expect(typeof c.state.get(ControllerMixinViewState.TEMPLATE)).toBe('undefined');
+    expect(typeof c.state.get(ControllerMixinViewState.ERROR_TEMPLATE)).toBe('undefined');
+    expect(typeof c.state.get(ControllerMixinViewState.LAYOUT)).toBe('object');
   });
 
   test('execute', async () => {
@@ -22,7 +22,7 @@ describe('Controller Mixin View Test', () => {
     }
     const c = new C({});
     c.state.get(ControllerState.HEADERS)['Content-Type'] = 'text/html';
-    Object.assign(c.state.get(ControllerMixinView.LAYOUT).data, { header: 'head', footer: 'foot' });
+    Object.assign(c.state.get(ControllerMixinViewState.LAYOUT).data, { header: 'head', footer: 'foot' });
 
     const r = await c.execute();
 
@@ -301,11 +301,11 @@ describe('Controller Mixin View Test', () => {
       constructor(request) {
         super(request,
           new Map([
-            [ControllerMixinView.LAYOUT_FILE, 'foo/bar'],
-            [ControllerMixinView.PLACEHOLDER, 'base'],
-            [ControllerMixinView.VIEW_CLASS, View.DefaultViewClass],
-            [ControllerMixinView.LAYOUT_DEFAULT_DATA, {}],
-            [ControllerMixinView.VIEW_DEFAULT_DATA, {}]
+            [ControllerMixinViewState.LAYOUT_FILE, 'foo/bar'],
+            [ControllerMixinViewState.PLACEHOLDER, 'base'],
+            [ControllerMixinViewState.VIEW_CLASS, View.DefaultViewClass],
+            [ControllerMixinViewState.LAYOUT_DEFAULT_DATA, {}],
+            [ControllerMixinViewState.VIEW_DEFAULT_DATA, {}]
           ])
         );
       }

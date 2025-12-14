@@ -1,6 +1,6 @@
 import { ControllerMixin, ControllerState } from '@lionrockjs/mvc';
 import Central from '../Central.mjs';
-import ControllerMixinView from './View.mjs';
+import { ControllerMixinViewState } from './View.mjs';
 export default class ControllerMixinViewData extends ControllerMixin {
     static init(state) {
         const request = state.get(ControllerState.REQUEST);
@@ -19,11 +19,11 @@ export default class ControllerMixinViewData extends ControllerMixin {
             query: request.query,
             cookies,
         };
-        Object.assign(state.get(ControllerMixinView.LAYOUT_DEFAULT_DATA), {
+        Object.assign(state.get(ControllerMixinViewState.LAYOUT_DEFAULT_DATA), {
             request: dataRequest,
             config: Central.config,
         });
-        Object.assign(state.get(ControllerMixinView.VIEW_DEFAULT_DATA), {
+        Object.assign(state.get(ControllerMixinViewState.VIEW_DEFAULT_DATA), {
             request: dataRequest,
             config: Central.config,
         });

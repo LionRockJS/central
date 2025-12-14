@@ -1,15 +1,17 @@
 import { ControllerMixin } from '@lionrockjs/mvc';
+export declare enum ControllerMixinViewState {
+    PLACEHOLDER = "placeHolder",
+    VIEW_CLASS = "viewClass",
+    THEME_PATH = "themePath",
+    LAYOUT = "layout",
+    LAYOUT_FILE = "layoutPath",
+    TEMPLATE = "template",
+    ERROR_TEMPLATE = "errorTemplate",
+    LAYOUT_DEFAULT_DATA = "layoutDefaultData",
+    VIEW_DEFAULT_DATA = "viewDefaultData"
+}
 export default class ControllerMixinView extends ControllerMixin {
     #private;
-    static PLACEHOLDER: string;
-    static VIEW_CLASS: string;
-    static THEME_PATH: string;
-    static LAYOUT: string;
-    static LAYOUT_FILE: string;
-    static TEMPLATE: string;
-    static ERROR_TEMPLATE: string;
-    static LAYOUT_DEFAULT_DATA: string;
-    static VIEW_DEFAULT_DATA: string;
     static init(state: any): void;
     static setTemplate(state: any, file: any, data?: {}, defaultFile?: string): void;
     static setLayout(state: any, file: any, data?: {}, defaultFile?: string): void;
