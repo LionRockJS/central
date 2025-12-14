@@ -1,4 +1,4 @@
-import { ControllerMixin, View, Controller } from '@lionrockjs/mvc';
+import { ControllerMixin, View, Controller, ControllerState } from '@lionrockjs/mvc';
 import JSONView from '../view/JSONView.mjs';
 
 export default class ControllerMixinView extends ControllerMixin {
@@ -20,7 +20,7 @@ export default class ControllerMixinView extends ControllerMixin {
   static VIEW_DEFAULT_DATA = 'viewDefaultData';
 
   static init(state) {
-    const language = state.get(Controller.STATE_LANGUAGE);
+    const language = state.get(ControllerState.LANGUAGE);
     const defaultViewData = {
       language
     };
@@ -68,7 +68,7 @@ export default class ControllerMixinView extends ControllerMixin {
 
   static assignJSONView(state){
     // .json return json content;
-    const headers = state.get(Controller.STATE_HEADERS);
+    const headers = state.get(ControllerState.HEADERS);
     if (/^application\/json/.test(headers['Content-Type'])) {
       state.set(this.LAYOUT, new JSONView(state.get(this.PLACEHOLDER)))
     }
@@ -82,13 +82,13 @@ export default class ControllerMixinView extends ControllerMixin {
     if (typeof output === 'object')output = JSON.stringify(output);
     if (typeof output !== 'string')throw new Error('Layout must be string or object');
 
-    state.set(Controller.STATE_BODY, output);
+    state.set(ControllerState.BODY, output);
   }
 
   static isSkipLayout(state){
-    const mime = state.get(Controller.STATE_HEADERS)['Content-Type'];
+    const mime = state.get(ControllerState.HEADERS)['Content-Type'];
     if (!mime)return false;
-    if (state.get(Controller.STATE_BODY) === null)return false;
+    if (state.get(ControllerState.BODY) === null)return false;
     if (/\/json/.test(mime))return false;
     if (/^text/.test(mime))return false;
     if (/xml/.test(mime))return false;
@@ -108,7 +108,7 @@ export default class ControllerMixinView extends ControllerMixin {
 
     // if layout data is string or no template, just render it.
     if(!template || typeof layout.data === 'string' ){
-      layout.data[state.get(this.PLACEHOLDER)] = state.get(Controller.STATE_BODY);
+      layout.data[state.get(this.PLACEHOLDER)] = state.get(ControllerState.BODY);
       await this.renderLayout(state);
       return;
     }
@@ -136,7 +136,7 @@ export default class ControllerMixinView extends ControllerMixin {
   }
 
   static async exit(state) {
-    if (state.get(Controller.STATE_STATUS) === 302) return;
+    if (state.get(ControllerState.STATUS) === 302) return;
     this.assignJSONView(state);
 
     const errorTemplate = state.get(this.ERROR_TEMPLATE);
@@ -145,10 +145,10 @@ export default class ControllerMixinView extends ControllerMixin {
 
     if(typeof layout.data !== 'string' ){
       if (errorTemplate) {
-        Object.assign(errorTemplate.data, { body: state.get(Controller.STATE_BODY) });
+        Object.assign(errorTemplate.data, { body: state.get(ControllerState.BODY) });
         layout.data[placeHolder] = await errorTemplate.render();
       } else {
-        layout.data[placeHolder] = state.get(Controller.STATE_BODY);
+        layout.data[placeHolder] = state.get(ControllerState.BODY);
       }
     }
 

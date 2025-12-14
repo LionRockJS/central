@@ -8,126 +8,126 @@
 import Central from './Central.mjs';
 import Model from './Model.mjs';
 export default class ORM {
-  static classPrefix = 'model/';
-  static create(MClass, options = {}) {
-    return new MClass(null, options);
-  }
-  static async factory(MClass, id, options = {}) {
-    const m = new MClass(id, options);
-    await m.read(options.columns);
-    return m;
-  }
-  static #collection(MClass, options = {}) {
-    const m = ORM.create(MClass, options);
-    return m.getCollection();
-  }
-  static async #readResult(result, m, creator, asArray) {
-    if (asArray)
-      return result.map(creator);
-    if (result.length === 0)
-      return null;
-    if (result.length === 1)
-      return Object.assign(m, result[0]);
-    return result.map(creator);
-  }
-  static async readAll(MClass, options = {}) {
-    const m = ORM.create(MClass, options);
-    const result = await m.getCollection().readAll(options.columns);
-    return this.#readResult(result, m, x => Object.assign(ORM.create(MClass, options), x), options.asArray);
-  }
-  static async readBy(MClass, key, values, options = {}) {
-    const m = ORM.create(MClass, options);
-    const result = await m.getCollection().readBy(key, values, options.columns) || [];
-    return this.#readResult(result, m, x => Object.assign(ORM.create(MClass, options), x), options.asArray);
-  }
-  /**
-   * Given criterias [['', 'id', SQL.EQUAL, 11], [SQL.AND, 'name', SQL.EQUAL, 'peter']]
-   */
-  static async readWith(MClass, criteria = [], options = {}) {
-    if (criteria.length === 0)
-      return [];
-    const m = ORM.create(MClass, options);
-    const result = await m.getCollection().readWith(criteria, options.columns) || [];
-    return this.#readResult(result, m, x => Object.assign(ORM.create(MClass, options), x), options.asArray);
-  }
-  static async countAll(MClass, options = {}) {
-    return await this.#collection(MClass, options).countAll();
-  }
-  static async countBy(MClass, key, values, options = {}) {
-    return await this.#collection(MClass, options).countBy(key, values);
-  }
-  /**
-   * Given criterias [['', 'id', SQL.EQUAL, 11], [SQL.AND, 'name', SQL.EQUAL, 'peter']]
-   */
-  static async countWith(MClass, criteria, options = {}) {
-    if (!criteria || criteria.length === 0)
-      throw new Error(`${MClass.constructor.name} count with no criteria`);
-    return await this.#collection(MClass, options).countWith(criteria);
-  }
-  static async deleteAll(MClass, options = {}) {
-    await this.#collection(MClass, options).deleteAll();
-  }
-  static async deleteBy(MClass, key, values, options = {}) {
-    await this.#collection(MClass, options).deleteBy(key, values);
-  }
-  /**
-   * Given criterias [['', 'id', SQL.EQUAL, 11], [SQL.AND, 'name', SQL.EQUAL, 'peter']]
-   */
-  static async deleteWith(MClass, criteria, options = {}) {
-    if (!criteria || criteria.length === 0)
-      throw new Error(`${MClass.name} delete with no criteria`);
-    const m = ORM.create(MClass, options);
-    return m.getCollection().deleteWith(criteria);
-  }
-  static async updateAll(MClass, kv, columnValues, options = {}) {
-    const m = ORM.create(MClass, options);
-    await m.getCollection().updateAll(kv, columnValues);
-  }
-  static async updateBy(MClass, key, values, columnValues, options = {}) {
-    const m = ORM.create(MClass, options);
-    return m.getCollection().updateBy(key, values, columnValues);
-  }
-  /**
-   * Given criterias [['', 'id', SQL.EQUAL, 11], [SQL.AND, 'name', SQL.EQUAL, 'peter']]
-   */
-  static async updateWith(MClass, criteria, columnValues, options = {}) {
-    if (!criteria || criteria.length === 0)
-      throw new Error(`${MClass.name} update with no criteria`);
-    if (!columnValues || columnValues.size === 0)
-      throw new Error(`${MClass.name} update without values`);
-    await this.#collection(MClass, options).updateWith(criteria, columnValues);
-  }
-  static async insertAll(MClass, columns, values, options = {}) {
-    // verify columns
-    columns.forEach(x => {
-      if (x === 'id')
-        return;
-      if (!MClass.fields.has(x) && !MClass.belongsTo.has(x))
-        throw new Error(`${MClass.name} insert invalid columns ${x}`);
-    });
-    await this.#collection(MClass, options).insertAll(columns, values);
-  }
-  static async import(modelName, defaultMClass = Model) {
-    try {
-      return await Central.import(ORM.classPrefix + modelName);
+    static classPrefix = 'model/';
+    static create(MClass, options = {}) {
+        return new MClass(null, options);
     }
-    catch (e) {
-      if (defaultMClass === Model)
-        throw e;
-      return defaultMClass;
+    static async factory(MClass, id, options = {}) {
+        const m = new MClass(id, options);
+        await m.read(options.columns);
+        return m;
     }
-  }
-  static async eagerLoad(orms, eagerLoadOptions) {
-    if (orms.length < 1)
-      return;
-    if (!eagerLoadOptions.with)
-      return;
-    await Promise.all(orms.map(async (it) => {
-      await it.eagerLoad(eagerLoadOptions);
-    }));
-  }
-  static async write(model) {
-    return model.write();
-  }
+    static #collection(MClass, options = {}) {
+        const m = ORM.create(MClass, options);
+        return m.getCollection();
+    }
+    static async #readResult(result, m, creator, asArray) {
+        if (asArray)
+            return result.map(creator);
+        if (result.length === 0)
+            return null;
+        if (result.length === 1)
+            return Object.assign(m, result[0]);
+        return result.map(creator);
+    }
+    static async readAll(MClass, options = {}) {
+        const m = ORM.create(MClass, options);
+        const result = await m.getCollection().readAll(options.columns);
+        return this.#readResult(result, m, x => Object.assign(ORM.create(MClass, options), x), options.asArray);
+    }
+    static async readBy(MClass, key, values, options = {}) {
+        const m = ORM.create(MClass, options);
+        const result = await m.getCollection().readBy(key, values, options.columns) || [];
+        return this.#readResult(result, m, x => Object.assign(ORM.create(MClass, options), x), options.asArray);
+    }
+    /**
+     * Given criterias [['', 'id', SQL.EQUAL, 11], [SQL.AND, 'name', SQL.EQUAL, 'peter']]
+     */
+    static async readWith(MClass, criteria = [], options = {}) {
+        if (criteria.length === 0)
+            return [];
+        const m = ORM.create(MClass, options);
+        const result = await m.getCollection().readWith(criteria, options.columns) || [];
+        return this.#readResult(result, m, x => Object.assign(ORM.create(MClass, options), x), options.asArray);
+    }
+    static async countAll(MClass, options = {}) {
+        return await this.#collection(MClass, options).countAll();
+    }
+    static async countBy(MClass, key, values, options = {}) {
+        return await this.#collection(MClass, options).countBy(key, values);
+    }
+    /**
+     * Given criterias [['', 'id', SQL.EQUAL, 11], [SQL.AND, 'name', SQL.EQUAL, 'peter']]
+     */
+    static async countWith(MClass, criteria, options = {}) {
+        if (!criteria || criteria.length === 0)
+            throw new Error(`${MClass.constructor.name} count with no criteria`);
+        return await this.#collection(MClass, options).countWith(criteria);
+    }
+    static async deleteAll(MClass, options = {}) {
+        await this.#collection(MClass, options).deleteAll();
+    }
+    static async deleteBy(MClass, key, values, options = {}) {
+        await this.#collection(MClass, options).deleteBy(key, values);
+    }
+    /**
+     * Given criterias [['', 'id', SQL.EQUAL, 11], [SQL.AND, 'name', SQL.EQUAL, 'peter']]
+     */
+    static async deleteWith(MClass, criteria, options = {}) {
+        if (!criteria || criteria.length === 0)
+            throw new Error(`${MClass.name} delete with no criteria`);
+        const m = ORM.create(MClass, options);
+        return m.getCollection().deleteWith(criteria);
+    }
+    static async updateAll(MClass, kv, columnValues, options = {}) {
+        const m = ORM.create(MClass, options);
+        await m.getCollection().updateAll(kv, columnValues);
+    }
+    static async updateBy(MClass, key, values, columnValues, options = {}) {
+        const m = ORM.create(MClass, options);
+        return m.getCollection().updateBy(key, values, columnValues);
+    }
+    /**
+     * Given criterias [['', 'id', SQL.EQUAL, 11], [SQL.AND, 'name', SQL.EQUAL, 'peter']]
+     */
+    static async updateWith(MClass, criteria, columnValues, options = {}) {
+        if (!criteria || criteria.length === 0)
+            throw new Error(`${MClass.name} update with no criteria`);
+        if (!columnValues || columnValues.size === 0)
+            throw new Error(`${MClass.name} update without values`);
+        await this.#collection(MClass, options).updateWith(criteria, columnValues);
+    }
+    static async insertAll(MClass, columns, values, options = {}) {
+        // verify columns
+        columns.forEach(x => {
+            if (x === 'id')
+                return;
+            if (!MClass.fields.has(x) && !MClass.belongsTo.has(x))
+                throw new Error(`${MClass.name} insert invalid columns ${x}`);
+        });
+        await this.#collection(MClass, options).insertAll(columns, values);
+    }
+    static async import(modelName, defaultMClass = Model) {
+        try {
+            return await Central.import(ORM.classPrefix + modelName);
+        }
+        catch (e) {
+            if (defaultMClass === Model)
+                throw e;
+            return defaultMClass;
+        }
+    }
+    static async eagerLoad(orms, eagerLoadOptions) {
+        if (orms.length < 1)
+            return;
+        if (!eagerLoadOptions.with)
+            return;
+        await Promise.all(orms.map(async (it) => {
+            await it.eagerLoad(eagerLoadOptions);
+        }));
+    }
+    static async write(model) {
+        return model.write();
+    }
 }
 Object.freeze(ORM.prototype);

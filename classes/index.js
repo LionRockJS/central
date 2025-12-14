@@ -21,11 +21,11 @@ import ControllerMixinViewData from './controller-mixin/ViewData.mjs';
 import ORMAdapter from './adapter/ORM.mjs';
 import DatabaseAdapter from './adapter/Database.mjs';
 import JSONView from "./view/JSONView.mjs";
-import { Controller, ControllerMixin, View } from '@lionrockjs/mvc';
+import { Controller, ControllerMixin, View, ControllerState } from '@lionrockjs/mvc';
 export default Central;
 export { CentralAdapterBun, CentralAdapterNode, 
 //mvc
-Model, View, Controller, ControllerMixin, ORM, 
+Model, View, Controller, ControllerMixin, ControllerState, ORM, 
 //adapters
 ORMAdapter, DatabaseAdapter, JSONView, 
 //controller mixins

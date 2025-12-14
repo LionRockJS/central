@@ -1,4 +1,4 @@
-import {Controller, View} from '@lionrockjs/mvc';
+import {Controller, View, ControllerState} from '@lionrockjs/mvc';
 import ControllerMixinView from '../../classes/controller-mixin/View.mjs';
 
 describe('Controller Mixin View Test', () => {
@@ -21,7 +21,7 @@ describe('Controller Mixin View Test', () => {
       static mixins = [ControllerMixinView];
     }
     const c = new C({});
-    c.state.get(Controller.STATE_HEADERS)['Content-Type'] = 'text/html';
+    c.state.get(ControllerState.HEADERS)['Content-Type'] = 'text/html';
     Object.assign(c.state.get(ControllerMixinView.LAYOUT).data, { header: 'head', footer: 'foot' });
 
     const r = await c.execute();
@@ -35,7 +35,7 @@ describe('Controller Mixin View Test', () => {
       static mixins = [ControllerMixinView];
     }
     const c = new C({});
-    c.state.get(Controller.STATE_HEADERS)['Content-Type'] = 'text/html';
+    c.state.get(ControllerState.HEADERS)['Content-Type'] = 'text/html';
 
     Object.assign(c.state.get('layout').data, { header: 'head', footer: 'foot' });
     ControllerMixinView.setTemplate(c.state,'', { content: 'hello' });
@@ -55,7 +55,7 @@ describe('Controller Mixin View Test', () => {
       static mixins = [ControllerMixinView];
     }
     const c = new C({});
-    c.state.get(Controller.STATE_HEADERS)['Content-Type'] = 'text/html';
+    c.state.get(ControllerState.HEADERS)['Content-Type'] = 'text/html';
 
     c.action_test = async () => {
       throw new Error('error throw');
@@ -96,7 +96,7 @@ describe('Controller Mixin View Test', () => {
       static mixins = [ControllerMixinView];
     }
     const c = new C({});
-    c.state.get(Controller.STATE_HEADERS)['Content-Type'] = 'text/html';
+    c.state.get(ControllerState.HEADERS)['Content-Type'] = 'text/html';
     ControllerMixinView.setLayout(c.state, 'layout', { foo: 'bar' });
 
     Object.assign(c.state.get('layout').data, { header: 'head', footer: 'foot' });
@@ -127,7 +127,7 @@ describe('Controller Mixin View Test', () => {
       static mixins = [ControllerMixinView];
     }
     const c = new C({});
-    c.state.get(Controller.STATE_HEADERS)['Content-Type'] = 'text/html';
+    c.state.get(ControllerState.HEADERS)['Content-Type'] = 'text/html';
 
     ControllerMixinView.setLayout(c.state, 'layout', { hello: 'world' });
     ControllerMixinView.setTemplate(c.state, 'tpl', { content: 'wow' });
@@ -175,16 +175,16 @@ describe('Controller Mixin View Test', () => {
       static mixins = [ControllerMixinView];
 
       async action_test() {
-        this.state.set(Controller.STATE_BODY, { foo: 'bar' });
+        this.state.set(ControllerState.BODY, { foo: 'bar' });
       }
     }
     const c = new C({});
-    c.state.get(Controller.STATE_HEADERS)['Content-Type'] = 'application/json';
+    c.state.get(ControllerState.HEADERS)['Content-Type'] = 'application/json';
     const res = await c.execute('test');
     expect(res.body).toBe('{"foo":"bar"}');
 
     const c2 = new C({});
-    c2.state.get(Controller.STATE_HEADERS)['Content-Type'] = 'application/json; charset=utf-8';
+    c2.state.get(ControllerState.HEADERS)['Content-Type'] = 'application/json; charset=utf-8';
 
     const res2 = await c2.execute('test');
     expect(res2.body).toBe('{"foo":"bar"}');
@@ -195,7 +195,7 @@ describe('Controller Mixin View Test', () => {
       static mixins = [ControllerMixinView];
 
       async action_test() {
-        this.state.set(Controller.STATE_BODY, {
+        this.state.set(ControllerState.BODY, {
           error: 'bar',
         });
         throw new Error();
@@ -203,7 +203,7 @@ describe('Controller Mixin View Test', () => {
     }
 
     const c = new C({});
-    c.state.get(Controller.STATE_HEADERS)['Content-Type'] = 'application/json';
+    c.state.get(ControllerState.HEADERS)['Content-Type'] = 'application/json';
     const res = await c.execute('test');
     expect(res.body).toBe('{"error":"bar"}');
   })
@@ -218,7 +218,7 @@ describe('Controller Mixin View Test', () => {
         ControllerMixinView.setErrorTemplate(this.state, {render:()=>'error_tpl', data:{}}, {});
       }
       async action_test() {
-        this.state.set(Controller.STATE_BODY, {
+        this.state.set(ControllerState.BODY, {
           foo: 'bar',
         });
       }
@@ -239,7 +239,7 @@ describe('Controller Mixin View Test', () => {
         ControllerMixinView.setErrorTemplate(this.state, {render:()=>'error_tpl', data:{}}, {});
       }
       async action_test() {
-        this.state.set(Controller.STATE_BODY, {
+        this.state.set(ControllerState.BODY, {
           foo: 'bar',
         });
       }
@@ -257,11 +257,11 @@ describe('Controller Mixin View Test', () => {
       constructor(request) {
         super(request);
         ControllerMixinView.setLayout(this.state, new View('layout', {}), {});
-        ControllerMixinView.setTemplate(this.state, {render:()=>this.state.get(Controller.STATE_BODY), data:{}}, {});
+        ControllerMixinView.setTemplate(this.state, {render:()=>this.state.get(ControllerState.BODY), data:{}}, {});
         ControllerMixinView.setErrorTemplate(this.state, {render:()=>'error_tpl', data:{}}, {});
       }
       async action_test() {
-        this.state.set(Controller.STATE_BODY, {
+        this.state.set(ControllerState.BODY, {
           foo: 'bar',
         });
       }
@@ -283,7 +283,7 @@ describe('Controller Mixin View Test', () => {
         ControllerMixinView.setErrorTemplate(this.state, {render:()=>'error_tpl', data:{}});
       }
       async action_test() {
-        this.state.set(Controller.STATE_BODY, {
+        this.state.set(ControllerState.BODY, {
           foo: 'bar',
         });
       }
@@ -310,7 +310,7 @@ describe('Controller Mixin View Test', () => {
         );
       }
       async action_test() {
-        this.state.set(Controller.STATE_BODY, {
+        this.state.set(ControllerState.BODY, {
           foo: 'bar',
         });
       }

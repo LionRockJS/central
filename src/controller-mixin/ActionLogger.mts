@@ -1,5 +1,5 @@
 import fs from 'node:fs';
-import { Controller, ControllerMixin } from '@lionrockjs/mvc';
+import { Controller, ControllerMixin, ControllerState } from '@lionrockjs/mvc';
 import Central from '../Central.mjs';
 
 export default class ActionLogger extends ControllerMixin{
@@ -13,8 +13,8 @@ export default class ActionLogger extends ControllerMixin{
     //log need to read session, it create in mixinSession.before()
     static async before(state: Map<string, any>): Promise<void> {
       const logActions = state.get(this.LOG_ACTIONS);
-      const request = state.get(Controller.STATE_REQUEST);
-      const action  = state.get(Controller.STATE_ACTION);
+      const request = state.get(ControllerState.REQUEST);
+      const action  = state.get(ControllerState.ACTION);
 
       // If logActions is null, log all actions. Otherwise, only log actions in the set.
       if(logActions === this.LOG_ACTIONS_ALL || (logActions && logActions.has(action))){
@@ -40,8 +40,8 @@ export default class ActionLogger extends ControllerMixin{
         const data = {
           time       : `${HH}:${MM}:${SS}`,
           user       : user,
-          ip         : state.get(Controller.STATE_CLIENT_IP),
-          params     : state.get(Controller.STATE_PARAMS),
+          ip         : state.get(ControllerState.CLIENT_IP),
+          params     : state.get(ControllerState.PARAMS),
         };
 
         fs.appendFile(file, `${JSON.stringify(data)}\n` , err => {if (err) throw err;});

@@ -26,7 +26,7 @@ import ORMAdapter from './adapter/ORM.mjs';
 import DatabaseAdapter from './adapter/Database.mjs';
 import JSONView from "./view/JSONView.mjs";
 
-import { Controller, ControllerMixin, View } from '@lionrockjs/mvc';
+import { Controller, ControllerMixin, View, ControllerState } from '@lionrockjs/mvc';
 
 export default Central
 
@@ -38,6 +38,7 @@ export {
   View,
   Controller,
   ControllerMixin,
+  ControllerState,
   ORM,
 //adapters
   ORMAdapter,
