@@ -9,6 +9,7 @@
 import ORM from './ORM.mjs';
 import ORMAdapter from './adapter/ORM.mjs';
 import ModelCollection from './ModelCollection.mjs';
+import {Model as MVCModel} from '@lionrockjs/mvc';
 
 interface ORMOption {
   database?: any;
@@ -24,7 +25,7 @@ interface ORMOption {
   insertIDs?: (string | number)[];
 }
 
-export default class Model {
+export default class Model extends MVCModel{
   // ORM is abstract, joinTablePrefix and tableName is null.
   static database: any = null;
 
@@ -56,7 +57,7 @@ export default class Model {
 
   #database: any = null;
   #options: ORMOption = {};
-  #states: any[] = [];
+
   #adapter: ORMAdapter;
   #columns: string[] = [];
   #defaultSelectColumns: string[] = [];
@@ -68,9 +69,10 @@ export default class Model {
    * @param options
    * */
   constructor(id: string | number | null = null, options: ORMOption = {}) {
+    super(id);
+
     this.#database = options.database || Model.database;
     this.#options = options;
-    this.#states = [];
 
     const Adapter = options.adapter || Model.defaultAdapter;
     this.#adapter = new Adapter(this, this.#database);
@@ -102,19 +104,6 @@ export default class Model {
    */
   getColumns(): string[] {
     return this.#columns;
-  }
-
-  /**
-   * states is a list of snapshots of the model.
-   *
-   * @returns {Array}
-   */
-  getStates(): any[] {
-    return this.#states;
-  }
-
-  snapshot(): void {
-    this.#states.push({ ...this });
   }
 
   /**
