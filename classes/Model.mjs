@@ -25,7 +25,6 @@ export default class Model extends MVCModel {
     uuid = null;
     created_at = null;
     updated_at = null;
-    id = null;
     #database = null;
     #options = {};
     #adapter;

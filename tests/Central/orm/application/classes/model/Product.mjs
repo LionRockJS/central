@@ -1,4 +1,4 @@
-import Model from '../../../../../../classes/Model.mjs';
+import Model from '../../../../../../src/Model.mts';
 
 export default class Product extends Model{
   //foreignKeys

@@ -1,11 +1,11 @@
 import * as url from 'node:url';
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url)).replace(/\/$/, '');
 
-import Central from "../../classes/Central.mjs";
-import CentralAdapterNode from "../../classes/adapter/Node.mjs";
+import Central from "../../src/Central.mts";
+import CentralAdapterNode from "../../src/adapter/Node.mts";
 
-import ORM from "../../classes/ORM.mjs";
-import Model from "../../classes/Model.mjs";
+import ORM from "../../src/ORM.mts";
+import Model from "../../src/Model.mts";
 import ORMAdapterTest from "./orm/application/classes/ORMAdapterTest.mjs";
 
 Central.adapter = CentralAdapterNode;
@@ -218,7 +218,7 @@ describe('orm test', () => {
       expect('this line should not be run').expect(true);
     } catch (e) {
       ORM.classPrefix = 'model/';
-      expect(e.message).toBe('Resolve path error: path models/Person.mjs not found. prefixPath: classes , store: {} ');
+      expect(e.message).toBe('Resolve path error: path models/Person not found. prefixPath: classes , store: {} ');
     }
   });
 

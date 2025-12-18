@@ -92,10 +92,13 @@ export default class Central {
         // pathToFile may include file extension;
         const adjustedPathToFile = /\..*$/.test(pathToFile) ? pathToFile : `${pathToFile}`;
         // if explicit set classPath to Class or required object, just return it.
-        const c = HelperCache.classPath.get(adjustedPathToFile);
+        let c = HelperCache.classPath.get(adjustedPathToFile);
+        if (!c && !/\..*$/.test(pathToFile)) {
+            c = HelperCache.classPath.get(`${adjustedPathToFile}.mjs`) || HelperCache.classPath.get(`${adjustedPathToFile}.js`) || HelperCache.classPath.get(`${adjustedPathToFile}.ts`);
+        }
         if (c && typeof c !== 'string')
             return c;
-        const file = HelperPath.resolve(adjustedPathToFile, 'classes', HelperCache.classPath);
+        const file = (typeof c === 'string') ? c : HelperPath.resolve(adjustedPathToFile, 'classes', HelperCache.classPath);
         return await this.adapter.import(file, HelperCache.cacheId);
     }
     static resolveView(pathToFile) {
@@ -115,6 +118,8 @@ export default class Central {
         await HelperPath.addModules(modules);
         //loop modules, if have it.configs, add them to config
         for (const it of modules) {
+            if (!it)
+                continue;
             const configs = it.configs || it.default?.configs;
             const filename = it.filename || it.default?.filename;
             if (configs && filename) {

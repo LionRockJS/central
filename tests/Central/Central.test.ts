@@ -5,7 +5,7 @@ import {fileURLToPath} from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 
-import Central, {CentralEnv} from "../../src/Central.mjs";
+import Central, {CentralEnv} from "../../src/Central.mts";
 import CentralAdapterBun from "../../src/adapter/Bun.mts";
 import CentralAdapterNode from "../../src/adapter/Node.mts";
 const runtime = (typeof process !== 'undefined') ? ( (process.env._ || '').split('/').pop() ) : "browser";
@@ -40,7 +40,7 @@ describe('Central test', () => {
     expect(Central.VIEW_PATH).toBe(`${__dirname}/views`);
   });
 
-  test.only('nodePackages after re-init', async () => {
+  test('nodePackages after re-init', async () => {
     await Central.init({ EXE_PATH: `${__dirname}/test1/`});
     expect(JSON.stringify([...Central.nodePackages.keys()])).toBe(JSON.stringify([path.normalize(`${__dirname}/test1/modules/test`)]));
 
@@ -90,7 +90,7 @@ describe('Central test', () => {
       const Foo2 = await Central.import('Foo');
       // eslint-disable-next-line no-unused-vars
       const f2 = new Foo2();
-    } catch (e) {
+    } catch (e:any) {
       expect(e.message.replace(/ {[^}]+}/, '')).toBe('Resolve path error: path Foo not found. prefixPath: classes , store: {} ');
     }
   });
@@ -111,7 +111,7 @@ describe('Central test', () => {
       const Foo2 = await Central.import('Foo');
       // eslint-disable-next-line no-unused-vars
       const f2 = new Foo2();
-    } catch (e) {
+    } catch (e:any) {
       expect(e.message.replace(/ {[^}]+}/, '')).toBe('Resolve path error: path Foo not found. prefixPath: classes , store: {} ');
     }
   });
@@ -133,16 +133,16 @@ describe('Central test', () => {
   test('path not found', async () => {
     try {
       await Central.import('NotFound');
-    } catch (e) {
+    } catch (e:any) {
       expect(e.message.replace(/ {[^}]+}/, '')).toBe('Resolve path error: path NotFound not found. prefixPath: classes , store: {} ');
     }
   });
 
   test('npm modules init ', async () => {
-    expect(global.testInit).toBe(undefined);
+    expect((global as any).testInit).toBe(undefined);
     await Central.init({ EXE_PATH: `${__dirname}/test5` });
-    expect(global.testInit).toBe(true);
-    delete global.testInit;
+    expect((global as any).testInit).toBe(true);
+    delete (global as any).testInit;
   });
 
   test('clear cache', async () => {
@@ -153,7 +153,6 @@ describe('Central test', () => {
     const Foo2 = await Central.import('Foo');
     expect(Foo2.id).toBe(1);
 
-    Central.configForceUpdate = false;
     Central.config.classes.cache = true;
     await Central.flushCache();
 
@@ -178,12 +177,10 @@ describe('Central test', () => {
     // jest override require, need to use reset modules to invalidate
 
     expect(Central.config.view.cache).toBe(true);
-
-    Central.configForceUpdate = true;
   });
 
   test('resolveView', async () => {
-    await Central.init({ EXE_PATH: `${__dirname}/test7` });
+    await Central.init({ EXE_PATH: `${__dirname}/test7`, VIEW_PATH: `${__dirname}/test7/application/views` });
     const viewFile = Central.resolveView('test.html');
     expect(viewFile).toBe(`${__dirname}/test7/application/views/test.html`);
   });
@@ -219,7 +216,6 @@ describe('Central test', () => {
     await Central.init({ EXE_PATH: `${__dirname}/test8` });
     await deleteFile(`${Central.APP_PATH}/config/salt.js`);
 
-    Central.configForceUpdate = true;
     await Central.initConfig(new Map([['salt', {value:'hello'}], ['test', null]]));
 
     expect(Central.config.salt.value).toBe('hello');
@@ -228,7 +224,7 @@ describe('Central test', () => {
 
   test('setPath default value', async() => {
     await Central.init();
-    expect(path.normalize(`${Central.EXE_PATH}/`)).toBe(path.normalize(`${__dirname}/../../classes/adapter/`));
+    expect(path.normalize(`${Central.EXE_PATH}/`)).toBe(path.normalize(`${__dirname}/../../src/adapter/`));
   });
 
   test('set all init value', async () => {
@@ -256,14 +252,14 @@ describe('Central test', () => {
     try {
       await Central.import('../hello');
       expect('this line should not run').toBe('');
-    } catch (e) {
+    } catch (e:any) {
       expect(e.message).toBe('invalid require path');
     }
 
     try {
       await Central.import('foo/../hello');
       expect('this line should not run').toBe('');
-    } catch (e) {
+    } catch (e:any) {
       expect(e.message).toBe('invalid require path');
     }
   });
@@ -327,7 +323,7 @@ describe('Central test', () => {
     try{
       await Central.init({ EXE_PATH: __dirname+ '/test16/' });
       expect('this line should not run').toBe('');
-    }catch(e){
+    }catch(e:any){
       expect(e.message).toBe('Test Error when import bootstrap');
     }
   });
@@ -335,7 +331,7 @@ describe('Central test', () => {
   test('coverage central.mjs', async () => {
     await Central.init({ EXE_PATH: __dirname });
 
-    Central.ENV = Central.ENV_PROD;
+    Central.ENV = CentralEnv.PRODUCTION;
     Central.config.system.debug = true;
     Central.log('hello', true);
 
@@ -353,7 +349,7 @@ describe('Central test', () => {
 
   test('log', async()=>{
     Central.log('hello');
-    Central.ENV = Central.ENV_PROD;
+    Central.ENV = CentralEnv.PRODUCTION;
     Central.log('hello');
   });
 

@@ -11,7 +11,8 @@ export default class Bun extends Node {
         return super.dirname(file);
     }
     static async import(pathToFile, cacheId = 0) {
-        const module = await import(pathToFile);
+        let path = (cacheId === 0) ? pathToFile : `${pathToFile}?cache=${cacheId}`;
+        const module = await import(path);
         return module.default || module;
     }
 }

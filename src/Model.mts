@@ -53,7 +53,7 @@ export default class Model extends MVCModel{
 
   updated_at: number | null = null;
 
-  id: string | number | null = null;
+  declare id: string | number | null;
 
   #database: any = null;
   #options: ORMOption = {};

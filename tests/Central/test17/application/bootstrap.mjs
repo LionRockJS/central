@@ -1,4 +1,4 @@
-import Central from '../../../../classes/Central.mjs';
+import Central from '../../../../src/Central.mts';
 import Test from '../modules/test';
 import Test2 from '../modules/test2';
 

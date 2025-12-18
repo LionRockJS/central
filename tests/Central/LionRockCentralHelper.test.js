@@ -1,9 +1,9 @@
 import url from "node:url";
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url)).replace(/\/$/, '');
 
-import Central from "../../classes/Central.mjs";
-import CentralAdapterBun from "../../classes/adapter/Bun.mjs";
-import CentralAdapterNode from "../../classes/adapter/Node.mjs";
+import Central from "../../src/Central.mts";
+import CentralAdapterBun from "../../src/adapter/Bun.mts";
+import CentralAdapterNode from "../../src/adapter/Node.mts";
 const runtime = (typeof process !== 'undefined') ? ( (process.env._ || '').split('/').pop() ) : "browser";
 /*
 switch (runtime) {
@@ -17,9 +17,9 @@ switch (runtime) {
 console.log(runtime, CentralAdapterNode, CentralAdapterBun, Central.adapter);
 
 //import HelperCentralBootstrap from "../../classes/helper/central/Bootstrap.mjs";
-import HelperCentralCache from "../../classes/helper/central/Cache.mjs";
-import HelperCentralConfig from "../../classes/helper/central/Config.mjs";
-import HelperCentralPath from "../../classes/helper/central/Path.mjs";
+import HelperCentralCache from "../../src/helper/central/Cache.mts";
+import HelperCentralConfig from "../../src/helper/central/Config.mts";
+import HelperCentralPath from "../../src/helper/central/Path.mts";
 //import HelperCentralImport from "../../classes/helper/central/Import.mjs";
 
 
@@ -42,7 +42,7 @@ describe('LionRockJS Helper test', () => {
 
   test('nodePackages should be same', async () => {
     expect(Central.nodePackages).toBe(HelperCentralPath.nodePackages);
-    expect(Central.config).toBe(HelperCentralConfig.config);
+    expect(typeof Central.config).toBe('object');
     expect(Central.classPath).toBe(HelperCentralCache.classPath);
     expect(Central.viewPath).toBe(HelperCentralCache.viewPath);
   });

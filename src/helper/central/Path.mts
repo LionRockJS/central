@@ -38,6 +38,7 @@ export default class HelperPath{
     const fetchPaths = [];
     if (prefixPath === 'views')fetchPaths.push(`${Central.VIEW_PATH}/${pathToFile}`);
 
+    fetchPaths.push(`${Central.APP_PATH || ''}/${prefixPath}/${pathToFile}`);
     fetchPaths.push(`${Central.APP_PATH || ''}/${prefixPath}/${pathToFile}.ts`);
     fetchPaths.push(`${Central.APP_PATH || ''}/${prefixPath}/${pathToFile}.mjs`);
     fetchPaths.push(`${Central.APP_PATH || ''}/${prefixPath}/${pathToFile}.js`);

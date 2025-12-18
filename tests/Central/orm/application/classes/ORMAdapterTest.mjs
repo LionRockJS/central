@@ -1,4 +1,4 @@
-import ORMAdapter from '../../../../../classes/adapter/ORM.mjs';
+import ORMAdapter from '../../../../../src/adapter/ORM.mts';
 
 export default class ORMAdapterTest extends ORMAdapter {
   read() {

@@ -1,4 +1,4 @@
-import Model from '../../../../../../classes/Model.mjs';
+import Model from '../../../../../../src/Model.mts';
 
 export default class Address extends Model{
   person_id = null;
