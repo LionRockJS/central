@@ -9,7 +9,7 @@
 import ORM from './ORM.mjs';
 import ORMAdapter from './adapter/ORM.mjs';
 import ModelCollection from './ModelCollection.mjs';
-import {Model as MVCModel} from '@lionrockjs/mvc';
+import { Model as MVCModel } from '@lionrockjs/mvc';
 
 interface ORMOption {
   database?: any;
@@ -84,8 +84,6 @@ export default class Model extends MVCModel{
     Array.from((this.constructor as typeof Model).belongsTo.keys()).forEach(x => this.#columns.push(x));
 
     this.#defaultSelectColumns = ['id', 'created_at', 'updated_at', ...this.#columns];
-
-    this.id = id;
     this.#collection = new ModelCollection(this.#adapter, this.#options, this.#defaultSelectColumns);
   }
 

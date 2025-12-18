@@ -38,7 +38,9 @@ export default class HelperPath{
     const fetchPaths = [];
     if (prefixPath === 'views')fetchPaths.push(`${Central.VIEW_PATH}/${pathToFile}`);
 
-    fetchPaths.push(`${Central.APP_PATH || ''}/${prefixPath}/${pathToFile}`);
+    fetchPaths.push(`${Central.APP_PATH || ''}/${prefixPath}/${pathToFile}.ts`);
+    fetchPaths.push(`${Central.APP_PATH || ''}/${prefixPath}/${pathToFile}.mjs`);
+    fetchPaths.push(`${Central.APP_PATH || ''}/${prefixPath}/${pathToFile}.js`);
     fetchPaths.push(pathToFile);
 
     // load from node_modules and modules
@@ -64,10 +66,7 @@ export default class HelperPath{
           return;
         }
 
-        const dirname = Central.adapter.dirname(filename);
-        this.nodePackages.add(dirname);
-
-        await HelperConfig.addConfigs(dirname, it.configs || it.default?.configs || []);
+        this.nodePackages.add(Central.adapter.dirname(filename));
       })
     );
   }

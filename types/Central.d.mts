@@ -13,12 +13,13 @@ interface CentralInitOptions {
     modules?: any[];
 }
 export declare enum CentralEnv {
-    DEV = "dev",
+    DEVELOPMENT = "dev",
     TEST = "uat",
     STAGING = "stg",
     PRODUCTION = "prd"
 }
 export default class Central {
+    #private;
     static EXE_PATH: string | null;
     static APP_PATH: string | null;
     static VIEW_PATH: string | null;

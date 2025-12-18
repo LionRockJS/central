@@ -13,8 +13,11 @@ export default class Node extends Noop{
   }
 
   static fileExists(pathToFile: string): boolean {
+    let pathToTest = pathToFile;
+    if(path.extname(pathToFile) === '')pathToTest = `${pathToFile}.mjs`;
+
     try{
-      return fs.statSync(pathToFile).isFile();
+      return fs.statSync(pathToTest).isFile();
     }catch(e){
       return false;
     }

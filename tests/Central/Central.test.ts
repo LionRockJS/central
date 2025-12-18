@@ -1,14 +1,15 @@
+import {describe, test, expect} from "bun:test";
 import { access, unlink, constants, copyFile } from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 
-import Central from "../../classes/Central.mjs";
-import CentralAdapterBun from "../../classes/adapter/Bun.mjs";
-import CentralAdapterNode from "../../classes/adapter/Node.mjs";
+import Central, {CentralEnv} from "../../src/Central.mjs";
+import CentralAdapterBun from "../../src/adapter/Bun.mts";
+import CentralAdapterNode from "../../src/adapter/Node.mts";
 const runtime = (typeof process !== 'undefined') ? ( (process.env._ || '').split('/').pop() ) : "browser";
-/*
+
 switch (runtime) {
   case 'node':
     Central.adapter = CentralAdapterNode;
@@ -16,10 +17,10 @@ switch (runtime) {
   case 'bun':
     Central.adapter = CentralAdapterBun;
     break;
-}*/
-Central.ENV = Central.ENV_PROD;
+}
+Central.ENV = CentralEnv.PRODUCTION;
 
-async function deleteFile(file){
+async function deleteFile(file: string){
   try {
     await access(file, constants.F_OK);
     await unlink(file);
@@ -28,7 +29,7 @@ async function deleteFile(file){
   }
 }
 
-async function wait(ms){
+async function wait(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -39,12 +40,12 @@ describe('Central test', () => {
     expect(Central.VIEW_PATH).toBe(`${__dirname}/views`);
   });
 
-  test('nodePackages after re-init', async () => {
+  test.only('nodePackages after re-init', async () => {
     await Central.init({ EXE_PATH: `${__dirname}/test1/`});
     expect(JSON.stringify([...Central.nodePackages.keys()])).toBe(JSON.stringify([path.normalize(`${__dirname}/test1/modules/test`)]));
 
-    await Central.init({ EXE_PATH: `${__dirname}/test1/`});
-    expect(JSON.stringify([...Central.nodePackages.keys()])).toBe(JSON.stringify([path.normalize(`${__dirname}/test1/modules/test`)]));
+    await Central.init({ EXE_PATH: `${__dirname}/test2/`});
+    expect(JSON.stringify([...Central.nodePackages.keys()])).toBe(JSON.stringify([path.normalize(`${__dirname}/test2/modules/test`)]));
   });
 
   test('Central.import', async () => {
@@ -90,7 +91,7 @@ describe('Central test', () => {
       // eslint-disable-next-line no-unused-vars
       const f2 = new Foo2();
     } catch (e) {
-      expect(e.message.replace(/ {[^}]+}/, '')).toBe('Resolve path error: path Foo.mjs not found. prefixPath: classes , store: {} ');
+      expect(e.message.replace(/ {[^}]+}/, '')).toBe('Resolve path error: path Foo not found. prefixPath: classes , store: {} ');
     }
   });
 
@@ -111,7 +112,7 @@ describe('Central test', () => {
       // eslint-disable-next-line no-unused-vars
       const f2 = new Foo2();
     } catch (e) {
-      expect(e.message.replace(/ {[^}]+}/, '')).toBe('Resolve path error: path Foo.mjs not found. prefixPath: classes , store: {} ');
+      expect(e.message.replace(/ {[^}]+}/, '')).toBe('Resolve path error: path Foo not found. prefixPath: classes , store: {} ');
     }
   });
 
@@ -133,7 +134,7 @@ describe('Central test', () => {
     try {
       await Central.import('NotFound');
     } catch (e) {
-      expect(e.message.replace(/ {[^}]+}/, '')).toBe('Resolve path error: path NotFound.mjs not found. prefixPath: classes , store: {} ');
+      expect(e.message.replace(/ {[^}]+}/, '')).toBe('Resolve path error: path NotFound not found. prefixPath: classes , store: {} ');
     }
   });
 

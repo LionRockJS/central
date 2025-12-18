@@ -4,7 +4,8 @@ export default class Bun extends Node {
         return super.resolveFetchList(x, store, pathToFile);
     }
     static fileExists(pathToFile) {
-        return super.fileExists(pathToFile);
+        //if no extension, check for .ts, .mts, .mjs
+        return super.fileExists(pathToFile + '.ts') || super.fileExists(pathToFile + '.mts') || super.fileExists(pathToFile);
     }
     static dirname(file = null) {
         return super.dirname(file);

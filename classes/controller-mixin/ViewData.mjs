@@ -21,11 +21,9 @@ export default class ControllerMixinViewData extends ControllerMixin {
         };
         Object.assign(state.get(ControllerMixinViewState.LAYOUT_DEFAULT_DATA), {
             request: dataRequest,
-            config: Central.config,
         });
         Object.assign(state.get(ControllerMixinViewState.VIEW_DEFAULT_DATA), {
             request: dataRequest,
-            config: Central.config,
         });
     }
 }

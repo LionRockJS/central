@@ -8,7 +8,8 @@
 import ORM from './ORM.mjs';
 import ORMAdapter from './adapter/ORM.mjs';
 import ModelCollection from './ModelCollection.mjs';
-export default class Model {
+import { Model as MVCModel } from '@lionrockjs/mvc';
+export default class Model extends MVCModel {
     // ORM is abstract, joinTablePrefix and tableName is null.
     static database = null;
     static tableName = null;
@@ -27,7 +28,6 @@ export default class Model {
     id = null;
     #database = null;
     #options = {};
-    #states = [];
     #adapter;
     #columns = [];
     #defaultSelectColumns = [];
@@ -37,9 +37,9 @@ export default class Model {
      * @param options
      * */
     constructor(id = null, options = {}) {
+        super(id);
         this.#database = options.database || Model.database;
         this.#options = options;
-        this.#states = [];
         const Adapter = options.adapter || Model.defaultAdapter;
         this.#adapter = new Adapter(this, this.#database);
         // list all columns of the model.
@@ -48,7 +48,6 @@ export default class Model {
         // add belongsTo to columns
         Array.from(this.constructor.belongsTo.keys()).forEach(x => this.#columns.push(x));
         this.#defaultSelectColumns = ['id', 'created_at', 'updated_at', ...this.#columns];
-        this.id = id;
         this.#collection = new ModelCollection(this.#adapter, this.#options, this.#defaultSelectColumns);
     }
     /**
@@ -65,17 +64,6 @@ export default class Model {
      */
     getColumns() {
         return this.#columns;
-    }
-    /**
-     * states is a list of snapshots of the model.
-     *
-     * @returns {Array}
-     */
-    getStates() {
-        return this.#states;
-    }
-    snapshot() {
-        this.#states.push({ ...this });
     }
     /**
      *

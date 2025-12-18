@@ -12,7 +12,7 @@ import HelperPath from './helper/central/Path.mjs';
 import AdapterNode from './adapter/Node.mjs';
 export var CentralEnv;
 (function (CentralEnv) {
-    CentralEnv["DEV"] = "dev";
+    CentralEnv["DEVELOPMENT"] = "dev";
     CentralEnv["TEST"] = "uat";
     CentralEnv["STAGING"] = "stg";
     CentralEnv["PRODUCTION"] = "prd";
@@ -22,7 +22,18 @@ export default class Central {
     static APP_PATH = null;
     static VIEW_PATH = null;
     static ENV = '';
-    static config = HelperConfig.config;
+    static #helperConfig;
+    static config = {
+        classes: {
+            cache: true
+        },
+        view: {
+            cache: true
+        },
+        system: {
+            debug: false
+        }
+    };
     static nodePackages = HelperPath.nodePackages;
     static classPath = HelperCache.classPath;
     static viewPath = HelperCache.viewPath;
@@ -36,9 +47,11 @@ export default class Central {
             modules: [],
             ...opts,
         };
+        this.#helperConfig = new HelperConfig();
+        await this.#helperConfig.init();
+        Central.config = this.#helperConfig.config;
         await HelperPath.init(options.EXE_PATH, options.APP_PATH, options.VIEW_PATH, options.modules);
         await HelperCache.init();
-        await HelperConfig.init();
         await this.applyApplicationConfigs();
         await HelperBootstrap.init();
         await this.reloadModuleInit(true);
@@ -49,7 +62,7 @@ export default class Central {
         await Promise.all(Object.keys(Central.config).map(async (key) => {
             //fs check file exist in ${APP_PATH}/config/${key}.mjs
             //if exists, apply to Central.config[key]
-            const source = `${Central.APP_PATH}/config/${key}.mjs`;
+            const source = `${Central.APP_PATH}/config/${key}`;
             const exist = this.adapter.fileExists(source);
             if (exist) {
                 const config = await this.adapter.import(source, HelperCache.cacheId);
@@ -62,13 +75,13 @@ export default class Central {
      * @param configMap
      */
     static async initConfig(configMap) {
-        await HelperConfig.addConfig(configMap);
+        await this.#helperConfig.addConfig(configMap);
         await this.applyApplicationConfigs();
     }
     static async flushCache() {
         if (Central.config.classes.cache !== true) {
             HelperCache.clearImportCache();
-            await HelperConfig.init();
+            await this.#helperConfig.init();
             await this.reloadConfig();
             await this.reloadModuleInit();
         }
@@ -77,7 +90,7 @@ export default class Central {
     }
     static async import(pathToFile) {
         // pathToFile may include file extension;
-        const adjustedPathToFile = /\..*$/.test(pathToFile) ? pathToFile : `${pathToFile}.mjs`;
+        const adjustedPathToFile = /\..*$/.test(pathToFile) ? pathToFile : `${pathToFile}`;
         // if explicit set classPath to Class or required object, just return it.
         const c = HelperCache.classPath.get(adjustedPathToFile);
         if (c && typeof c !== 'string')
@@ -100,6 +113,25 @@ export default class Central {
     //add modules to a set of filename, load config, then run init.mjs in each dirname
     static async addModules(modules) {
         await HelperPath.addModules(modules);
+        //loop modules, if have it.configs, add them to config
+        for (const it of modules) {
+            const configs = it.configs || it.default?.configs;
+            const filename = it.filename || it.default?.filename;
+            if (configs && filename) {
+                const dirname = this.adapter.dirname(filename);
+                const configMap = new Map();
+                for (const configName of configs) {
+                    const configPath = `${dirname}/config/${configName}.mjs`;
+                    if (this.adapter.fileExists(configPath)) {
+                        const configModule = await this.adapter.import(configPath, HelperCache.cacheId);
+                        configMap.set(configName, configModule);
+                    }
+                }
+                if (configMap.size > 0) {
+                    await this.#helperConfig.addConfig(configMap);
+                }
+            }
+        }
         await this.applyApplicationConfigs();
     }
     //module may add after init, so we need to force reload module init
@@ -115,7 +147,7 @@ export default class Central {
             const packages = [...HelperPath.nodePackages.values()];
             for (let j = 0; j < packages.length; j++) {
                 const dir = packages[j];
-                const configFile = `${dir}/config/${configKey}.mjs`;
+                const configFile = `${dir}/config/${configKey}`;
                 const exist = this.adapter.fileExists(configFile);
                 if (exist) {
                     const config = await this.adapter.import(configFile, HelperCache.cacheId);

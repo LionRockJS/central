@@ -10,7 +10,8 @@ export default class Bun extends Node{
   }
 
   static fileExists(pathToFile: string): boolean {
-    return super.fileExists(pathToFile);
+    //if no extension, check for .ts, .mts, .mjs
+    return super.fileExists(pathToFile + '.ts') || super.fileExists(pathToFile + '.mts') || super.fileExists(pathToFile) ;
   }
 
   static dirname(file: string | null = null): string {

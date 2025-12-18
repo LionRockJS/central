@@ -1,5 +1,4 @@
 import Central from '../../Central.mjs';
-import HelperConfig from './Config.mjs';
 export default class HelperPath {
     static nodePackages = new Set();
     static async init(EXE_PATH = null, APP_PATH = null, VIEW_PATH = null, modules = []) {
@@ -33,7 +32,9 @@ export default class HelperPath {
         const fetchPaths = [];
         if (prefixPath === 'views')
             fetchPaths.push(`${Central.VIEW_PATH}/${pathToFile}`);
-        fetchPaths.push(`${Central.APP_PATH || ''}/${prefixPath}/${pathToFile}`);
+        fetchPaths.push(`${Central.APP_PATH || ''}/${prefixPath}/${pathToFile}.ts`);
+        fetchPaths.push(`${Central.APP_PATH || ''}/${prefixPath}/${pathToFile}.mjs`);
+        fetchPaths.push(`${Central.APP_PATH || ''}/${prefixPath}/${pathToFile}.js`);
         fetchPaths.push(pathToFile);
         // load from node_modules and modules
         [...this.nodePackages].reverse().forEach(x => fetchPaths.push(`${x}/${prefixPath}/${pathToFile}`));
@@ -53,9 +54,7 @@ export default class HelperPath {
                 Central.log(`Module ${idx} does not have filename property`);
                 return;
             }
-            const dirname = Central.adapter.dirname(filename);
-            this.nodePackages.add(dirname);
-            await HelperConfig.addConfigs(dirname, it.configs || it.default?.configs || []);
+            this.nodePackages.add(Central.adapter.dirname(filename));
         }));
     }
 }

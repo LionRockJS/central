@@ -7,6 +7,7 @@
  */
 import ORMAdapter from './adapter/ORM.mjs';
 import ModelCollection from './ModelCollection.mjs';
+import { Model as MVCModel } from '@lionrockjs/mvc';
 interface ORMOption {
     database?: any;
     adapter?: typeof ORMAdapter;
@@ -20,7 +21,7 @@ interface ORMOption {
     retry?: number;
     insertIDs?: (string | number)[];
 }
-export default class Model {
+export default class Model extends MVCModel {
     #private;
     static database: any;
     static tableName: string | null;
@@ -51,13 +52,6 @@ export default class Model {
      * @returns {Array}
      */
     getColumns(): string[];
-    /**
-     * states is a list of snapshots of the model.
-     *
-     * @returns {Array}
-     */
-    getStates(): any[];
-    snapshot(): void;
     /**
      *
      * @param option
