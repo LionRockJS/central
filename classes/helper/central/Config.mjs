@@ -1,9 +1,8 @@
 export default class HelperConfig {
-    config = { classes: {}, view: {} };
-    async init() {
+    static async init(config) {
         // Clear all config
-        Object.keys(this.config).forEach(it => this.config[it] = {});
-        await this.addConfig(new Map([
+        Object.keys(config).forEach(it => config[it] = {});
+        await this.addConfig(config, new Map([
             ['classes', await import('../../config/classes.mjs')],
             ['view', await import('../../config/view.mjs')],
             ['system', await import('../../config/system.mjs')],
@@ -11,13 +10,13 @@ export default class HelperConfig {
             ['language', await import('../../config/language.mjs')],
         ]));
     }
-    async addConfig(configMap) {
+    static async addConfig(config, configMap) {
         await Promise.all([...configMap.entries()].map(async (it) => {
             const key = it[0];
             const v = it[1] || {};
-            const config = this.config[key] || {};
-            Object.assign(config, v.default || v);
-            this.config[key] = config;
+            const configValue = config[key] || {};
+            Object.assign(configValue, v.default || v);
+            config[key] = configValue;
         }));
     }
 }

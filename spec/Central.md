@@ -5,7 +5,7 @@ Central supports loading external npm modules as plugins. This allows extending 
 ## Workflow
 
 1.  **Create an npm module** (or a local module).
-2.  **Export module metadata** in the module's entry point (e.g., `index.js` or `index.mjs`).
+2.  **Export module metadata** in the module's entry point (e.g., `index.js`).
 3.  **Register the module** in the application using `Central.addModules`.
 
 ## Module Structure

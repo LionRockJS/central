@@ -19,7 +19,6 @@ export declare enum CentralEnv {
     PRODUCTION = "prd"
 }
 export default class Central {
-    #private;
     static EXE_PATH: string | null;
     static APP_PATH: string | null;
     static VIEW_PATH: string | null;

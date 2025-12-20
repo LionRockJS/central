@@ -1,13 +1,14 @@
 import Central from '../../Central.mjs';
 export default class HelperPath {
-    static nodePackages = new Set();
-    static async init(EXE_PATH = null, APP_PATH = null, VIEW_PATH = null, modules = []) {
-        this.nodePackages.clear();
-        this.setCentralDefaultPaths(EXE_PATH, APP_PATH, VIEW_PATH);
-        await this.addModules(modules);
+    static async init(nodePackages, EXE_PATH = null, APP_PATH = null, VIEW_PATH = null, modules = []) {
+        nodePackages.clear();
+        Central.EXE_PATH = (EXE_PATH || Central.adapter.dirname()).replace(/\/$/, '');
+        Central.APP_PATH = (APP_PATH || `${Central.EXE_PATH}/application`).replace(/\/$/, '');
+        Central.VIEW_PATH = (VIEW_PATH || `${Central.EXE_PATH}/views`).replace(/\/$/, '');
+        await HelperPath.addModules(nodePackages, modules);
     }
-    static async reloadModuleInit() {
-        const initFiles = [...this.nodePackages.keys()].map(x => `${x}/init.mjs`);
+    static async reloadModuleInit(nodePackages) {
+        const initFiles = [...nodePackages.keys()].map(x => `${x}/init.mjs`);
         for (let i = 0; i < initFiles.length; i++) {
             const file = initFiles[i];
             try {
@@ -18,12 +19,7 @@ export default class HelperPath {
             }
         }
     }
-    static setCentralDefaultPaths(EXE_PATH = null, APP_PATH = null, VIEW_PATH = null) {
-        Central.EXE_PATH = (EXE_PATH || Central.adapter.dirname()).replace(/\/$/, '');
-        Central.APP_PATH = (APP_PATH || `${Central.EXE_PATH}/application`).replace(/\/$/, '');
-        Central.VIEW_PATH = (VIEW_PATH || `${Central.EXE_PATH}/views`).replace(/\/$/, '');
-    }
-    static resolve(pathToFile, prefixPath, store, forceUpdate = false) {
+    static resolve(nodePackages, pathToFile, prefixPath, store, forceUpdate = false) {
         if (/\.\./.test(pathToFile))
             throw new Error('invalid require path');
         if (store.get(pathToFile) && !forceUpdate)
@@ -38,13 +34,18 @@ export default class HelperPath {
         fetchPaths.push(`${Central.APP_PATH || ''}/${prefixPath}/${pathToFile}.js`);
         fetchPaths.push(pathToFile);
         // load from node_modules and modules
-        [...this.nodePackages].reverse().forEach(x => fetchPaths.push(`${x}/${prefixPath}/${pathToFile}`));
+        [nodePackages].reverse().forEach(x => {
+            fetchPaths.push(`${x}/../${prefixPath}/${pathToFile}`);
+            fetchPaths.push(`${x}/../${prefixPath}/${pathToFile}.ts`);
+            fetchPaths.push(`${x}/../${prefixPath}/${pathToFile}.mjs`);
+            fetchPaths.push(`${x}/../${prefixPath}/${pathToFile}.js`);
+        });
         fetchPaths.some(path => Central.adapter.resolveFetchList(path, store, pathToFile));
         if (!store.get(pathToFile))
-            throw new Error(`Resolve path error: path ${pathToFile} not found. prefixPath: ${prefixPath} , store: ${JSON.stringify(store)} `);
+            throw new Error(`Resolve path error: path ${pathToFile} not found. prefixPath: ${prefixPath} , store: ${JSON.stringify(store)}, searched paths: \n${fetchPaths.join('\n')}`);
         return store.get(pathToFile);
     }
-    static async addModules(modules) {
+    static async addModules(nodePackages, modules) {
         await Promise.all(modules.map(async (it, idx) => {
             if (!it) {
                 Central.log(`Module ${idx} is not defined.`);
@@ -55,7 +56,7 @@ export default class HelperPath {
                 Central.log(`Module ${idx} does not have filename property`);
                 return;
             }
-            this.nodePackages.add(Central.adapter.dirname(filename));
+            nodePackages.add(Central.adapter.dirname(filename));
         }));
     }
 }

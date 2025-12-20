@@ -41,7 +41,6 @@ describe('LionRockJS Helper test', () => {
   });
 
   test('nodePackages should be same', async () => {
-    expect(Central.nodePackages).toBe(HelperCentralPath.nodePackages);
     expect(typeof Central.config).toBe('object');
     expect(Central.classPath).toBe(HelperCentralCache.classPath);
     expect(Central.viewPath).toBe(HelperCentralCache.viewPath);
