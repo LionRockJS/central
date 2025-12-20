@@ -69,8 +69,10 @@ export default class Central {
     await HelperPath.init(this.nodePackages, options.EXE_PATH, options.APP_PATH, options.VIEW_PATH, options.modules);
     await HelperCache.init();
     await this.applyApplicationConfigs();
-    await HelperBootstrap.init();
-    await this.reloadModuleInit(true);
+    await HelperBootstrap.init(this.adapter, this.APP_PATH);
+    await Central.reloadModuleInit(true);
+
+    await HelperBootstrap.loadRoutes(this.adapter, this.APP_PATH);
 
     return Central;
   }
