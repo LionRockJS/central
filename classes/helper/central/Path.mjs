@@ -34,11 +34,11 @@ export default class HelperPath {
         fetchPaths.push(`${Central.APP_PATH || ''}/${prefixPath}/${pathToFile}.js`);
         fetchPaths.push(pathToFile);
         // load from node_modules and modules
-        [nodePackages].reverse().forEach(x => {
-            fetchPaths.push(`${x}/../${prefixPath}/${pathToFile}`);
-            fetchPaths.push(`${x}/../${prefixPath}/${pathToFile}.ts`);
-            fetchPaths.push(`${x}/../${prefixPath}/${pathToFile}.mjs`);
-            fetchPaths.push(`${x}/../${prefixPath}/${pathToFile}.js`);
+        [...nodePackages].reverse().forEach(x => {
+            fetchPaths.push(`${x}/${prefixPath}/${pathToFile}`);
+            fetchPaths.push(`${x}/${prefixPath}/${pathToFile}.ts`);
+            fetchPaths.push(`${x}/${prefixPath}/${pathToFile}.mjs`);
+            fetchPaths.push(`${x}/${prefixPath}/${pathToFile}.js`);
         });
         fetchPaths.some(path => Central.adapter.resolveFetchList(path, store, pathToFile));
         if (!store.get(pathToFile))
