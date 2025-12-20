@@ -11,7 +11,7 @@ export default class HelperPath{
     await HelperPath.addModules(nodePackages, modules);
   }
 
-  static async reloadModuleInit(nodePackages): Promise<void> {
+  static async reloadModuleInit(nodePackages:Set<string>): Promise<void> {
     const initFiles = [...nodePackages.keys()].map(x => `${x}/init.mjs`);
 
     for(let i=0; i< initFiles.length; i++){
@@ -39,11 +39,11 @@ export default class HelperPath{
     fetchPaths.push(pathToFile);
 
     // load from node_modules and modules
-    [nodePackages].reverse().forEach(x => {
-      fetchPaths.push(`${x}/../${prefixPath}/${pathToFile}`)
-      fetchPaths.push(`${x}/../${prefixPath}/${pathToFile}.ts`)
-      fetchPaths.push(`${x}/../${prefixPath}/${pathToFile}.mjs`)
-      fetchPaths.push(`${x}/../${prefixPath}/${pathToFile}.js`)
+    [...nodePackages].reverse().forEach(x => {
+      fetchPaths.push(`${x}/${prefixPath}/${pathToFile}`)
+      fetchPaths.push(`${x}/${prefixPath}/${pathToFile}.ts`)
+      fetchPaths.push(`${x}/${prefixPath}/${pathToFile}.mjs`)
+      fetchPaths.push(`${x}/${prefixPath}/${pathToFile}.js`)
     });
 
     fetchPaths.some(path => Central.adapter.resolveFetchList(path, store, pathToFile));
@@ -52,7 +52,7 @@ export default class HelperPath{
     return store.get(pathToFile);
   }
 
-  static async addModules(nodePackages, modules: any[]): Promise<void> {
+  static async addModules(nodePackages:Set<string>, modules: any[]): Promise<void> {
     await Promise.all(
       modules.map(async (it, idx)=>{
         if(!it){

@@ -64,6 +64,7 @@ export default class Central {
       ...opts,
     };
 
+    Object.keys(this.config).forEach(key => delete this.config[key]);
     await HelperConfig.init(this.config);
     await HelperPath.init(this.nodePackages, options.EXE_PATH, options.APP_PATH, options.VIEW_PATH, options.modules);
     await HelperCache.init();
