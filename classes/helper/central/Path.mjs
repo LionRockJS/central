@@ -24,6 +24,13 @@ export default class HelperPath {
             throw new Error('invalid require path');
         if (store.get(pathToFile) && !forceUpdate)
             return store.get(pathToFile);
+
+        if (pathToFile.startsWith('/') || /^[a-zA-Z]:/.test(pathToFile)) {
+            if (Central.adapter.resolveFetchList(pathToFile, store, pathToFile)) {
+                return store.get(pathToFile);
+            }
+        }
+
         // search application, then modules
         const fetchPaths = [];
         if (prefixPath === 'views')
