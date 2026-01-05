@@ -25,7 +25,11 @@ import HelperCentralPath from "../../src/helper/central/Path.mts";
 
 describe('LionRockJS Helper test', () => {
   test('Central init', async () => {
-    await Central.init();
+    try{
+      await Central.init();
+    }catch(e){
+      expect(e.message).toBe('Central.init requires EXE_PATH option');
+    }
   });
 
   test('default APP Path', async () => {

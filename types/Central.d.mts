@@ -5,6 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
+import HelperPath from './helper/central/Path.mjs';
 import AdapterNode from './adapter/Node.mjs';
 interface CentralInitOptions {
     EXE_PATH?: string | null;
@@ -24,11 +25,11 @@ export default class Central {
     static VIEW_PATH: string | null;
     static ENV: string;
     static config: any;
-    static nodePackages: Set<string>;
     static classPath: Map<string, any>;
     static viewPath: Map<string, string>;
     static adapter: typeof AdapterNode;
     static port: string;
+    static helperPath: HelperPath;
     static init(opts?: CentralInitOptions): Promise<typeof Central>;
     static applyApplicationConfigs(): Promise<void>;
     /**
@@ -38,7 +39,7 @@ export default class Central {
     static initConfig(configMap: Map<string, any>): Promise<void>;
     static flushCache(): Promise<void>;
     static import(pathToFile: string): Promise<any>;
-    static resolveView(pathToFile: string): string;
+    static resolveView(pathToFile: string): Promise<string>;
     static log(args: any, verbose?: boolean): any;
     static addModules(modules: any[]): Promise<void>;
     static reloadModuleInit(force?: boolean): Promise<void>;

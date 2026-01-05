@@ -33,11 +33,11 @@ export default class Central {
             debug: false
         }
     };
-    static nodePackages = new Set();
     static classPath = HelperCache.classPath;
     static viewPath = HelperCache.viewPath;
     static adapter = AdapterNode;
     static port = "";
+    static helperPath = new HelperPath();
     static async init(opts = {}) {
         const options = {
             EXE_PATH: null,
@@ -48,7 +48,7 @@ export default class Central {
         };
         Object.keys(this.config).forEach(key => delete this.config[key]);
         await HelperConfig.init(this.config);
-        await HelperPath.init(this.nodePackages, options.EXE_PATH, options.APP_PATH, options.VIEW_PATH, options.modules);
+        this.helperPath.init(options.EXE_PATH, options.APP_PATH, options.VIEW_PATH, options.modules);
         await HelperCache.init();
         await this.applyApplicationConfigs();
         await HelperBootstrap.init(this.adapter, this.APP_PATH);
@@ -90,18 +90,11 @@ export default class Central {
     static async import(pathToFile) {
         // pathToFile may include file extension;
         const adjustedPathToFile = /\..*$/.test(pathToFile) ? pathToFile : `${pathToFile}`;
-        // if explicit set classPath to Class or required object, just return it.
-        let c = HelperCache.classPath.get(adjustedPathToFile);
-        if (!c && !/\..*$/.test(pathToFile)) {
-            c = HelperCache.classPath.get(`${adjustedPathToFile}.mjs`) || HelperCache.classPath.get(`${adjustedPathToFile}.js`) || HelperCache.classPath.get(`${adjustedPathToFile}.ts`);
-        }
-        if (c && typeof c !== 'string')
-            return c;
-        const file = (typeof c === 'string') ? c : HelperPath.resolve(this.nodePackages, adjustedPathToFile, 'classes', HelperCache.classPath);
+        const file = this.helperPath.resolve(adjustedPathToFile);
         return await this.adapter.import(file, HelperCache.cacheId);
     }
-    static resolveView(pathToFile) {
-        return HelperPath.resolve(this.nodePackages, pathToFile, 'views', HelperCache.viewPath);
+    static async resolveView(pathToFile) {
+        return await this.helperPath.resolveView(pathToFile);
     }
     static log(args, verbose = true) {
         if (Central.ENV === CentralEnv.PRODUCTION && Central.config?.system?.debug !== true)
@@ -114,15 +107,18 @@ export default class Central {
     }
     //add modules to a set of filename, load config, then run init.mjs in each dirname
     static async addModules(modules) {
-        await HelperPath.addModules(this.nodePackages, modules);
+        this.helperPath.addModules(modules);
+        await this.helperPath.reloadModuleInit();
         //loop modules, if have it.configs, add them to config
         for (const it of modules) {
             if (!it)
                 continue;
             const configs = it.configs || it.default?.configs;
             const filename = it.filename || it.default?.filename;
-            if (configs && filename) {
-                const dirname = this.adapter.dirname(filename);
+            if (!filename)
+                continue;
+            const dirname = this.adapter.dirname(filename);
+            if (configs) {
                 const configMap = new Map();
                 for (const configName of configs) {
                     const configPath = `${dirname}/config/${configName}.mjs`;
@@ -142,13 +138,13 @@ export default class Central {
     static async reloadModuleInit(force = false) {
         if (force === false && Central.config.classes.cache)
             return;
-        await HelperPath.reloadModuleInit(this.nodePackages);
+        await this.helperPath.reloadModuleInit();
     }
     static async reloadConfig() {
         const configKeys = Object.keys(Central.config);
         for (let i = 0; i < configKeys.length; i++) {
             const configKey = configKeys[i];
-            const packages = [...this.nodePackages.values()];
+            const packages = [...this.helperPath.modules.keys()];
             for (let j = 0; j < packages.length; j++) {
                 const dir = packages[j];
                 const configFile = `${dir}/config/${configKey}`;

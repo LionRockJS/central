@@ -42,15 +42,15 @@ describe('Central test', () => {
 
   test('nodePackages after re-init', async () => {
     await Central.init({ EXE_PATH: `${__dirname}/test1/`});
-    expect(JSON.stringify([...Central.nodePackages.keys()])).toBe(JSON.stringify([path.normalize(`${__dirname}/test1/modules/test`)]));
+    expect(JSON.stringify([...Central.helperPath.modules.keys()])).toBe(JSON.stringify([path.normalize(`${__dirname}/test1/modules/test`)]));
 
     await Central.init({ EXE_PATH: `${__dirname}/test2/`});
-    expect(JSON.stringify([...Central.nodePackages.keys()])).toBe(JSON.stringify([path.normalize(`${__dirname}/test2/modules/test`)]));
+    expect(JSON.stringify([...Central.helperPath.modules.keys()])).toBe(JSON.stringify([path.normalize(`${__dirname}/test2/modules/test`)]));
   });
 
   test('Central.import', async () => {
     await Central.init({ EXE_PATH: `${__dirname}/test1/`});
-    expect(JSON.stringify([...Central.nodePackages.keys()])).toBe(JSON.stringify([path.normalize(`${__dirname}/test1/modules/test`)]));
+    expect(JSON.stringify([...Central.helperPath.modules.keys()])).toBe(JSON.stringify([path.normalize(`${__dirname}/test1/modules/test`)]));
 
     const Test = await Central.import('Test');
     const t = new Test();
@@ -59,7 +59,7 @@ describe('Central test', () => {
 
   test('Central.import again', async () => {
     await Central.init({ EXE_PATH: `${__dirname}/test1/`});
-    expect(JSON.stringify([...Central.nodePackages.keys()])).toBe(JSON.stringify([path.normalize(`${__dirname}/test1/modules/test`)]));
+    expect(JSON.stringify([...Central.helperPath.modules.keys()])).toBe(JSON.stringify([path.normalize(`${__dirname}/test1/modules/test`)]));
 
     const Test = await Central.import('Test');
     const t = new Test();

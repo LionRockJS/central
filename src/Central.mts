@@ -47,14 +47,12 @@ export default class Central {
     }
   };
 
-  static nodePackages: Set<string> = new Set();
-
   static classPath = HelperCache.classPath;
   static viewPath = HelperCache.viewPath;
 
   static adapter = AdapterNode;
   static port: string = "";
-  static pathHelper = new HelperPath();
+  static helperPath = new HelperPath();
 
   static async init(opts: CentralInitOptions = {}): Promise<typeof Central> {
     const options = {
@@ -65,9 +63,12 @@ export default class Central {
       ...opts,
     };
 
+    if(!options.EXE_PATH) throw new Error('Central.init requires EXE_PATH option');
+
     Object.keys(this.config).forEach(key => delete this.config[key]);
     await HelperConfig.init(this.config);
-    await this.pathHelper.init(this.nodePackages, options.EXE_PATH, options.APP_PATH, options.VIEW_PATH, options.modules);
+    this.helperPath.init(options.EXE_PATH, options.APP_PATH, options.VIEW_PATH, options.modules);
+
     await HelperCache.init();
     await this.applyApplicationConfigs();
     await HelperBootstrap.init(this.adapter, this.APP_PATH);
@@ -118,20 +119,12 @@ export default class Central {
   static async import(pathToFile: string): Promise<any> {
     // pathToFile may include file extension;
     const adjustedPathToFile = /\..*$/.test(pathToFile) ? pathToFile : `${pathToFile}`;
-
-    // if explicit set classPath to Class or required object, just return it.
-    let c = HelperCache.classPath.get(adjustedPathToFile);
-    if(!c && !/\..*$/.test(pathToFile)) {
-       c = HelperCache.classPath.get(`${adjustedPathToFile}.mjs`) || HelperCache.classPath.get(`${adjustedPathToFile}.js`) || HelperCache.classPath.get(`${adjustedPathToFile}.ts`);
-    }
-    if (c && typeof c !== 'string') return c;
-
-    const file = (typeof c === 'string') ? c : this.pathHelper.resolve(this.nodePackages, adjustedPathToFile, 'classes', HelperCache.classPath);
+    const file = this.helperPath.resolve(adjustedPathToFile);
     return await this.adapter.import(file, HelperCache.cacheId);
   }
 
-  static resolveView(pathToFile: string): string {
-    return this.pathHelper.resolve(this.nodePackages, pathToFile, 'views', HelperCache.viewPath);
+  static async resolveView(pathToFile: string): Promise<string> {
+    return await this.helperPath.resolveView(pathToFile);
   }
 
   static log(args: any, verbose: boolean = true): any {
@@ -145,17 +138,19 @@ export default class Central {
 
   //add modules to a set of filename, load config, then run init.mjs in each dirname
   static async addModules(modules: any[]): Promise<void> {
-    await this.pathHelper.addModules(this.nodePackages,modules);
+    this.helperPath.addModules(modules);
+    await this.helperPath.reloadModuleInit();
 
     //loop modules, if have it.configs, add them to config
     for(const it of modules) {
       if(!it) continue;
       const configs = it.configs || it.default?.configs;
       const filename = it.filename || it.default?.filename;
+      if(!filename) continue;
+      const dirname = this.adapter.dirname(filename);
 
-      if(configs && filename){
-        const dirname = this.adapter.dirname(filename);
-        const configMap = new Map<string, any>();
+      if(configs){
+         const configMap = new Map<string, any>();
 
         for(const configName of configs) {
           const configPath = `${dirname}/config/${configName}.mjs`;
@@ -177,14 +172,14 @@ export default class Central {
   //module may add after init, so we need to force reload module init
   static async reloadModuleInit(force: boolean = false): Promise<void> {
     if(force === false && Central.config.classes.cache)return;
-    await this.pathHelper.reloadModuleInit(this.nodePackages);
+    await this.helperPath.reloadModuleInit();
   }
 
   static async reloadConfig(): Promise<void> {
     const configKeys = Object.keys(Central.config);
     for(let i = 0; i < configKeys.length; i++){
       const configKey = configKeys[i];
-      const packages = [...this.nodePackages.values()];
+      const packages = [...this.helperPath.modules.keys()];
 
       for(let j= 0; j< packages.length; j++){
         const dir = packages[j];
