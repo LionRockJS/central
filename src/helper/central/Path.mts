@@ -3,74 +3,34 @@ import { dirname, join, relative, extname } from 'node:path';
 import { readdirSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-interface FileEntry {
-    path: string;
-    priority: number;
-}
-
 export default class HelperPath {
-  fileList = new Map<string, FileEntry>();
-  modules: any[] = [];
+  loader = new Loader();
+
+  get fileList() { return this.loader.fileList; }
+  get modules() { return this.loader.modules; }
 
   async init(nodePackages:Set<string>, EXE_PATH: string | null = null, APP_PATH: string | null = null, VIEW_PATH: string | null = null, modules: any[] = []): Promise<void> {
     console.log('Path Helper Init');
     nodePackages.clear();
-    this.fileList.clear();
-    this.modules = [];
+    this.loader.fileList.clear();
+    this.loader.modules = [];
 
     Central.EXE_PATH  = (EXE_PATH  || Central.adapter.dirname()).replace(/\/$/, '');
     Central.APP_PATH  = (APP_PATH  || `${Central.EXE_PATH}/application`).replace(/\/$/, '');
     Central.VIEW_PATH = (VIEW_PATH || `${Central.EXE_PATH}/views`).replace(/\/$/, '');
 
-    // Scan VIEW_PATH (Highest Priority for views)
-    if (Central.VIEW_PATH) {
-       this.scanDir(Central.VIEW_PATH, Central.VIEW_PATH, 'views', Infinity);
-    }
-
-    // Scan APP_PATH (High Priority)
-    if (Central.APP_PATH) {
-       this.scanDir(Central.APP_PATH, Central.APP_PATH, '', Infinity);
-    }
-
+    // 1. Modules (Lowest Priority)
     await this.addModules(nodePackages, modules);
-  }
 
-  scanDir(basePath: string, currentPath: string, prefix: string = '', priority: number = 0) {
-    try {
-      const files = readdirSync(currentPath);
-      for (const file of files) {
-        const fullPath = join(currentPath, file);
-        const stat = statSync(fullPath);
-        if (stat.isDirectory()) {
-          this.scanDir(basePath, fullPath, prefix, priority);
-        } else {
-          if (file.startsWith('.') || file.startsWith('index.')) continue;
-          const ext = extname(file);
-          const relativePath = relative(basePath, fullPath);
-          const normalizedPath = relativePath.split('\\').join('/');
-          
-          // Key without extension
-          let key = normalizedPath.slice(0, -ext.length);
-          if(prefix) key = `${prefix}/${key}`;
-          
-          this.updateFile(key, fullPath, priority);
-
-          // Key with extension
-          let keyWithExt = normalizedPath;
-          if(prefix) keyWithExt = `${prefix}/${keyWithExt}`;
-          this.updateFile(keyWithExt, fullPath, priority);
-        }
-      }
-    } catch (e) {
-      // Directory might not exist, ignore
+    // 2. Scan APP_PATH (High Priority)
+    if (Central.APP_PATH) {
+       this.loader.scanDir(Central.APP_PATH, Central.APP_PATH, '');
     }
-  }
 
-  updateFile(key: string, path: string, priority: number) {
-      const existing = this.fileList.get(key);
-      if (!existing || priority > existing.priority) {
-          this.fileList.set(key, { path, priority });
-      }
+    // 3. Scan VIEW_PATH (Highest Priority for views)
+    if (Central.VIEW_PATH) {
+       this.loader.scanDir(Central.VIEW_PATH, Central.VIEW_PATH, 'views');
+    }
   }
 
   async reloadModuleInit(nodePackages:Set<string>): Promise<void> {
@@ -96,10 +56,10 @@ export default class HelperPath {
 
     const key = prefixPath ? `${prefixPath}/${pathToFile}` : pathToFile;
     
-    if(this.fileList.has(key)) {
-        const entry = this.fileList.get(key)!;
-        store.set(pathToFile, entry.path); 
-        return entry.path;
+    if(this.loader.fileList.has(key)) {
+        const path = this.loader.fileList.get(key)!;
+        store.set(pathToFile, path); 
+        return path;
     }
 
     if( store.get(pathToFile) && !forceUpdate ) return store.get(pathToFile);
@@ -108,12 +68,10 @@ export default class HelperPath {
   }
 
   async resolveView(viewName: string) {
-    const entry = this.fileList.get(`view/${viewName}`);
-    return entry ? entry.path : undefined;
+    return this.loader.resolveView(viewName);
   }
 
   async addModules(nodePackages:Set<string>, modules: any[]): Promise<void> {
-    let currentPriority = nodePackages.size;
     for (let i = 0; i < modules.length; i++) {
         const it = modules[i];
         if(!it){
@@ -126,26 +84,75 @@ export default class HelperPath {
           continue;
         }
         
-        // Store module info
-        this.addModule(it, currentPriority);
+        this.loader.addModule(it);
 
         const dir = Central.adapter.dirname(filename);
         nodePackages.add(dir);
-        
-        this.scanDir(dir, dir, '', currentPriority);
-        currentPriority++;
     }
   }
+}
 
-  addModule(module: any, priority: number = 0) {
+class Loader {
+  modules: any[] = [];
+  fileList = new Map<string, string>();
+
+  constructor() {
+
+  }
+
+  async resolveView(viewName: string) {
+    return this.fileList.get(`view/${viewName}`);
+  }
+
+  async resolve(moduleName: string) {
+    const path = this.fileList.get(moduleName);
+    return await import(path!);
+  }
+
+  addModule(module: any) {
     let path;
     if (module.filename) {
       path = dirname(fileURLToPath(module.filename));
     }
     this.modules.push({
       ...module,
-      path,
-      priority
+      path
     });
+
+    if (path) {
+      this.scanDir(path, path);
+    }
+  }
+
+  scanDir(basePath: string, currentPath: string, prefix: string = '') {
+    try {
+      const files = readdirSync(currentPath);
+      for (const file of files) {
+        const fullPath = join(currentPath, file);
+        const stat = statSync(fullPath);
+        if (stat.isDirectory()) {
+          this.scanDir(basePath, fullPath, prefix);
+        } else {
+          if (file.startsWith('.') || file.startsWith('index.')) continue;
+          const ext = extname(file);
+          const relativePath = relative(basePath, fullPath);
+          const normalizedPath = relativePath.split('\\').join('/');
+          
+          let key = normalizedPath.slice(0, -ext.length);
+          if(prefix) key = `${prefix}/${key}`;
+          this.fileList.set(key, fullPath);
+
+          let keyWithExt = normalizedPath;
+          if(prefix) keyWithExt = `${prefix}/${keyWithExt}`;
+          this.fileList.set(keyWithExt, fullPath);
+        }
+      }
+    } catch (e) {
+      // Directory might not exist, ignore
+    }
+  }
+
+  addModules(modules: any[]) {
+    modules.forEach(m => this.addModule(m));
   }
 }
