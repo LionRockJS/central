@@ -3,10 +3,10 @@ export default class HelperPath {
     get fileList(): Map<string, string>;
     get templateList(): Map<string, string>;
     get modules(): Map<string, any>;
-    init(EXE_PATH?: string | null, APP_PATH?: string | null, VIEW_PATH?: string | null, modules?: any[]): void;
+    init(EXE_PATH: string, APP_PATH?: string | null, VIEW_PATH?: string | null, modules?: any[]): void;
     reloadModuleInit(): Promise<void>;
     resolve(pathToFile: string): string;
-    resolveView(viewName: string): Promise<any>;
+    resolveView(viewName: string): string;
     addModules(modules: any[]): void;
 }
 declare class Loader {

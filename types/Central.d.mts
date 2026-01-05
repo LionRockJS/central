@@ -30,6 +30,7 @@ export default class Central {
     static adapter: typeof AdapterNode;
     static port: string;
     static helperPath: HelperPath;
+    static get nodePackages(): Set<string>;
     static init(opts?: CentralInitOptions): Promise<typeof Central>;
     static applyApplicationConfigs(): Promise<void>;
     /**
@@ -39,7 +40,7 @@ export default class Central {
     static initConfig(configMap: Map<string, any>): Promise<void>;
     static flushCache(): Promise<void>;
     static import(pathToFile: string): Promise<any>;
-    static resolveView(pathToFile: string): Promise<string>;
+    static resolveView(pathToFile: string): string;
     static log(args: any, verbose?: boolean): any;
     static addModules(modules: any[]): Promise<void>;
     static reloadModuleInit(force?: boolean): Promise<void>;

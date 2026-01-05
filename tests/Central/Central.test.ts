@@ -224,7 +224,7 @@ describe('Central test', () => {
 
   test('setPath default value', async() => {
     await Central.init();
-    expect(path.normalize(`${Central.EXE_PATH}/`)).toBe(path.normalize(`${__dirname}/../../src/adapter/`));
+    expect(path.normalize(`${Central.EXE_PATH}/`)).toBe(path.normalize(`${process.cwd()}/`));
   });
 
   test('set all init value', async () => {

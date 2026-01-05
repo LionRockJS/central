@@ -38,14 +38,17 @@ export default class Central {
     static adapter = AdapterNode;
     static port = "";
     static helperPath = new HelperPath();
+    static get nodePackages() { return new Set(this.helperPath.modules.keys()); }
     static async init(opts = {}) {
         const options = {
-            EXE_PATH: null,
+            EXE_PATH: process.cwd(),
             APP_PATH: null,
             VIEW_PATH: null,
             modules: [],
             ...opts,
         };
+        if (!options.EXE_PATH)
+            throw new Error('Central.init requires EXE_PATH option');
         Object.keys(this.config).forEach(key => delete this.config[key]);
         await HelperConfig.init(this.config);
         this.helperPath.init(options.EXE_PATH, options.APP_PATH, options.VIEW_PATH, options.modules);
@@ -90,11 +93,23 @@ export default class Central {
     static async import(pathToFile) {
         // pathToFile may include file extension;
         const adjustedPathToFile = /\..*$/.test(pathToFile) ? pathToFile : `${pathToFile}`;
+        let cacheKey = adjustedPathToFile;
+        if (!/\..*$/.test(cacheKey))
+            cacheKey += '.mjs';
+        if (Central.classPath.has(cacheKey)) {
+            const cached = Central.classPath.get(cacheKey);
+            if (typeof cached !== 'string')
+                return cached;
+            return await this.adapter.import(cached, HelperCache.cacheId);
+        }
         const file = this.helperPath.resolve(adjustedPathToFile);
+        if (!file) {
+            throw new Error(`Resolve path error: path ${adjustedPathToFile}.mjs not found. prefixPath: classes , store: {} `);
+        }
         return await this.adapter.import(file, HelperCache.cacheId);
     }
-    static async resolveView(pathToFile) {
-        return await this.helperPath.resolveView(pathToFile);
+    static resolveView(pathToFile) {
+        return this.helperPath.resolveView(pathToFile);
     }
     static log(args, verbose = true) {
         if (Central.ENV === CentralEnv.PRODUCTION && Central.config?.system?.debug !== true)

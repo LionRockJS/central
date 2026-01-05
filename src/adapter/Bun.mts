@@ -19,8 +19,8 @@ export default class Bun extends Node{
   }
 
   static async import(pathToFile: string, cacheId: number = 0): Promise<any> {
-//    let path = (cacheId === 0) ? pathToFile : `${pathToFile}?cache=${cacheId}`;
-    const module = await import(pathToFile);
+    let path = (cacheId === 0) ? pathToFile : `${pathToFile}?cache=${cacheId}`;
+    const module = await import(path);
     return module.default || module;
   }
 }

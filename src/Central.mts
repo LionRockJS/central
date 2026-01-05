@@ -54,9 +54,11 @@ export default class Central {
   static port: string = "";
   static helperPath = new HelperPath();
 
+  static get nodePackages() { return new Set(this.helperPath.modules.keys()); }
+
   static async init(opts: CentralInitOptions = {}): Promise<typeof Central> {
     const options = {
-      EXE_PATH: null,
+      EXE_PATH: process.cwd(),
       APP_PATH: null,
       VIEW_PATH: null,
       modules: [],
@@ -119,12 +121,27 @@ export default class Central {
   static async import(pathToFile: string): Promise<any> {
     // pathToFile may include file extension;
     const adjustedPathToFile = /\..*$/.test(pathToFile) ? pathToFile : `${pathToFile}`;
+
+    let cacheKey = adjustedPathToFile;
+    if(!/\..*$/.test(cacheKey)) cacheKey += '.mjs';
+
+    if(Central.classPath.has(cacheKey)){
+      const cached = Central.classPath.get(cacheKey);
+      if(typeof cached !== 'string') return cached;
+      return await this.adapter.import(cached, HelperCache.cacheId);
+    }
+
     const file = this.helperPath.resolve(adjustedPathToFile);
+
+    if (!file) {
+      throw new Error(`Resolve path error: path ${adjustedPathToFile}.mjs not found. prefixPath: classes , store: {} `);
+    }
+
     return await this.adapter.import(file, HelperCache.cacheId);
   }
 
-  static async resolveView(pathToFile: string): Promise<string> {
-    return await this.helperPath.resolveView(pathToFile);
+  static resolveView(pathToFile: string): string {
+    return this.helperPath.resolveView(pathToFile);
   }
 
   static log(args: any, verbose: boolean = true): any {
