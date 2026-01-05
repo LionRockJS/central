@@ -44,7 +44,7 @@ describe('LionRockJS Helper test', () => {
     expect(Central.VIEW_PATH).toBe(`${__dirname}/test1/views`);
   });
 
-  test('nodePackages should be same', async () => {
+  test('helperPath.modules should be same', async () => {
     expect(typeof Central.config).toBe('object');
     expect(Central.classPath).toBe(HelperCentralCache.classPath);
     expect(Central.viewPath).toBe(HelperCentralCache.viewPath);

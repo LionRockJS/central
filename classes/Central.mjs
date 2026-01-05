@@ -38,7 +38,6 @@ export default class Central {
     static adapter = AdapterNode;
     static port = "";
     static helperPath = new HelperPath();
-    static get nodePackages() { return new Set(this.helperPath.modules.keys()); }
     static async init(opts = {}) {
         const options = {
             EXE_PATH: process.cwd(),

@@ -40,7 +40,7 @@ describe('Central test', () => {
     expect(Central.VIEW_PATH).toBe(`${__dirname}/views`);
   });
 
-  test('nodePackages after re-init', async () => {
+  test('helperPath.modules.values after re-init', async () => {
     await Central.init({ EXE_PATH: `${__dirname}/test1/`});
     expect(JSON.stringify([...Central.helperPath.modules.keys()])).toBe(JSON.stringify([path.normalize(`${__dirname}/test1/modules/test`)]));
 
@@ -68,7 +68,7 @@ describe('Central test', () => {
 
   test('switch package', async () => {
     await Central.init({ EXE_PATH: `${__dirname}/test1`});
-    expect(JSON.stringify([...Central.nodePackages.keys()]))
+    expect(JSON.stringify([...Central.helperPath.modules.keys()]))
       .toBe(JSON.stringify([path.normalize(`${__dirname}/test1/modules/test`)]));
 
     const Test = await Central.import('Test');
@@ -80,7 +80,7 @@ describe('Central test', () => {
     expect(f1.getFoo()).toBe('fooo');
 
     await Central.init({ EXE_PATH: `${__dirname}/test2`});
-    expect(JSON.stringify([...Central.nodePackages.keys()]))
+    expect(JSON.stringify([...Central.helperPath.modules.keys()]))
       .toBe(JSON.stringify([path.normalize(`${__dirname}/test2/modules/test`)]));
     const T = await Central.import('Test');
     const t2 = new T();
@@ -240,7 +240,7 @@ describe('Central test', () => {
 
   test('Central nodePackages without init', async () => {
     await Central.init({ EXE_PATH: `${__dirname}/test9` });
-    expect(Central.nodePackages.size).toBe(2);
+    expect(Central.helperPath.modules.size).toBe(2);
   });
 
   test('Central require file with extension', async () => {
@@ -300,25 +300,25 @@ describe('Central test', () => {
     await Central.init({ EXE_PATH: __dirname });
     const Test = await import('./test1/modules/test/index');
     Central.addModules([Test])
-    expect(Central.nodePackages.size).toBe(1);
+    expect(Central.helperPath.modules.size).toBe(1);
 
-    expect([...Central.nodePackages.keys()][0]).toBe(path.normalize(__dirname + '/test1/modules/test'));
+    expect([...Central.helperPath.modules.keys()][0]).toBe(path.normalize(__dirname + '/test1/modules/test'));
   });
 
   test('add node module with empty value', async () => {
     await Central.init({ EXE_PATH: __dirname });
     const Test = await import('./test1/modules/test/index');
     Central.addModules([Test, null, Test])
-    expect(Central.nodePackages.size).toBe(1);
+    expect(Central.helperPath.modules.size).toBe(1);
 
-    expect([...Central.nodePackages.keys()][0]).toBe(path.normalize(__dirname + '/test1/modules/test'));
+    expect([...Central.helperPath.modules.keys()][0]).toBe(path.normalize(__dirname + '/test1/modules/test'));
   });
 
   test('add node module without default dirname', async () => {
     await Central.init({ EXE_PATH: __dirname });
     const Test = await import('./test1/modules/test2/index');
     Central.addModules([Test]);
-    expect(Central.nodePackages.size).toBe(0);
+    expect(Central.helperPath.modules.size).toBe(0);
   });
 
   test('error when import bootstrap', async () => {

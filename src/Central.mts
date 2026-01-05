@@ -54,8 +54,6 @@ export default class Central {
   static port: string = "";
   static helperPath = new HelperPath();
 
-  static get nodePackages() { return new Set(this.helperPath.modules.keys()); }
-
   static async init(opts: CentralInitOptions = {}): Promise<typeof Central> {
     const options = {
       EXE_PATH: process.cwd(),

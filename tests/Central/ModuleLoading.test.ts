@@ -29,9 +29,9 @@ describe('Central Module Loading', () => {
 
     await Central.addModules([module]);
 
-    // Check if module path is added to nodePackages
+    // Check if module path is added to helperPath.modules
     const expectedPackagePath = path.dirname(modulePath);
-    expect([...Central.nodePackages]).toContain(expectedPackagePath);
+    expect([...Central.helperPath.modules.keys()]).toContain(expectedPackagePath);
 
     // Check if config is loaded
     // The config name is 'plugin_config', so it should be in Central.config.plugin_config
@@ -58,12 +58,12 @@ describe('Central Module Loading', () => {
 
     await Central.addModules([module]);
 
-    // Check if module path is added to nodePackages
+    // Check if module path is added to helperPath.modules
     const expectedPackagePath = path.dirname(modulePath);
-    expect([...Central.nodePackages]).toContain(expectedPackagePath);
+    expect([...Central.helperPath.modules.keys()]).toContain(expectedPackagePath);
 
     // Try to resolve a class from the module
-    // Central.import uses HelperPath.resolve which searches in nodePackages
+    // Central.import uses HelperPath.resolve which searches in helperPath.modules
     const simpleClass = await Central.import('Simple');
     expect(simpleClass).toBeDefined();
     expect(simpleClass.name).toBe('Simple');
@@ -79,9 +79,9 @@ describe('Central Module Loading', () => {
     // This should not throw
     await Central.addModules([module]);
 
-    // Check if module path is added to nodePackages
+    // Check if module path is added to helperPath.modules
     const expectedPackagePath = path.dirname(modulePath);
-    expect([...Central.nodePackages]).toContain(expectedPackagePath);
+    expect([...Central.helperPath.modules.keys()]).toContain(expectedPackagePath);
 
     // Verify that non_existent config is NOT in Central.config
     expect(Central.config.non_existent).toBeUndefined();

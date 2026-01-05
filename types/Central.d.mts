@@ -30,7 +30,6 @@ export default class Central {
     static adapter: typeof AdapterNode;
     static port: string;
     static helperPath: HelperPath;
-    static get nodePackages(): Set<string>;
     static init(opts?: CentralInitOptions): Promise<typeof Central>;
     static applyApplicationConfigs(): Promise<void>;
     /**
