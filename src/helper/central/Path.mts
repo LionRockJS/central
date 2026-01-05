@@ -1,19 +1,22 @@
 import Central from '../../Central.mjs';
-import { join, relative, extname } from 'node:path';
+import { dirname, join, relative, extname } from 'node:path';
 import { readdirSync, statSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
 interface FileEntry {
     path: string;
     priority: number;
 }
 
-export default class HelperPath{
-  static fileList = new Map<string, FileEntry>();
+export default class HelperPath {
+  fileList = new Map<string, FileEntry>();
+  modules: any[] = [];
 
-  static async init(nodePackages:Set<string>, EXE_PATH: string | null = null, APP_PATH: string | null = null, VIEW_PATH: string | null = null, modules: any[] = []): Promise<void> {
+  async init(nodePackages:Set<string>, EXE_PATH: string | null = null, APP_PATH: string | null = null, VIEW_PATH: string | null = null, modules: any[] = []): Promise<void> {
     console.log('Path Helper Init');
     nodePackages.clear();
     this.fileList.clear();
+    this.modules = [];
 
     Central.EXE_PATH  = (EXE_PATH  || Central.adapter.dirname()).replace(/\/$/, '');
     Central.APP_PATH  = (APP_PATH  || `${Central.EXE_PATH}/application`).replace(/\/$/, '');
@@ -29,11 +32,10 @@ export default class HelperPath{
        this.scanDir(Central.APP_PATH, Central.APP_PATH, '', Infinity);
     }
 
-    await HelperPath.addModules(nodePackages, modules);
+    await this.addModules(nodePackages, modules);
   }
 
-  static scanDir(basePath: string, currentPath: string, prefix: string = '', priority: number = 0) {
-    // console.log(`Scanning ${currentPath} with prefix '${prefix}' and priority ${priority}`);
+  scanDir(basePath: string, currentPath: string, prefix: string = '', priority: number = 0) {
     try {
       const files = readdirSync(currentPath);
       for (const file of files) {
@@ -61,19 +63,17 @@ export default class HelperPath{
       }
     } catch (e) {
       // Directory might not exist, ignore
-      // console.log('scanDir error', e);
     }
   }
 
-  static updateFile(key: string, path: string, priority: number) {
-      // console.log(`Updating ${key} -> ${path} (priority: ${priority})`);
+  updateFile(key: string, path: string, priority: number) {
       const existing = this.fileList.get(key);
       if (!existing || priority > existing.priority) {
           this.fileList.set(key, { path, priority });
       }
   }
 
-  static async reloadModuleInit(nodePackages:Set<string>): Promise<void> {
+  async reloadModuleInit(nodePackages:Set<string>): Promise<void> {
     const initFiles = [...nodePackages.keys()].map(x => `${x}/init.mjs`);
 
     for(let i=0; i< initFiles.length; i++){
@@ -86,7 +86,7 @@ export default class HelperPath{
     }
   }
 
-  static resolve(nodePackages:Set<string>, pathToFile: string, prefixPath: string, store: Map<string, any>, forceUpdate: boolean = false): string {
+  resolve(nodePackages:Set<string>, pathToFile: string, prefixPath: string, store: Map<string, any>, forceUpdate: boolean = false): string {
     if (/\.\./.test(pathToFile)) throw new Error('invalid require path');
     
     // Handle absolute paths
@@ -107,7 +107,12 @@ export default class HelperPath{
     throw new Error(`Resolve path error: path ${pathToFile} not found. prefixPath: ${prefixPath} , store: ${JSON.stringify(store)}`);
   }
 
-  static async addModules(nodePackages:Set<string>, modules: any[]): Promise<void> {
+  async resolveView(viewName: string) {
+    const entry = this.fileList.get(`view/${viewName}`);
+    return entry ? entry.path : undefined;
+  }
+
+  async addModules(nodePackages:Set<string>, modules: any[]): Promise<void> {
     let currentPriority = nodePackages.size;
     for (let i = 0; i < modules.length; i++) {
         const it = modules[i];
@@ -120,11 +125,27 @@ export default class HelperPath{
           Central.log(`Module ${i} does not have filename property`);
           continue;
         }
+        
+        // Store module info
+        this.addModule(it, currentPriority);
+
         const dir = Central.adapter.dirname(filename);
         nodePackages.add(dir);
         
         this.scanDir(dir, dir, '', currentPriority);
         currentPriority++;
     }
+  }
+
+  addModule(module: any, priority: number = 0) {
+    let path;
+    if (module.filename) {
+      path = dirname(fileURLToPath(module.filename));
+    }
+    this.modules.push({
+      ...module,
+      path,
+      priority
+    });
   }
 }
