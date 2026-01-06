@@ -238,7 +238,7 @@ describe('Central test', () => {
     expect(Central.APP_PATH).toBe(`${__dirname}/test2/application`);
   });
 
-  test('Central nodePackages without init', async () => {
+  test('Central helperPath.modules without init', async () => {
     await Central.init({ EXE_PATH: `${__dirname}/test9` });
     expect(Central.helperPath.modules.size).toBe(2);
   });

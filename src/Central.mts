@@ -72,7 +72,7 @@ export default class Central {
     await HelperCache.init();
     await this.applyApplicationConfigs();
     await HelperBootstrap.init(this.adapter, this.APP_PATH);
-    await Central.reloadModuleInit(true);
+    await this.helperPath.reloadModuleInit();
 
     await HelperBootstrap.loadRoutes(this.adapter, this.APP_PATH);
 
