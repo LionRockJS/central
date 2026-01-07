@@ -128,5 +128,6 @@ export default class HelperPath {
 
   addModules(modules: any[]){
     this.loader.addModules(modules);
+    this.viewLoader.addModules(modules);
   }
 }
