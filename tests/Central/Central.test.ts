@@ -184,7 +184,8 @@ describe('Central test', () => {
   test('resolveView', async () => {
     await Central.init({ EXE_PATH: `${__dirname}/test7`, VIEW_PATH: `${__dirname}/test7/application/views` });
     const viewFile = Central.resolveView('test.html');
-    expect(viewFile).toBe(`${__dirname}/test7/application/views/test.html`);
+    const expected = path.join(__dirname, 'test7/application/views/test.html');
+    expect(viewFile).toBe(expected);
   });
 
   test('config path', async() => {

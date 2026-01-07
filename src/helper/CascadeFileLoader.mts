@@ -5,16 +5,19 @@ import { readdirSync, statSync } from 'node:fs';
 interface LoaderOptions {
   ignoreList?: RegExp[];
   pathHandler?: (path: string) => string;
+  keepExtension?: boolean;
 }
 
 export default class CascadeFileLoader {
   public fileList = new Map<string, string>();
   private ignoreList: RegExp[];
   private pathHandler?: (path: string) => string;
+  private keepExtension: boolean;
 
   constructor(options?: LoaderOptions) {
     this.ignoreList = options?.ignoreList || [];
     this.pathHandler = options?.pathHandler || ((path) => path);
+    this.keepExtension = options?.keepExtension || false;
   }
 
   scanDir(basePath: string, currentPath: string = "") {
@@ -33,7 +36,11 @@ export default class CascadeFileLoader {
           const ext = extname(file);
           const relativePath = relative(basePath, fullPath);
           const normalizedPath = relativePath.split('\\').join('/');
-          const key = normalizedPath.slice(0, -ext.length);
+          
+          let key = normalizedPath;
+          if(!this.keepExtension) {
+             key = normalizedPath.slice(0, -ext.length);
+          }
           this.fileList.set(key, fullPath);
         }
       }

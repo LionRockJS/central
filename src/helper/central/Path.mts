@@ -9,7 +9,8 @@ export default class HelperPath {
 
   private loader = new CascadeFileLoader();
   private viewLoader = new CascadeFileLoader({
-      pathHandler: (path) => path+'/../views'
+      pathHandler: (path) => path+'/../views',
+      keepExtension: true
   });
 
 
@@ -95,6 +96,12 @@ export default class HelperPath {
     if(pathToFile.includes('../')) throw new Error('invalid require path');
     let file = this.loader.resolve(pathToFile);
 
+    if (!file && /\..+$/.test(pathToFile)) {
+       const ext = extname(pathToFile);
+       const key = pathToFile.slice(0, -ext.length);
+       file = this.loader.resolve(key);
+    }
+
     if(!file && Central.APP_PATH) {
       const extensions = ['.mjs', '.js', '.mts', '.ts'];
       const pathsToCheck = [
@@ -103,6 +110,18 @@ export default class HelperPath {
       ];
 
       for (const basePath of pathsToCheck) {
+        if (/\..+$/.test(pathToFile)) {
+           const fullPath = join(basePath, pathToFile);
+           try {
+             if(statSync(fullPath).isFile()) {
+               file = fullPath;
+               break;
+             }
+           } catch(e) {}
+        }
+
+        if (file) break;
+
         for(const ext of extensions) {
           const fullPath = join(basePath, pathToFile + ext);
           try {
@@ -127,7 +146,31 @@ export default class HelperPath {
   }
 
   addModules(modules: any[]){
-    this.loader.addModules(modules);
     this.viewLoader.addModules(modules);
+
+    modules.forEach(m => {
+       if(!m) return;
+       const module = m.default || m;
+       if(module.filename){
+         try{
+            const filePath = fileURLToPath(module.filename);
+            const dir = dirname(filePath);
+
+            this.modules.set(dir, {
+              filename: module.filename
+            });
+
+            // For classes loader: prefer 'classes' subdirectory
+            const classesPath = join(dir, 'classes');
+            let target = dir;
+            try {
+               if(statSync(classesPath).isDirectory()) {
+                  target = classesPath;
+               }
+            } catch(e){}
+            this.loader.scanDir(target);
+         }catch(e){}
+       }
+    });
   }
 }
