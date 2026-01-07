@@ -88,7 +88,7 @@ export default class HelperPath {
     resolve(pathToFile) {
         if (pathToFile.includes('../'))
             throw new Error('invalid require path');
-        let file = this.loader.resolve(pathToFile);
+        const file = this.loader.resolve(pathToFile);
         if (!file) {
             throw new Error(`Resolve path error: path ${pathToFile} not found. prefixPath: classes , store: {} `);
         }
@@ -103,26 +103,25 @@ export default class HelperPath {
             if (!m)
                 return;
             const module = m.default || m;
-            if (module.filename) {
+            if (!module.filename)
+                return;
+            try {
+                const dir = dirname(fileURLToPath(module.filename));
+                this.modules.set(dir, {
+                    filename: module.filename
+                });
+                // For classes loader: prefer 'classes' subdirectory
+                const classesPath = join(dir, 'classes');
+                let target = dir;
                 try {
-                    const filePath = fileURLToPath(module.filename);
-                    const dir = dirname(filePath);
-                    this.modules.set(dir, {
-                        filename: module.filename
-                    });
-                    // For classes loader: prefer 'classes' subdirectory
-                    const classesPath = join(dir, 'classes');
-                    let target = dir;
-                    try {
-                        if (statSync(classesPath).isDirectory()) {
-                            target = classesPath;
-                        }
+                    if (statSync(classesPath).isDirectory()) {
+                        target = classesPath;
                     }
-                    catch (e) { }
-                    this.loader.scanDir(target);
                 }
                 catch (e) { }
+                this.loader.scanDir(target);
             }
+            catch (e) { }
         });
     }
 }

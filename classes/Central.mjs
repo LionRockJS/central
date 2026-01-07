@@ -37,7 +37,7 @@ export default class Central {
     static viewPath = HelperCache.viewPath;
     static adapter = AdapterNode;
     static port = "";
-    static modules = new Map();
+    static get modules() { return this.helperPath.modules; }
     static helperPath = new HelperPath();
     static async init(opts = {}) {
         const options = {
@@ -52,7 +52,6 @@ export default class Central {
         Object.keys(this.config).forEach(key => delete this.config[key]);
         await HelperConfig.init(this.config);
         this.helperPath.init(options.EXE_PATH, options.APP_PATH, options.VIEW_PATH, options.modules);
-        this.modules.clear();
         await HelperCache.init();
         await this.applyApplicationConfigs();
         await HelperBootstrap.init(this.adapter, this.APP_PATH);
@@ -133,7 +132,6 @@ export default class Central {
             const filename = it.filename || it.default?.filename;
             if (!filename)
                 continue;
-            this.modules.set(filename, it);
             const dirname = this.adapter.dirname(filename);
             if (configs) {
                 const configMap = new Map();

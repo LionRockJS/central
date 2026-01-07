@@ -28,7 +28,7 @@ export default class Central {
     static viewPath: Map<string, string>;
     static adapter: typeof AdapterNode;
     static port: string;
-    static modules: Map<string, any>;
+    static get modules(): Map<string, any>;
     private static helperPath;
     static init(opts?: CentralInitOptions): Promise<typeof Central>;
     static applyApplicationConfigs(): Promise<void>;
