@@ -9,8 +9,7 @@ export default class HelperPath {
 
   private loader = new CascadeFileLoader();
   private viewLoader = new CascadeFileLoader({
-      pathHandler: (path) => path+'/../views',
-      keepExtension: true
+      pathHandler: (path) => path+'/../views'
   });
 
 

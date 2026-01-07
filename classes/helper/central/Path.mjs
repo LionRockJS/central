@@ -7,8 +7,7 @@ export default class HelperPath {
     modules = new Map();
     loader = new CascadeFileLoader();
     viewLoader = new CascadeFileLoader({
-        pathHandler: (path) => path + '/../views',
-        keepExtension: true
+        pathHandler: (path) => path + '/../views'
     });
     get fileList() { return this.loader.fileList; }
     get templateList() { return this.viewLoader.fileList; }
@@ -90,7 +89,7 @@ export default class HelperPath {
             throw new Error('invalid require path');
         const file = this.loader.resolve(pathToFile);
         if (!file) {
-            throw new Error(`Resolve path error: path ${pathToFile} not found. prefixPath: classes , store: {} `);
+            throw new Error(`Resolve path error: path ${pathToFile} not found.`);
         }
         return file;
     }
