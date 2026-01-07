@@ -91,7 +91,7 @@ describe('Central test', () => {
       // eslint-disable-next-line no-unused-vars
       const f2 = new Foo2();
     } catch (e:any) {
-      expect(e.message).toContain('Resolve path error: path Foo not found. prefixPath: classes , store: {}');
+      expect(e.message).toContain('Resolve path error: path Foo not found.');
     }
   });
 
@@ -112,7 +112,7 @@ describe('Central test', () => {
       // eslint-disable-next-line no-unused-vars
       const f2 = new Foo2();
     } catch (e:any) {
-      expect(e.message).toContain('Resolve path error: path Foo not found. prefixPath: classes , store: {}');
+      expect(e.message).toContain('Resolve path error: path Foo not found.');
     }
   });
 
@@ -134,7 +134,7 @@ describe('Central test', () => {
     try {
       await Central.import('NotFound');
     } catch (e:any) {
-      expect(e.message).toContain('Resolve path error: path NotFound not found. prefixPath: classes , store: {}');
+      expect(e.message).toContain('Resolve path error: path NotFound not found.');
     }
   });
 
@@ -251,7 +251,7 @@ describe('Central test', () => {
       const ins = new Foo();
       expect(ins.getFoo()).toBe('bar');
     }catch(e:any){
-      expect(e.message).toBe('Resolve path error: path Foo.js not found. prefixPath: classes , store: {} ');
+      expect(e.message).toBe('Resolve path error: path Foo.js not found.');
     }
 
   });

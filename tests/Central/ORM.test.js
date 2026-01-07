@@ -218,7 +218,7 @@ describe('orm test', () => {
       expect('this line should not be run').expect(true);
     } catch (e) {
       ORM.classPrefix = 'model/';
-      expect(e.message).toContain('Resolve path error: path models/Person not found. prefixPath: classes , store: {}');
+      expect(e.message).toContain('Resolve path error: path models/Person not found.');
     }
   });
 

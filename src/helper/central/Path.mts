@@ -97,7 +97,7 @@ export default class HelperPath {
     const file = this.loader.resolve(pathToFile);
 
     if(!file) {
-      throw new Error(`Resolve path error: path ${pathToFile} not found. prefixPath: classes , store: {} `);
+      throw new Error(`Resolve path error: path ${pathToFile} not found.`);
     }
     return file;
   }
