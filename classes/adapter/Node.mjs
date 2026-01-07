@@ -30,7 +30,7 @@ export default class Node extends Noop {
             qs = '';
         let importPath = pathToFile;
         if (Os.platform() === 'win32')
-            importPath = pathToFileURL(pathToFile);
+            importPath = pathToFileURL(pathToFile).href;
         const module = await import(importPath + qs);
         return module.default || module;
     }

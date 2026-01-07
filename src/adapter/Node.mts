@@ -30,8 +30,8 @@ export default class Node extends Noop{
   static async import(pathToFile: string, cacheId: number = 0): Promise<any> {
     let qs = `?r=${cacheId}`;
     if(cacheId === 0)qs = '';
-    let importPath: string | URL = pathToFile;
-    if(Os.platform() === 'win32')importPath = pathToFileURL(pathToFile);
+    let importPath: string = pathToFile;
+    if(Os.platform() === 'win32')importPath = pathToFileURL(pathToFile).href;
     const module = await import(importPath + qs);
     return module.default || module;
   }

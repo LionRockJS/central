@@ -52,7 +52,8 @@ export default class Central {
 
   static adapter = AdapterNode;
   static port: string = "";
-  static helperPath = new HelperPath();
+  private static helperClassPath = new HelperPath();
+  private static helperViewPath = new HelperPath();
 
   static async init(opts: CentralInitOptions = {}): Promise<typeof Central> {
     const options = {
@@ -67,12 +68,12 @@ export default class Central {
 
     Object.keys(this.config).forEach(key => delete this.config[key]);
     await HelperConfig.init(this.config);
-    this.helperPath.init(options.EXE_PATH, options.APP_PATH, options.VIEW_PATH, options.modules);
+    this.helperClassPath.init(options.EXE_PATH, options.APP_PATH, options.VIEW_PATH, options.modules);
 
     await HelperCache.init();
     await this.applyApplicationConfigs();
     await HelperBootstrap.init(this.adapter, this.APP_PATH);
-    await this.helperPath.reloadModuleInit();
+    await this.helperClassPath.reloadModuleInit();
 
     await HelperBootstrap.loadRoutes(this.adapter, this.APP_PATH);
 
@@ -129,7 +130,7 @@ export default class Central {
       return await this.adapter.import(cached, HelperCache.cacheId);
     }
 
-    const file = this.helperPath.resolve(adjustedPathToFile);
+    const file = this.helperClassPath.resolve(adjustedPathToFile);
 
     if (!file) {
       throw new Error(`Resolve path error: path ${adjustedPathToFile}.mjs not found. prefixPath: classes , store: {} `);
@@ -139,7 +140,7 @@ export default class Central {
   }
 
   static resolveView(pathToFile: string): string {
-    return this.helperPath.resolveView(pathToFile);
+    return this.helperClassPath.resolveView(pathToFile);
   }
 
   static log(args: any, verbose: boolean = true): any {
@@ -153,8 +154,8 @@ export default class Central {
 
   //add modules to a set of filename, load config, then run init.mjs in each dirname
   static async addModules(modules: any[]): Promise<void> {
-    this.helperPath.addModules(modules);
-    await this.helperPath.reloadModuleInit();
+    this.helperClassPath.addModules(modules);
+    await this.helperClassPath.reloadModuleInit();
 
     //loop modules, if have it.configs, add them to config
     for(const it of modules) {
@@ -187,14 +188,14 @@ export default class Central {
   //module may add after init, so we need to force reload module init
   static async reloadModuleInit(force: boolean = false): Promise<void> {
     if(force === false && Central.config.classes.cache)return;
-    await this.helperPath.reloadModuleInit();
+    await this.helperClassPath.reloadModuleInit();
   }
 
   static async reloadConfig(): Promise<void> {
     const configKeys = Object.keys(Central.config);
     for(let i = 0; i < configKeys.length; i++){
       const configKey = configKeys[i];
-      const packages = [...this.helperPath.modules.keys()];
+      const packages = [...this.helperClassPath.modules.keys()];
 
       for(let j= 0; j< packages.length; j++){
         const dir = packages[j];

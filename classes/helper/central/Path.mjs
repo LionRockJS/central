@@ -1,16 +1,20 @@
 import Central from '../../Central.mjs';
-import { dirname, join, relative, extname } from 'node:path';
+import { join } from 'node:path';
 import { readdirSync, statSync, existsSync } from 'node:fs';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { pathToFileURL } from 'node:url';
+import CascadeFileLoader from '../CascadeFileLoader.mjs';
 export default class HelperPath {
-    loader = new Loader();
+    modules = new Map();
+    loader = new CascadeFileLoader();
+    viewLoader = new CascadeFileLoader({
+        pathHandler: (path) => path + '/../views'
+    });
     get fileList() { return this.loader.fileList; }
-    get templateList() { return this.loader.templateList; }
-    get modules() { return this.loader.modules; }
+    get templateList() { return this.viewLoader.fileList; }
     init(EXE_PATH, APP_PATH = null, VIEW_PATH = null, modules = []) {
         this.loader.fileList.clear();
-        this.loader.modules.clear();
-        this.loader.templateList.clear();
+        this.modules.clear();
+        this.viewLoader.fileList.clear();
         Central.EXE_PATH = EXE_PATH.replace(/\/$/, '');
         Central.APP_PATH = (APP_PATH || `${Central.EXE_PATH}/application`).replace(/\/$/, '');
         Central.VIEW_PATH = (VIEW_PATH || `${Central.EXE_PATH}/views`).replace(/\/$/, '');
@@ -22,7 +26,7 @@ export default class HelperPath {
         }
         // 3. Scan VIEW_PATH (Highest Priority for views)
         if (Central.VIEW_PATH) {
-            this.loader.scanViewDir(Central.VIEW_PATH);
+            this.viewLoader.scanDir(Central.VIEW_PATH);
         }
         // 4. Scan EXE_PATH/modules
         try {
@@ -38,7 +42,7 @@ export default class HelperPath {
                         if (statSync(modulePath).isDirectory()) {
                             const initFile = join(modulePath, 'init.mjs');
                             if (statSync(initFile).isFile()) {
-                                this.loader.modules.set(modulePath, {
+                                this.modules.set(modulePath, {
                                     filename: pathToFileURL(initFile).href
                                 });
                                 const classesPath = join(modulePath, 'classes');
@@ -67,7 +71,7 @@ export default class HelperPath {
         }
     }
     async reloadModuleInit() {
-        const initFiles = [...this.loader.modules.keys()].map(x => `${x}/init.mjs`);
+        const initFiles = [...this.modules.keys()].map(x => `${x}/init.mjs`);
         for (let i = 0; i < initFiles.length; i++) {
             const file = initFiles[i];
             if (!existsSync(file))
@@ -111,96 +115,9 @@ export default class HelperPath {
         return file;
     }
     resolveView(viewName) {
-        return this.loader.templateList.get(viewName);
+        return this.viewLoader.resolve(viewName);
     }
     addModules(modules) {
         this.loader.addModules(modules);
-    }
-}
-class Loader {
-    modules = new Map();
-    fileList = new Map();
-    templateList = new Map();
-    constructor() { }
-    resolve(moduleName) {
-        const res = this.fileList.get(moduleName);
-        return res;
-    }
-    addModule(module) {
-        if (!module)
-            return;
-        const m = module.default || module;
-        if (!m.filename)
-            return;
-        const path = dirname(fileURLToPath(m.filename));
-        this.modules.set(path, module);
-        const classesPath = join(path, 'classes');
-        try {
-            if (statSync(classesPath).isDirectory()) {
-                this.scanDir(classesPath);
-            }
-            else {
-                this.scanDir(path);
-            }
-        }
-        catch (e) {
-            this.scanDir(path);
-        }
-        this.scanViewDir(join(path, '../views'));
-    }
-    scanDir(basePath, currentPath = "") {
-        if (!currentPath)
-            currentPath = basePath;
-        try {
-            const files = readdirSync(currentPath);
-            for (const file of files) {
-                const fullPath = join(currentPath, file);
-                const stat = statSync(fullPath);
-                if (stat.isDirectory()) {
-                    this.scanDir(basePath, fullPath);
-                }
-                else {
-                    if (file.startsWith('.') || file.startsWith('index.') || file.startsWith('init.'))
-                        continue;
-                    const ext = extname(file);
-                    const relativePath = relative(basePath, fullPath);
-                    const normalizedPath = relativePath.split('\\').join('/');
-                    const key = normalizedPath.slice(0, -ext.length);
-                    this.fileList.set(key, fullPath);
-                    this.fileList.set(normalizedPath, fullPath);
-                }
-            }
-        }
-        catch (e) {
-            // console.log('scanDir error', basePath, e);
-            // ignore
-        }
-    }
-    scanViewDir(basePath, currentPath = "") {
-        if (!currentPath)
-            currentPath = basePath;
-        try {
-            const files = readdirSync(currentPath);
-            for (const file of files) {
-                const fullPath = join(currentPath, file);
-                const stat = statSync(fullPath);
-                if (stat.isDirectory()) {
-                    this.scanViewDir(basePath, fullPath);
-                }
-                else {
-                    const ext = extname(file);
-                    const relativePath = relative(basePath, fullPath);
-                    const normalizedPath = relativePath.split('\\').join('/');
-                    const key = normalizedPath.slice(0, -ext.length);
-                    this.templateList.set(key, fullPath);
-                    this.templateList.set(normalizedPath, fullPath);
-                }
-            }
-        }
-        catch (e) {
-        }
-    }
-    addModules(modules) {
-        modules.forEach(m => this.addModule(m));
     }
 }

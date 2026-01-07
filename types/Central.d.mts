@@ -5,7 +5,6 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
-import HelperPath from './helper/central/Path.mjs';
 import AdapterNode from './adapter/Node.mjs';
 interface CentralInitOptions {
     EXE_PATH?: string | null;
@@ -29,7 +28,8 @@ export default class Central {
     static viewPath: Map<string, string>;
     static adapter: typeof AdapterNode;
     static port: string;
-    static helperPath: HelperPath;
+    private static helperClassPath;
+    private static helperViewPath;
     static init(opts?: CentralInitOptions): Promise<typeof Central>;
     static applyApplicationConfigs(): Promise<void>;
     /**
