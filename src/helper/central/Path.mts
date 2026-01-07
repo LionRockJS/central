@@ -96,45 +96,6 @@ export default class HelperPath {
     if(pathToFile.includes('../')) throw new Error('invalid require path');
     let file = this.loader.resolve(pathToFile);
 
-    if (!file && /\..+$/.test(pathToFile)) {
-       const ext = extname(pathToFile);
-       const key = pathToFile.slice(0, -ext.length);
-       file = this.loader.resolve(key);
-    }
-
-    if(!file && Central.APP_PATH) {
-      const extensions = ['.mjs', '.js', '.mts', '.ts'];
-      const pathsToCheck = [
-        join(Central.APP_PATH, 'classes'),
-        Central.APP_PATH
-      ];
-
-      for (const basePath of pathsToCheck) {
-        if (/\..+$/.test(pathToFile)) {
-           const fullPath = join(basePath, pathToFile);
-           try {
-             if(statSync(fullPath).isFile()) {
-               file = fullPath;
-               break;
-             }
-           } catch(e) {}
-        }
-
-        if (file) break;
-
-        for(const ext of extensions) {
-          const fullPath = join(basePath, pathToFile + ext);
-          try {
-            if(statSync(fullPath).isFile()) {
-              file = fullPath;
-              break;
-            }
-          } catch(e) {}
-        }
-        if(file) break;
-      }
-    }
-
     if(!file) {
       throw new Error(`Resolve path error: path ${pathToFile} not found. prefixPath: classes , store: {} `);
     }

@@ -53,7 +53,7 @@ export default class Central {
   static adapter = AdapterNode;
   static port: string = "";
 
-  private static modules = new Map<string, any>();
+  static modules = new Map<string, any>();
   private static helperPath = new HelperPath();
 
   static async init(opts: CentralInitOptions = {}): Promise<typeof Central> {

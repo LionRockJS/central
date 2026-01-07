@@ -37,8 +37,8 @@ export default class Central {
     static viewPath = HelperCache.viewPath;
     static adapter = AdapterNode;
     static port = "";
-    static helperClassPath = new HelperPath();
-    static helperViewPath = new HelperPath();
+    static modules = new Map();
+    static helperPath = new HelperPath();
     static async init(opts = {}) {
         const options = {
             EXE_PATH: process.cwd(),
@@ -51,11 +51,12 @@ export default class Central {
             throw new Error('Central.init requires EXE_PATH option');
         Object.keys(this.config).forEach(key => delete this.config[key]);
         await HelperConfig.init(this.config);
-        this.helperClassPath.init(options.EXE_PATH, options.APP_PATH, options.VIEW_PATH, options.modules);
+        this.helperPath.init(options.EXE_PATH, options.APP_PATH, options.VIEW_PATH, options.modules);
+        this.modules.clear();
         await HelperCache.init();
         await this.applyApplicationConfigs();
         await HelperBootstrap.init(this.adapter, this.APP_PATH);
-        await this.helperClassPath.reloadModuleInit();
+        await this.helperPath.reloadModuleInit();
         await HelperBootstrap.loadRoutes(this.adapter, this.APP_PATH);
         return Central;
     }
@@ -102,14 +103,14 @@ export default class Central {
                 return cached;
             return await this.adapter.import(cached, HelperCache.cacheId);
         }
-        const file = this.helperClassPath.resolve(adjustedPathToFile);
+        const file = this.helperPath.resolve(adjustedPathToFile);
         if (!file) {
             throw new Error(`Resolve path error: path ${adjustedPathToFile}.mjs not found. prefixPath: classes , store: {} `);
         }
         return await this.adapter.import(file, HelperCache.cacheId);
     }
     static resolveView(pathToFile) {
-        return this.helperClassPath.resolveView(pathToFile);
+        return this.helperPath.resolveView(pathToFile);
     }
     static log(args, verbose = true) {
         if (Central.ENV === CentralEnv.PRODUCTION && Central.config?.system?.debug !== true)
@@ -122,8 +123,8 @@ export default class Central {
     }
     //add modules to a set of filename, load config, then run init.mjs in each dirname
     static async addModules(modules) {
-        this.helperClassPath.addModules(modules);
-        await this.helperClassPath.reloadModuleInit();
+        this.helperPath.addModules(modules);
+        await this.helperPath.reloadModuleInit();
         //loop modules, if have it.configs, add them to config
         for (const it of modules) {
             if (!it)
@@ -132,6 +133,7 @@ export default class Central {
             const filename = it.filename || it.default?.filename;
             if (!filename)
                 continue;
+            this.modules.set(filename, it);
             const dirname = this.adapter.dirname(filename);
             if (configs) {
                 const configMap = new Map();
@@ -153,13 +155,13 @@ export default class Central {
     static async reloadModuleInit(force = false) {
         if (force === false && Central.config.classes.cache)
             return;
-        await this.helperClassPath.reloadModuleInit();
+        await this.helperPath.reloadModuleInit();
     }
     static async reloadConfig() {
         const configKeys = Object.keys(Central.config);
         for (let i = 0; i < configKeys.length; i++) {
             const configKey = configKeys[i];
-            const packages = [...this.helperClassPath.modules.keys()];
+            const packages = [...this.helperPath.modules.keys()];
             for (let j = 0; j < packages.length; j++) {
                 const dir = packages[j];
                 const configFile = `${dir}/config/${configKey}`;

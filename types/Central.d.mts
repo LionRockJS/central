@@ -28,8 +28,8 @@ export default class Central {
     static viewPath: Map<string, string>;
     static adapter: typeof AdapterNode;
     static port: string;
-    private static helperClassPath;
-    private static helperViewPath;
+    static modules: Map<string, any>;
+    private static helperPath;
     static init(opts?: CentralInitOptions): Promise<typeof Central>;
     static applyApplicationConfigs(): Promise<void>;
     /**

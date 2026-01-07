@@ -1,13 +1,14 @@
 import Central from '../../Central.mjs';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { readdirSync, statSync, existsSync } from 'node:fs';
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import CascadeFileLoader from '../CascadeFileLoader.mjs';
 export default class HelperPath {
     modules = new Map();
     loader = new CascadeFileLoader();
     viewLoader = new CascadeFileLoader({
-        pathHandler: (path) => path + '/../views'
+        pathHandler: (path) => path + '/../views',
+        keepExtension: true
     });
     get fileList() { return this.loader.fileList; }
     get templateList() { return this.viewLoader.fileList; }
@@ -88,27 +89,6 @@ export default class HelperPath {
         if (pathToFile.includes('../'))
             throw new Error('invalid require path');
         let file = this.loader.resolve(pathToFile);
-        if (!file && Central.APP_PATH) {
-            const extensions = ['.mjs', '.js', '.mts', '.ts'];
-            const pathsToCheck = [
-                join(Central.APP_PATH, 'classes'),
-                Central.APP_PATH
-            ];
-            for (const basePath of pathsToCheck) {
-                for (const ext of extensions) {
-                    const fullPath = join(basePath, pathToFile + ext);
-                    try {
-                        if (statSync(fullPath).isFile()) {
-                            file = fullPath;
-                            break;
-                        }
-                    }
-                    catch (e) { }
-                }
-                if (file)
-                    break;
-            }
-        }
         if (!file) {
             throw new Error(`Resolve path error: path ${pathToFile} not found. prefixPath: classes , store: {} `);
         }
@@ -118,6 +98,31 @@ export default class HelperPath {
         return this.viewLoader.resolve(viewName);
     }
     addModules(modules) {
-        this.loader.addModules(modules);
+        this.viewLoader.addModules(modules);
+        modules.forEach(m => {
+            if (!m)
+                return;
+            const module = m.default || m;
+            if (module.filename) {
+                try {
+                    const filePath = fileURLToPath(module.filename);
+                    const dir = dirname(filePath);
+                    this.modules.set(dir, {
+                        filename: module.filename
+                    });
+                    // For classes loader: prefer 'classes' subdirectory
+                    const classesPath = join(dir, 'classes');
+                    let target = dir;
+                    try {
+                        if (statSync(classesPath).isDirectory()) {
+                            target = classesPath;
+                        }
+                    }
+                    catch (e) { }
+                    this.loader.scanDir(target);
+                }
+                catch (e) { }
+            }
+        });
     }
 }

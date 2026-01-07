@@ -5,9 +5,11 @@ export default class CascadeFileLoader {
     fileList = new Map();
     ignoreList;
     pathHandler;
+    keepExtension;
     constructor(options) {
         this.ignoreList = options?.ignoreList || [];
         this.pathHandler = options?.pathHandler || ((path) => path);
+        this.keepExtension = options?.keepExtension || false;
     }
     scanDir(basePath, currentPath = "") {
         if (!currentPath)
@@ -26,7 +28,10 @@ export default class CascadeFileLoader {
                     const ext = extname(file);
                     const relativePath = relative(basePath, fullPath);
                     const normalizedPath = relativePath.split('\\').join('/');
-                    const key = normalizedPath.slice(0, -ext.length);
+                    let key = normalizedPath;
+                    if (!this.keepExtension) {
+                        key = normalizedPath.slice(0, -ext.length);
+                    }
                     this.fileList.set(key, fullPath);
                 }
             }
