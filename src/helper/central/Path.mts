@@ -8,7 +8,17 @@ export default class HelperPath {
   constructor() {}
   modules = new Map<string, any>();
 
-  private loader = new CascadeFileLoader();
+  private loader = new CascadeFileLoader({
+    pathHandler: (path) => {
+      const classesPath = join(path, 'classes');
+      try {
+        if(existsSync(classesPath) && statSync(classesPath).isDirectory()) {
+          return classesPath;
+        }
+      } catch(e) {}
+      return path;
+    }
+  });
   private viewLoader = new CascadeFileLoader({
       pathHandler: (path) => path+'/../views'
   });
