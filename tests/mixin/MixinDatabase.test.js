@@ -1,5 +1,5 @@
 import { Controller } from '@lionrockjs/mvc';
-import ControllerMixinDatabase from '../../classes/controller-mixin/Database.mjs';
+import ControllerMixinDatabase from '../../src/controller-mixin/Database.mts';
 
 describe('test mixin database', () => {
   test('test add mixin', async () => {

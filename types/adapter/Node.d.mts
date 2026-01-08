@@ -1,5 +1,6 @@
 import Noop from './Noop.mjs';
 export default class Node extends Noop {
+    constructor();
     static resolveFetchList(x: string, store: Map<string, any>, pathToFile: string): boolean;
     static fileExists(pathToFile: string): boolean;
     static dirname(file?: string | null): string;

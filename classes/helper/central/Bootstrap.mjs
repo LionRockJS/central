@@ -1,4 +1,5 @@
 export default class HelperBootstrap {
+    constructor() { }
     static loadID = 0;
     static async init(adapter, APP_PATH) {
         try {

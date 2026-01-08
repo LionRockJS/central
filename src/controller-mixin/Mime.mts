@@ -2,6 +2,10 @@ import { ControllerMixin, Controller, ControllerState } from '@lionrockjs/mvc';
 import mime from 'mime';
 
 export default class Mime extends ControllerMixin {
+  constructor() {
+    super();
+  }
+
   static init(state: Map<string, any>): void {
     const headers = state.get(ControllerState.HEADERS);
     const request = state.get(ControllerState.REQUEST);

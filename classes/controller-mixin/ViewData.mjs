@@ -2,6 +2,9 @@ import { ControllerMixin, ControllerState } from '@lionrockjs/mvc';
 import Central from '../Central.mjs';
 import { ControllerMixinViewState } from './View.mjs';
 export default class ControllerMixinViewData extends ControllerMixin {
+    constructor() {
+        super();
+    }
     static init(state) {
         const request = state.get(ControllerState.REQUEST);
         const client = state.get(ControllerState.CLIENT);

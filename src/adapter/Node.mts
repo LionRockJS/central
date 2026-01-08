@@ -5,6 +5,10 @@ import Os from "node:os";
 
 import Noop from './Noop.mjs';
 export default class Node extends Noop{
+  constructor() {
+    super();
+  }
+
   static resolveFetchList(x: string, store: Map<string, any>, pathToFile: string): boolean {
     if(this.fileExists(x) !== true)return false;
 

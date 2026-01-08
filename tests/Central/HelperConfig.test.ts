@@ -3,6 +3,10 @@ import HelperConfig from "../../src/helper/central/Config.mts";
 
 describe('HelperConfig', () => {
 
+  test('instantiation', () => {
+    new HelperConfig();
+  });
+
   beforeEach(() => {
   });
 

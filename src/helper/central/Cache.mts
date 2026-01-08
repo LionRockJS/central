@@ -1,6 +1,7 @@
 import {View} from "@lionrockjs/mvc";
 
 export default class HelperCache{
+  constructor() {}
   static cacheId: number = 0;
   static classPath: Map<string, any> = new Map(); // {'ORM'          => 'APP_PATH/classes/ORM.mjs'}
   static viewPath: Map<string, string> = new Map(); // {'layout/index' => 'APP_PATH/views/layout/index'}

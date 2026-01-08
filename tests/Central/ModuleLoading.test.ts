@@ -60,7 +60,7 @@ describe('Central Module Loading', () => {
 
     // Check if module path is added to helperPath.modules
     const expectedPackagePath = path.dirname(modulePath);
-    expect([...Central.helperPath.modules.keys()]).toContain(expectedPackagePath);
+    expect([...Central.modules.keys()]).toContain(expectedPackagePath);
 
     // Try to resolve a class from the module
     // Central.import uses HelperPath.resolve which searches in helperPath.modules

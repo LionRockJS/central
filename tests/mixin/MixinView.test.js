@@ -1,5 +1,5 @@
 import {Controller, View, ControllerState} from '@lionrockjs/mvc';
-import ControllerMixinView, { ControllerMixinViewState } from '../../classes/controller-mixin/View.mjs';
+import ControllerMixinView, { ControllerMixinViewState } from '../../src/controller-mixin/View.mts';
 
 describe('Controller Mixin View Test', () => {
   test('constructor', async () => {

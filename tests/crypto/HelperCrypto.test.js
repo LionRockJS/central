@@ -1,5 +1,5 @@
 import path from 'node:path';
-import HelperCrypto from '../../classes/helper/Crypto.mjs';
+import HelperCrypto from '../../src/helper/Crypto.mts';
 
 const testKeyHS256 = {
   kty: 'oct', alg: 'HS256', key_ops: ['sign', 'verify'], k: 'ALhJbC1Spav8eSbMJxXe2yR0ZZ-eXneYGaYM51ti1T5pGT9QxYlS6YqQD5Asm4VrVjyTmZLQ00ID1vmn-91ckg', ext: true,

@@ -166,7 +166,7 @@ describe('orm test', () => {
 
   test('abstract ORM adapter function coverage', async () => {
     const Person = await Central.import('model/Person');
-    const {default: Adapter} = await import('../../classes/adapter/ORM');
+    const {default: Adapter} = await import('../../src/adapter/ORM.mts');
     const p = ORM.create(Person);
     const a = new Adapter(p, null);
     Adapter.defaultID();

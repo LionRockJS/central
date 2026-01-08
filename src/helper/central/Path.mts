@@ -5,6 +5,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import CascadeFileLoader from '../CascadeFileLoader.mjs';
 
 export default class HelperPath {
+  constructor() {}
   modules = new Map<string, any>();
 
   private loader = new CascadeFileLoader();
@@ -107,30 +108,15 @@ export default class HelperPath {
 
   addModules(modules: any[]){
     this.viewLoader.addModules(modules);
+    this.loader.addModules(modules);
 
     modules.forEach(m => {
-       if(!m) return;
-       const module = m.default || m;
-       if(!module.filename)return;
+      if(!m) return;
+      const module = m.default || m;
+      if(!module.filename)return;
 
-       try{
-          const dir = dirname(fileURLToPath(module.filename));
-
-          this.modules.set(dir, {
-            filename: module.filename
-          });
-
-          // For classes loader: prefer 'classes' subdirectory
-          const classesPath = join(dir, 'classes');
-          let target = dir;
-          try {
-              if(statSync(classesPath).isDirectory()) {
-                target = classesPath;
-              }
-          } catch(e){}
-          this.loader.scanDir(target);
-        }catch(e){}
-      }
-    );
+      const dir = dirname(fileURLToPath(module.filename));
+      this.modules.set(dir, module);
+    });
   }
 }

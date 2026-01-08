@@ -7,6 +7,9 @@ export var ActionLoggerState;
     ActionLoggerState["LOG_ACTIONS_ALL"] = "logActionsAll";
 })(ActionLoggerState || (ActionLoggerState = {}));
 export default class ActionLogger extends ControllerMixin {
+    constructor() {
+        super();
+    }
     static init(state) {
         if (!state.get(ActionLoggerState.LOG_ACTIONS)) {
             state.set(ActionLoggerState.LOG_ACTIONS, new Set(['update', 'delete', 'read', 'import', 'export', 'upload_post']));

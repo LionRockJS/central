@@ -2,9 +2,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import Node from './Node.mjs';
-import Os from "node:os";
 
 export default class Bun extends Node{
+  constructor() {
+    super();
+  }
+
   static resolveFetchList(x: string, store: Map<string, any>, pathToFile: string): boolean {
     return super.resolveFetchList(x, store, pathToFile);
   }

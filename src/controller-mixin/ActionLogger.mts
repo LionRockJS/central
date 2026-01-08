@@ -8,6 +8,10 @@ export enum ActionLoggerState {
 }
 
 export default class ActionLogger extends ControllerMixin {
+  constructor() {
+    super();
+  }
+
   static init(state: Map<string, any>): void {
     if (!state.get(ActionLoggerState.LOG_ACTIONS)) {
       state.set(ActionLoggerState.LOG_ACTIONS, new Set(['update', 'delete', 'read', 'import', 'export', 'upload_post']));

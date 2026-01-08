@@ -1,4 +1,5 @@
 export default class HelperPath {
+    constructor();
     modules: Map<string, any>;
     private loader;
     private viewLoader;

@@ -1,4 +1,4 @@
-import Model from '../../../../../classes/Model';
+import Model from '../../../../../src/Model.mts';
 
 export default class Person extends Model{
   constructor(id, options) {

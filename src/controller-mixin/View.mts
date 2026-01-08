@@ -14,8 +14,11 @@ export enum ControllerMixinViewState {
 }
 
 export default class ControllerMixinView extends ControllerMixin {
+  constructor() {
+    super();
+  }
 
-  static init(state) {
+  static override init(state) {
     const language = state.get(ControllerState.LANGUAGE);
     const defaultViewData = {
       language
@@ -50,15 +53,17 @@ export default class ControllerMixinView extends ControllerMixin {
   }
 
   static setErrorTemplate(state, file, data = {}, defaultFile="") {
-    state.set(ControllerMixinViewState.ERROR_TEMPLATE, (typeof file === 'string')
-      ? this.#getView(state, file, { ...state.get(ControllerMixinViewState.VIEW_DEFAULT_DATA), ...data }, defaultFile)
-      : file);
+    if (typeof file === 'string') {
+      state.set(ControllerMixinViewState.ERROR_TEMPLATE, this.#getView(state, file, { ...state.get(ControllerMixinViewState.VIEW_DEFAULT_DATA), ...data }, defaultFile));
+    } else {
+      state.set(ControllerMixinViewState.ERROR_TEMPLATE, file);
+    }
   }
 
-  static async setup(state) {
+  static override async setup(state) {
   }
 
-  static async before(state) {
+  static override async before(state) {
     if (!state.get(ControllerMixinViewState.LAYOUT))this.setLayout(state, state.get(ControllerMixinViewState.LAYOUT_FILE), {});
   }
 
@@ -92,7 +97,7 @@ export default class ControllerMixinView extends ControllerMixin {
     return true;
   }
 
-  static async after(state) {
+  static override async after(state) {
     if(this.isSkipLayout(state))return;
 
     this.assignJSONView(state);
@@ -131,7 +136,7 @@ export default class ControllerMixinView extends ControllerMixin {
     await this.renderLayout(state);
   }
 
-  static async exit(state) {
+  static override async exit(state) {
     if (state.get(ControllerState.STATUS) === 302) return;
     this.assignJSONView(state);
 

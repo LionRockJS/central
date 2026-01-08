@@ -1,4 +1,5 @@
 export default class HelperCache {
+    constructor() { }
     static cacheId = 0;
     static classPath = new Map(); // {'ORM'          => 'APP_PATH/classes/ORM.mjs'}
     static viewPath = new Map(); // {'layout/index' => 'APP_PATH/views/layout/index'}

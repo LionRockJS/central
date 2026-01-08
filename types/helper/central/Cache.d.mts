@@ -1,4 +1,5 @@
 export default class HelperCache {
+    constructor();
     static cacheId: number;
     static classPath: Map<string, any>;
     static viewPath: Map<string, string>;

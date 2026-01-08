@@ -1,5 +1,8 @@
 import Node from './Node.mjs';
 export default class Bun extends Node {
+    constructor() {
+        super();
+    }
     static resolveFetchList(x, store, pathToFile) {
         return super.resolveFetchList(x, store, pathToFile);
     }

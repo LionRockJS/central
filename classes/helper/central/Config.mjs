@@ -1,4 +1,5 @@
 export default class HelperConfig {
+    constructor() { }
     static async init(config) {
         // Clear all config
         Object.keys(config).forEach(it => config[it] = {});

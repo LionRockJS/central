@@ -5,6 +5,10 @@ import DatabaseAdapter from '../adapter/Database.mjs';
 import Central from '../Central.mjs';
 
 export default class ControllerMixinDatabase extends ControllerMixin {
+  constructor() {
+    super();
+  }
+
   static #dbConnection: Map<string, any> = new Map();
 
   static DATABASE_MAP: string = 'databaseMap';

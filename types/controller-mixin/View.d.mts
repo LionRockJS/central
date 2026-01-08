@@ -12,6 +12,7 @@ export declare enum ControllerMixinViewState {
 }
 export default class ControllerMixinView extends ControllerMixin {
     #private;
+    constructor();
     static init(state: any): void;
     static setTemplate(state: any, file: any, data?: {}, defaultFile?: string): void;
     static setLayout(state: any, file: any, data?: {}, defaultFile?: string): void;

@@ -4,6 +4,10 @@ import Central from '../Central.mjs';
 import ControllerMixinView, { ControllerMixinViewState } from './View.mjs';
 
 export default class ControllerMixinViewData extends ControllerMixin {
+  constructor() {
+    super();
+  }
+
   static init(state: Map<string, any>): void {
     const request = state.get(ControllerState.REQUEST);
     const client = state.get(ControllerState.CLIENT);

@@ -34,6 +34,10 @@ async function wait(ms: number): Promise<void> {
 }
 
 describe('Central test', () => {
+  test('instantiation', () => {
+    new Central();
+  });
+
   test('default APP Path', async () => {
     await Central.init({ EXE_PATH : __dirname });
     expect(Central.APP_PATH).toBe(`${__dirname}/application`);
@@ -376,4 +380,22 @@ describe('Central test', () => {
       JSON.stringify(config)
     );
   })
+
+  test('reloadConfig', async () => {
+    await Central.reloadConfig();
+  });
+
+  test('add module multiple init', async () => {
+    await Central.init({ EXE_PATH: __dirname });
+    const Test = await import('./test1/modules/test/index');
+    const Test2 = await import('./test1/modules/test2/index');
+    const Test3 = await import('./test2/modules/test/index');
+    Central.addModules([Test, Test2, Test3])
+
+    expect(Central.modules.size).toBe(2);
+
+    const g = global as any;
+    expect(g.testValue).toBe('hello from test1 init.mjs');
+    expect(g.testValue2).toBe('hello from test2 init.mjs');
+  });
 });

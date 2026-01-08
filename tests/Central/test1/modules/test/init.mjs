@@ -1,0 +1,1 @@
+global.testValue = "hello from test1 init.mjs";

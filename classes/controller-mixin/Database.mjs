@@ -3,6 +3,9 @@ import { ControllerMixin } from '@lionrockjs/mvc';
 import DatabaseAdapter from '../adapter/Database.mjs';
 import Central from '../Central.mjs';
 export default class ControllerMixinDatabase extends ControllerMixin {
+    constructor() {
+        super();
+    }
     static #dbConnection = new Map();
     static DATABASE_MAP = 'databaseMap';
     static DATABASE_ADAPTER = 'databaseAdapter';

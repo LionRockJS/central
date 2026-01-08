@@ -13,6 +13,9 @@ export var ControllerMixinViewState;
     ControllerMixinViewState["VIEW_DEFAULT_DATA"] = "viewDefaultData";
 })(ControllerMixinViewState || (ControllerMixinViewState = {}));
 export default class ControllerMixinView extends ControllerMixin {
+    constructor() {
+        super();
+    }
     static init(state) {
         const language = state.get(ControllerState.LANGUAGE);
         const defaultViewData = {
@@ -44,9 +47,12 @@ export default class ControllerMixinView extends ControllerMixin {
             : file);
     }
     static setErrorTemplate(state, file, data = {}, defaultFile = "") {
-        state.set(ControllerMixinViewState.ERROR_TEMPLATE, (typeof file === 'string')
-            ? this.#getView(state, file, { ...state.get(ControllerMixinViewState.VIEW_DEFAULT_DATA), ...data }, defaultFile)
-            : file);
+        if (typeof file === 'string') {
+            state.set(ControllerMixinViewState.ERROR_TEMPLATE, this.#getView(state, file, { ...state.get(ControllerMixinViewState.VIEW_DEFAULT_DATA), ...data }, defaultFile));
+        }
+        else {
+            state.set(ControllerMixinViewState.ERROR_TEMPLATE, file);
+        }
     }
     static async setup(state) {
     }

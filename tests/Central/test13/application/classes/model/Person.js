@@ -1,4 +1,4 @@
-const ORM = require('../../../../../../classes/ORM');
+const ORM = require('../../../../../../src/ORM.mts');
 
 class Person extends ORM{
   constructor(id, options) {
