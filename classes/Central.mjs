@@ -33,11 +33,10 @@ export default class Central {
             debug: false
         }
     };
-    static classPath = HelperCache.classPath;
-    static viewPath = HelperCache.viewPath;
     static adapter = AdapterNode;
     static port = "";
     static get modules() { return this.helperPath.modules; }
+    static get classPath() { return this.helperPath.fileList; }
     static helperPath = new HelperPath();
     static async init(opts = {}) {
         const options = {
@@ -80,32 +79,15 @@ export default class Central {
         await HelperConfig.addConfig(this.config, configMap);
         await this.applyApplicationConfigs();
     }
-    static async flushCache() {
-        if (Central.config.classes.cache !== true) {
-            HelperCache.clearImportCache();
-            await HelperConfig.init(this.config);
-            await this.reloadConfig();
-            await this.reloadModuleInit();
-        }
-        if (Central.config.view.cache !== true)
-            HelperCache.clearViewCache();
-    }
     static async import(pathToFile) {
         // pathToFile may include file extension;
-        const adjustedPathToFile = /\..*$/.test(pathToFile) ? pathToFile : `${pathToFile}`;
-        let cacheKey = adjustedPathToFile;
-        if (!/\..*$/.test(cacheKey))
-            cacheKey += '.mjs';
-        if (Central.classPath.has(cacheKey)) {
-            const cached = Central.classPath.get(cacheKey);
-            if (typeof cached !== 'string')
-                return cached;
-            return await this.adapter.import(cached, HelperCache.cacheId);
-        }
+        const adjustedPathToFile = /\..*$/.test(pathToFile) ? pathToFile : `${pathToFile}.mjs`;
         const file = this.helperPath.resolve(adjustedPathToFile);
         if (!file) {
             throw new Error(`Resolve path error: path ${adjustedPathToFile}.mjs not found. prefixPath: classes , store: {} `);
         }
+        if (typeof file !== 'string')
+            return file;
         return await this.adapter.import(file, HelperCache.cacheId);
     }
     static resolveView(pathToFile) {
@@ -171,5 +153,10 @@ export default class Central {
             }
         }
         await this.applyApplicationConfigs();
+    }
+    static async flushCache() {
+        HelperCache.clearImportCache();
+        if (this.config.classes.cache === false)
+            await this.reloadConfig();
     }
 }

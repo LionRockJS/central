@@ -24,11 +24,10 @@ export default class Central {
     static VIEW_PATH: string | null;
     static ENV: string;
     static config: any;
-    static classPath: Map<string, any>;
-    static viewPath: Map<string, string>;
     static adapter: typeof AdapterNode;
     static port: string;
     static get modules(): Map<string, any>;
+    static get classPath(): Map<string, string>;
     private static helperPath;
     static init(opts?: CentralInitOptions): Promise<typeof Central>;
     static applyApplicationConfigs(): Promise<void>;
@@ -37,12 +36,12 @@ export default class Central {
      * @param configMap
      */
     static initConfig(configMap: Map<string, any>): Promise<void>;
-    static flushCache(): Promise<void>;
     static import(pathToFile: string): Promise<any>;
     static resolveView(pathToFile: string): string;
     static log(args: any, verbose?: boolean): any;
     static addModules(modules: any[]): Promise<void>;
     static reloadModuleInit(force?: boolean): Promise<void>;
     static reloadConfig(): Promise<void>;
+    static flushCache(): Promise<void>;
 }
 export {};

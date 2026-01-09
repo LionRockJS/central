@@ -6,7 +6,18 @@ import CascadeFileLoader from '../CascadeFileLoader.mjs';
 export default class HelperPath {
     constructor() { }
     modules = new Map();
-    loader = new CascadeFileLoader();
+    loader = new CascadeFileLoader({
+        pathHandler: (path) => {
+            const classesPath = join(path, 'classes');
+            try {
+                if (existsSync(classesPath) && statSync(classesPath).isDirectory()) {
+                    return classesPath;
+                }
+            }
+            catch (e) { }
+            return path;
+        }
+    });
     viewLoader = new CascadeFileLoader({
         pathHandler: (path) => path + '/../views'
     });

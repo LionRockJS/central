@@ -47,13 +47,11 @@ export default class Central {
     }
   };
 
-  static classPath = HelperCache.classPath;
-  static viewPath = HelperCache.viewPath;
-
   static adapter = AdapterNode;
   static port: string = "";
 
   static get modules() { return this.helperPath.modules; }
+  static get classPath() { return this.helperPath.fileList; }
   private static helperPath = new HelperPath();
 
   static async init(opts: CentralInitOptions = {}): Promise<typeof Central> {
@@ -68,10 +66,13 @@ export default class Central {
     if(!options.EXE_PATH) throw new Error('Central.init requires EXE_PATH option');
 
     Object.keys(this.config).forEach(key => delete this.config[key]);
+
     await HelperConfig.init(this.config);
     this.helperPath.init(options.EXE_PATH, options.APP_PATH, options.VIEW_PATH, options.modules);
+
     await HelperCache.init();
     await this.applyApplicationConfigs();
+
     await HelperBootstrap.init(this.adapter, this.APP_PATH);
     await this.helperPath.reloadModuleInit();
 
@@ -106,36 +107,16 @@ export default class Central {
     await this.applyApplicationConfigs();
   }
 
-  static async flushCache(): Promise<void> {
-    if (Central.config.classes.cache !== true) {
-      HelperCache.clearImportCache();
-      await HelperConfig.init(this.config);
-
-      await this.reloadConfig();
-      await this.reloadModuleInit();
-    }
-    if (Central.config.view.cache !== true) HelperCache.clearViewCache();
-  }
-
   static async import(pathToFile: string): Promise<any> {
     // pathToFile may include file extension;
-    const adjustedPathToFile = /\..*$/.test(pathToFile) ? pathToFile : `${pathToFile}`;
-
-    let cacheKey = adjustedPathToFile;
-    if(!/\..*$/.test(cacheKey)) cacheKey += '.mjs';
-
-    if(Central.classPath.has(cacheKey)){
-      const cached = Central.classPath.get(cacheKey);
-      if(typeof cached !== 'string') return cached;
-      return await this.adapter.import(cached, HelperCache.cacheId);
-    }
+    const adjustedPathToFile = /\..*$/.test(pathToFile) ? pathToFile : `${pathToFile}.mjs`;
 
     const file = this.helperPath.resolve(adjustedPathToFile);
 
     if (!file) {
       throw new Error(`Resolve path error: path ${adjustedPathToFile}.mjs not found. prefixPath: classes , store: {} `);
     }
-
+    if(typeof file !== 'string') return file;
     return await this.adapter.import(file, HelperCache.cacheId);
   }
 
@@ -209,5 +190,10 @@ export default class Central {
     }
 
     await this.applyApplicationConfigs();
+  }
+
+  static async flushCache(): Promise<void> {
+    HelperCache.clearImportCache();
+    if(this.config.classes.cache === false) await this.reloadConfig();
   }
 }
