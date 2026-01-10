@@ -15,21 +15,19 @@ export default class CascadeFileLoader {
         try {
             const files = readdirSync(currentPath);
             for (const file of files) {
+                if (this.ignoreList.some(ignore => ignore.test(file)))
+                    continue;
                 const fullPath = join(currentPath, file);
                 const stat = statSync(fullPath);
                 if (stat.isDirectory()) {
                     this.scanDir(basePath, fullPath);
                 }
                 else {
-                    if (this.ignoreList.some(ignore => ignore.test(file)))
-                        continue;
                     const ext = extname(file);
                     const relativePath = relative(basePath, fullPath);
                     const normalizedPath = relativePath.split('\\').join('/');
-                    this.fileList.set(normalizedPath, fullPath);
-                    if (ext.length > 0) {
-                        this.fileList.set(normalizedPath.slice(0, -ext.length), fullPath);
-                    }
+                    const fileKey = (ext.length > 0) ? normalizedPath.slice(0, -ext.length) : normalizedPath;
+                    this.fileList.set(fileKey, fullPath);
                 }
             }
         }
@@ -40,7 +38,8 @@ export default class CascadeFileLoader {
         }
     }
     resolve(moduleName) {
-        return this.fileList.get(moduleName);
+        const ext = extname(moduleName);
+        return this.fileList.get((ext.length > 0) ? moduleName.slice(0, -ext.length) : moduleName);
     }
     addModule(module) {
         if (!module)

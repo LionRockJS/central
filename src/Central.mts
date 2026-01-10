@@ -52,6 +52,8 @@ export default class Central {
 
   static get modules() { return this.helperPath.modules; }
   static get classPath() { return this.helperPath.fileList; }
+  static get viewPath() { return this.helperPath.templateList; }
+
   private static helperPath = new HelperPath();
 
   static async init(opts: CentralInitOptions = {}): Promise<typeof Central> {

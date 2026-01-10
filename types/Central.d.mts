@@ -28,6 +28,7 @@ export default class Central {
     static port: string;
     static get modules(): Map<string, any>;
     static get classPath(): Map<string, string>;
+    static get viewPath(): Map<string, string>;
     private static helperPath;
     static init(opts?: CentralInitOptions): Promise<typeof Central>;
     static applyApplicationConfigs(): Promise<void>;

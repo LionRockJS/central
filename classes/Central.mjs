@@ -37,6 +37,7 @@ export default class Central {
     static port = "";
     static get modules() { return this.helperPath.modules; }
     static get classPath() { return this.helperPath.fileList; }
+    static get viewPath() { return this.helperPath.templateList; }
     static helperPath = new HelperPath();
     static async init(opts = {}) {
         const options = {
