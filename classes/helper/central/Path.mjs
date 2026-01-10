@@ -7,7 +7,7 @@ export default class HelperPath {
     constructor() { }
     modules = new Map();
     loader = new CascadeFileLoader({
-        ignoreList: [/^\./, /^index/, /^init/],
+        ignoreList: [/^\./, /^index/, /^init/, /^readme/],
         pathHandler: (path) => {
             const classesPath = join(path, 'classes');
             try {
@@ -20,7 +20,7 @@ export default class HelperPath {
         }
     });
     viewLoader = new CascadeFileLoader({
-        ignoreList: [/^\./],
+        ignoreList: [/^\./, /^readme/],
         pathHandler: (path) => path + '/../views'
     });
     get fileList() { return this.loader.fileList; }
