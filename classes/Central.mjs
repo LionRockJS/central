@@ -33,7 +33,7 @@ export default class Central {
             debug: false
         }
     };
-    static adapter = AdapterNode;
+    static adapter = new AdapterNode();
     static port = "";
     static get modules() { return this.helperPath.modules; }
     static get classPath() { return this.helperPath.fileList; }
@@ -41,7 +41,7 @@ export default class Central {
     static helperPath = new HelperPath();
     static async init(opts = {}) {
         const options = {
-            EXE_PATH: process.cwd(),
+            EXE_PATH: this.adapter.process().cwd(),
             APP_PATH: null,
             VIEW_PATH: null,
             modules: [],

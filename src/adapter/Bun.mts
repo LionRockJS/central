@@ -8,20 +8,20 @@ export default class Bun extends Node{
     super();
   }
 
-  static resolveFetchList(x: string, store: Map<string, any>, pathToFile: string): boolean {
+  override resolveFetchList(x: string, store: Map<string, any>, pathToFile: string): boolean {
     return super.resolveFetchList(x, store, pathToFile);
   }
 
-  static fileExists(pathToFile: string): boolean {
+  override fileExists(pathToFile: string): boolean {
     //if no extension, check for .ts, .mts, .mjs
     return super.fileExists(pathToFile + '.ts') || super.fileExists(pathToFile + '.mts') || super.fileExists(pathToFile) ;
   }
 
-  static dirname(file: string | null = null): string {
+  override dirname(file: string | null = null): string {
     return super.dirname(file);
   }
 
-  static async import(pathToFile: string, cacheId: number = 0): Promise<any> {
+  override async import(pathToFile: string, cacheId: number = 0): Promise<any> {
 //    let path = (cacheId === 0) ? pathToFile : `${pathToFile}?cache=${cacheId}`;
     const module = await import(pathToFile);
     return module.default || module;

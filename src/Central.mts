@@ -10,6 +10,7 @@ import HelperCache from './helper/central/Cache.mjs';
 import HelperBootstrap from './helper/central/Bootstrap.mjs';
 import HelperConfig from './helper/central/Config.mjs';
 import HelperPath from './helper/central/Path.mjs';
+import AdapterNoop from './adapter/Noop.mjs';
 
 import AdapterNode from './adapter/Node.mjs';
 import system from './config/system.mjs';
@@ -47,7 +48,7 @@ export default class Central {
     }
   };
 
-  static adapter = AdapterNode;
+  static adapter:AdapterNoop = new AdapterNode();
   static port: string = "";
 
   static get modules() { return this.helperPath.modules; }
@@ -58,7 +59,7 @@ export default class Central {
 
   static async init(opts: CentralInitOptions = {}): Promise<typeof Central> {
     const options = {
-      EXE_PATH: process.cwd(),
+      EXE_PATH: this.adapter.process().cwd(),
       APP_PATH: null,
       VIEW_PATH: null,
       modules: [],

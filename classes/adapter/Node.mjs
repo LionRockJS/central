@@ -7,13 +7,13 @@ export default class Node extends Noop {
     constructor() {
         super();
     }
-    static resolveFetchList(x, store, pathToFile) {
+    resolveFetchList(x, store, pathToFile) {
         if (this.fileExists(x) !== true)
             return false;
         store.set(pathToFile, x);
         return true;
     }
-    static fileExists(pathToFile) {
+    fileExists(pathToFile) {
         let pathToTest = pathToFile;
         if (path.extname(pathToFile) === '')
             pathToTest = `${pathToFile}.mjs`;
@@ -24,10 +24,10 @@ export default class Node extends Noop {
             return false;
         }
     }
-    static dirname(file = null) {
+    dirname(file = null) {
         return path.dirname(fileURLToPath(file || import.meta.url));
     }
-    static async import(pathToFile, cacheId = 0) {
+    async import(pathToFile, cacheId = 0) {
         let qs = `?r=${cacheId}`;
         if (cacheId === 0)
             qs = '';
@@ -37,7 +37,7 @@ export default class Node extends Noop {
         const module = await import(importPath + qs);
         return module.default || module;
     }
-    static process() {
+    process() {
         return process;
     }
 }

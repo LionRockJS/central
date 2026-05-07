@@ -1,21 +1,24 @@
 export default abstract class Noop {
-  static resolveFetchList(x: string, store: Map<string, any>, pathToFile: string): boolean {
+  resolveFetchList(x: string, store: Map<string, any>, pathToFile: string): boolean {
     return true;
   }
 
-  static dirname(): string {
-    return './';
+  dirname(file: string | null = null): string {
+    return './'+(file || '');
   }
 
-  static async import(pathToFile: string, cacheId: number = 0): Promise<any> {
+  async import(pathToFile: string, cacheId: number = 0): Promise<any> {
     return {};
   }
 
-  static fileExists(pathToFile: string): boolean {
+  fileExists(pathToFile: string): boolean {
     return false;
   }
 
-  static process(): any {
-    return {};
+  process(): any {
+    return {
+      status: 'Noop adapter - no process object available', 
+      cwd: () => './'
+    };
   }
 }

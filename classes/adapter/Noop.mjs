@@ -1,17 +1,20 @@
 export default class Noop {
-    static resolveFetchList(x, store, pathToFile) {
+    resolveFetchList(x, store, pathToFile) {
         return true;
     }
-    static dirname() {
-        return './';
+    dirname(file = null) {
+        return './' + (file || '');
     }
-    static async import(pathToFile, cacheId = 0) {
+    async import(pathToFile, cacheId = 0) {
         return {};
     }
-    static fileExists(pathToFile) {
+    fileExists(pathToFile) {
         return false;
     }
-    static process() {
-        return {};
+    process() {
+        return {
+            status: 'Noop adapter - no process object available',
+            cwd: () => './'
+        };
     }
 }

@@ -3,17 +3,17 @@ export default class Bun extends Node {
     constructor() {
         super();
     }
-    static resolveFetchList(x, store, pathToFile) {
+    resolveFetchList(x, store, pathToFile) {
         return super.resolveFetchList(x, store, pathToFile);
     }
-    static fileExists(pathToFile) {
+    fileExists(pathToFile) {
         //if no extension, check for .ts, .mts, .mjs
         return super.fileExists(pathToFile + '.ts') || super.fileExists(pathToFile + '.mts') || super.fileExists(pathToFile);
     }
-    static dirname(file = null) {
+    dirname(file = null) {
         return super.dirname(file);
     }
-    static async import(pathToFile, cacheId = 0) {
+    async import(pathToFile, cacheId = 0) {
         //    let path = (cacheId === 0) ? pathToFile : `${pathToFile}?cache=${cacheId}`;
         const module = await import(pathToFile);
         return module.default || module;

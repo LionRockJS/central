@@ -9,14 +9,14 @@ export default class Node extends Noop{
     super();
   }
 
-  static resolveFetchList(x: string, store: Map<string, any>, pathToFile: string): boolean {
+  override resolveFetchList(x: string, store: Map<string, any>, pathToFile: string): boolean {
     if(this.fileExists(x) !== true)return false;
 
     store.set(pathToFile, x);
     return true;
   }
 
-  static fileExists(pathToFile: string): boolean {
+  override fileExists(pathToFile: string): boolean {
     let pathToTest = pathToFile;
     if(path.extname(pathToFile) === '')pathToTest = `${pathToFile}.mjs`;
 
@@ -27,11 +27,11 @@ export default class Node extends Noop{
     }
   }
 
-  static dirname(file: string | null = null): string {
+  override dirname(file: string | null = null): string {
     return path.dirname(fileURLToPath(file || import.meta.url));
   }
 
-  static async import(pathToFile: string, cacheId: number = 0): Promise<any> {
+  override async import(pathToFile: string, cacheId: number = 0): Promise<any> {
     let qs = `?r=${cacheId}`;
     if(cacheId === 0)qs = '';
     let importPath: string = pathToFile;
@@ -40,7 +40,7 @@ export default class Node extends Noop{
     return module.default || module;
   }
 
-  static process(): NodeJS.Process {
+  override process(): any {
     return process;
   }
 }
