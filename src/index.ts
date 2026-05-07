@@ -8,6 +8,7 @@
 
 import CentralAdapterBun from './adapter/Bun.mjs';
 import CentralAdapterNode from './adapter/Node.mjs';
+import CentralAdapterWorker from './adapter/Worker.mjs';
 
 import Central, { CentralEnv } from './Central.mjs';
 import HelperConfig from './helper/central/Config.mjs';
@@ -33,6 +34,7 @@ export default Central
 export {
   CentralAdapterBun,
   CentralAdapterNode,
+  CentralAdapterWorker,
 //mvc
   Model,
   View,

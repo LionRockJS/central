@@ -7,6 +7,7 @@
  */
 import CentralAdapterBun from './adapter/Bun.mjs';
 import CentralAdapterNode from './adapter/Node.mjs';
+import CentralAdapterWorker from './adapter/Worker.mjs';
 import Central, { CentralEnv } from './Central.mjs';
 import HelperConfig from './helper/central/Config.mjs';
 import HelperCrypto from './helper/Crypto.mjs';
@@ -23,7 +24,7 @@ import DatabaseAdapter from './adapter/Database.mjs';
 import JSONView from "./view/JSONView.mjs";
 import { Controller, ControllerMixin, View, ControllerState } from '@lionrockjs/mvc';
 export default Central;
-export { CentralAdapterBun, CentralAdapterNode, 
+export { CentralAdapterBun, CentralAdapterNode, CentralAdapterWorker, 
 //mvc
 Model, View, Controller, ControllerMixin, ControllerState, ORM, 
 //adapters
