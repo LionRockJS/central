@@ -5,5 +5,5 @@ export default class Worker extends Noop {
     fileExists(pathToFile: string): boolean;
     dirname(file?: string | null): string;
     import(pathToFile: string, cacheId?: number): Promise<any>;
-    process(): Record<string, never>;
+    process(): any;
 }

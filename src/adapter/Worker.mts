@@ -25,7 +25,7 @@ export default class Worker extends Noop{
     return module.default || module;
   }
 
-  override process(): Record<string, never> {
-    return {};
+  override process(): any {
+    return super.process();
   }
 }

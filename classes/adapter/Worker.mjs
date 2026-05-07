@@ -21,6 +21,6 @@ export default class Worker extends Noop {
         return module.default || module;
     }
     process() {
-        return {};
+        return super.process();
     }
 }
