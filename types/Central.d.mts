@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
-import AdapterNoop from './adapter/Noop.mjs';
+import RuntimeAdapter from './adapter/runtime/Noop.mjs';
 interface CentralInitOptions {
     EXE_PATH?: string | null;
     APP_PATH?: string | null;
@@ -24,7 +24,7 @@ export default class Central {
     static VIEW_PATH: string | null;
     static ENV: string;
     static config: any;
-    static adapter: AdapterNoop;
+    static runtime: RuntimeAdapter;
     static port: string;
     static get modules(): Map<string, any>;
     static get classPath(): Map<string, string>;

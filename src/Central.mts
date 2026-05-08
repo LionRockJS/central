@@ -10,9 +10,9 @@ import HelperCache from './helper/central/Cache.mjs';
 import HelperBootstrap from './helper/central/Bootstrap.mjs';
 import HelperConfig from './helper/central/Config.mjs';
 import HelperPath from './helper/central/Path.mjs';
-import AdapterNoop from './adapter/Noop.mjs';
+import RuntimeAdapter from './adapter/runtime/Noop.mjs';
 
-import AdapterNode from './adapter/Node.mjs';
+import RuntimeAdapterNode from './adapter/runtime/Node.mjs';
 import system from './config/system.mjs';
 
 interface CentralInitOptions {
@@ -48,7 +48,7 @@ export default class Central {
     }
   };
 
-  static adapter:AdapterNoop = new AdapterNode();
+  static runtime: RuntimeAdapter = new RuntimeAdapterNode();
   static port: string = "";
 
   static get modules() { return this.helperPath.modules; }
@@ -59,7 +59,7 @@ export default class Central {
 
   static async init(opts: CentralInitOptions = {}): Promise<typeof Central> {
     const options = {
-      EXE_PATH: this.adapter.process().cwd(),
+      EXE_PATH: this.runtime.process().cwd(),
       APP_PATH: null,
       VIEW_PATH: null,
       modules: [],
@@ -76,10 +76,10 @@ export default class Central {
     await HelperCache.init();
     await this.applyApplicationConfigs();
 
-    await HelperBootstrap.init(this.adapter, this.APP_PATH);
+    await HelperBootstrap.init(this.runtime, this.APP_PATH);
     await this.helperPath.reloadModuleInit();
 
-    await HelperBootstrap.loadRoutes(this.adapter, this.APP_PATH);
+    await HelperBootstrap.loadRoutes(this.runtime, this.APP_PATH);
 
     return Central;
   }
@@ -91,10 +91,10 @@ export default class Central {
         //fs check file exist in ${APP_PATH}/config/${key}.mjs
         //if exists, apply to Central.config[key]
         const source = `${Central.APP_PATH}/config/${key}`;
-        const exist = this.adapter.fileExists(source);
+        const exist = this.runtime.fileExists(source);
 
         if(exist){
-          const config = await this.adapter.import(source, HelperCache.cacheId);
+          const config = await this.runtime.import(source, HelperCache.cacheId);
           Object.assign(Central.config[key], config);
         }
       })
@@ -120,7 +120,7 @@ export default class Central {
       throw new Error(`Resolve path error: path ${adjustedPathToFile}.mjs not found. prefixPath: classes , store: {} `);
     }
     if(typeof file !== 'string') return file;
-    return await this.adapter.import(file, HelperCache.cacheId);
+    return await this.runtime.import(file, HelperCache.cacheId);
   }
 
   static resolveView(pathToFile: string): string {
@@ -147,15 +147,15 @@ export default class Central {
       const configs = it.configs || it.default?.configs;
       const filename = it.filename || it.default?.filename;
       if(!filename) continue;
-      const dirname = this.adapter.dirname(filename);
+      const dirname = this.runtime.dirname(filename);
 
       if(configs){
          const configMap = new Map<string, any>();
 
         for(const configName of configs) {
           const configPath = `${dirname}/config/${configName}.mjs`;
-          if(this.adapter.fileExists(configPath)){
-            const configModule = await this.adapter.import(configPath, HelperCache.cacheId);
+          if(this.runtime.fileExists(configPath)){
+            const configModule = await this.runtime.import(configPath, HelperCache.cacheId);
             configMap.set(configName, configModule);
           }
         }
@@ -184,9 +184,9 @@ export default class Central {
       for(let j= 0; j< packages.length; j++){
         const dir = packages[j];
         const configFile = `${dir}/config/${configKey}`;
-        const exist = this.adapter.fileExists(configFile);
+        const exist = this.runtime.fileExists(configFile);
         if (exist) {
-          const config = await this.adapter.import(configFile, HelperCache.cacheId);
+          const config = await this.runtime.import(configFile, HelperCache.cacheId);
           Central[configKey] = Object.assign(Central.config[configKey], config.default || config);
         }
       }

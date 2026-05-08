@@ -9,7 +9,7 @@ import HelperCache from './helper/central/Cache.mjs';
 import HelperBootstrap from './helper/central/Bootstrap.mjs';
 import HelperConfig from './helper/central/Config.mjs';
 import HelperPath from './helper/central/Path.mjs';
-import AdapterNode from './adapter/Node.mjs';
+import RuntimeAdapterNode from './adapter/runtime/Node.mjs';
 export var CentralEnv;
 (function (CentralEnv) {
     CentralEnv["DEVELOPMENT"] = "dev";
@@ -33,7 +33,7 @@ export default class Central {
             debug: false
         }
     };
-    static adapter = new AdapterNode();
+    static runtime = new RuntimeAdapterNode();
     static port = "";
     static get modules() { return this.helperPath.modules; }
     static get classPath() { return this.helperPath.fileList; }
@@ -41,7 +41,7 @@ export default class Central {
     static helperPath = new HelperPath();
     static async init(opts = {}) {
         const options = {
-            EXE_PATH: this.adapter.process().cwd(),
+            EXE_PATH: this.runtime.process().cwd(),
             APP_PATH: null,
             VIEW_PATH: null,
             modules: [],
@@ -54,9 +54,9 @@ export default class Central {
         this.helperPath.init(options.EXE_PATH, options.APP_PATH, options.VIEW_PATH, options.modules);
         await HelperCache.init();
         await this.applyApplicationConfigs();
-        await HelperBootstrap.init(this.adapter, this.APP_PATH);
+        await HelperBootstrap.init(this.runtime, this.APP_PATH);
         await this.helperPath.reloadModuleInit();
-        await HelperBootstrap.loadRoutes(this.adapter, this.APP_PATH);
+        await HelperBootstrap.loadRoutes(this.runtime, this.APP_PATH);
         return Central;
     }
     static async applyApplicationConfigs() {
@@ -65,9 +65,9 @@ export default class Central {
             //fs check file exist in ${APP_PATH}/config/${key}.mjs
             //if exists, apply to Central.config[key]
             const source = `${Central.APP_PATH}/config/${key}`;
-            const exist = this.adapter.fileExists(source);
+            const exist = this.runtime.fileExists(source);
             if (exist) {
-                const config = await this.adapter.import(source, HelperCache.cacheId);
+                const config = await this.runtime.import(source, HelperCache.cacheId);
                 Object.assign(Central.config[key], config);
             }
         }));
@@ -89,7 +89,7 @@ export default class Central {
         }
         if (typeof file !== 'string')
             return file;
-        return await this.adapter.import(file, HelperCache.cacheId);
+        return await this.runtime.import(file, HelperCache.cacheId);
     }
     static resolveView(pathToFile) {
         return this.helperPath.resolveView(pathToFile);
@@ -115,13 +115,13 @@ export default class Central {
             const filename = it.filename || it.default?.filename;
             if (!filename)
                 continue;
-            const dirname = this.adapter.dirname(filename);
+            const dirname = this.runtime.dirname(filename);
             if (configs) {
                 const configMap = new Map();
                 for (const configName of configs) {
                     const configPath = `${dirname}/config/${configName}.mjs`;
-                    if (this.adapter.fileExists(configPath)) {
-                        const configModule = await this.adapter.import(configPath, HelperCache.cacheId);
+                    if (this.runtime.fileExists(configPath)) {
+                        const configModule = await this.runtime.import(configPath, HelperCache.cacheId);
                         configMap.set(configName, configModule);
                     }
                 }
@@ -146,9 +146,9 @@ export default class Central {
             for (let j = 0; j < packages.length; j++) {
                 const dir = packages[j];
                 const configFile = `${dir}/config/${configKey}`;
-                const exist = this.adapter.fileExists(configFile);
+                const exist = this.runtime.fileExists(configFile);
                 if (exist) {
-                    const config = await this.adapter.import(configFile, HelperCache.cacheId);
+                    const config = await this.runtime.import(configFile, HelperCache.cacheId);
                     Central[configKey] = Object.assign(Central.config[configKey], config.default || config);
                 }
             }
