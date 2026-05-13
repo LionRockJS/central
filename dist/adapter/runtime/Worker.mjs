@@ -16,7 +16,6 @@ export default class Worker extends Noop {
         return new URL('.', file || import.meta.url).pathname;
     }
     async import(pathToFile, cacheId = 0) {
-        // CF Workers: dynamic import only works for bundled modules; no query-string cache busting
         const module = await import(pathToFile);
         return module.default || module;
     }

@@ -18,4 +18,7 @@ export default class Bun extends Node {
         const module = await import(pathToFile);
         return module.default || module;
     }
+    process() {
+        return process;
+    }
 }

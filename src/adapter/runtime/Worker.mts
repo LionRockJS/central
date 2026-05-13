@@ -20,7 +20,6 @@ export default class Worker extends Noop{
   }
 
   override async import(pathToFile: string, cacheId: number = 0): Promise<any> {
-    // CF Workers: dynamic import only works for bundled modules; no query-string cache busting
     const module = await import(pathToFile);
     return module.default || module;
   }

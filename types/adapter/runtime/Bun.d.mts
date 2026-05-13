@@ -5,4 +5,5 @@ export default class Bun extends Node {
     fileExists(pathToFile: string): boolean;
     dirname(file?: string | null): string;
     import(pathToFile: string, cacheId?: number): Promise<any>;
+    process(): any;
 }
