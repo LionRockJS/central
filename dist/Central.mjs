@@ -15,18 +15,21 @@ export var CentralEnv;
     CentralEnv["STAGING"] = "stg";
     CentralEnv["PRODUCTION"] = "prd";
 })(CentralEnv || (CentralEnv = {}));
+import ConfigClasses from './config/classes.mjs';
+import ConfigDatabase from './config/database.mjs';
+import ConfigLanguage from './config/language.mjs';
+import ConfigSystem from './config/system.mjs';
+import ConfigView from './config/view.mjs';
 export default class Central {
     static ENV = '';
+    static cacheId = 0;
+    static modules = new Map();
     static config = {
-        classes: {
-            cache: true
-        },
-        view: {
-            cache: true
-        },
-        system: {
-            debug: false
-        }
+        classes: ConfigClasses,
+        database: ConfigDatabase,
+        language: ConfigLanguage,
+        system: ConfigSystem,
+        view: ConfigView,
     };
     static runtime = new RuntimeAdapterNode();
     static port = "";
@@ -46,6 +49,13 @@ export default class Central {
             return;
         }
         console.trace(args);
+    }
+    static addConfig(configs) {
+        for (const [key, value] of configs.entries()) {
+            if (Central.config[key] === undefined)
+                Central.config[key] = {};
+            Object.assign(Central.config[key], value.default || value);
+        }
     }
     //add modules to a set of filename, load config, then run init.mjs in each dirname
     static async addModules(modules) {

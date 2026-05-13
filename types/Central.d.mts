@@ -14,6 +14,8 @@ export declare enum CentralEnv {
 }
 export default class Central {
     static ENV: string;
+    static cacheId: number;
+    static modules: Map<string, any>;
     static config: any;
     static runtime: RuntimeAdapter;
     static port: string;
@@ -22,5 +24,6 @@ export default class Central {
     static resolveModel(modelName: string): any;
     static resolveView(pathToFile: string): any;
     static log(args: any, verbose?: boolean): any;
+    static addConfig(configs: Map<string, any>): void;
     static addModules(modules: any[]): Promise<void>;
 }

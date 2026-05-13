@@ -10,7 +10,6 @@ import ORM from './ORM.mjs';
 import Model from './Model.mjs';
 import RuntimeAdapter from './adapter/runtime/Noop.mjs';
 import RuntimeAdapterNode from './adapter/runtime/Node.mjs';
-import system from './config/system.mjs';
 
 interface CentralInitOptions {
   bootstrap?: any;
@@ -26,19 +25,23 @@ export enum CentralEnv {
   PRODUCTION = 'prd'
 }
 
+import ConfigClasses from './config/classes.mjs';
+import ConfigDatabase from './config/database.mjs';
+import ConfigLanguage from './config/language.mjs';
+import ConfigSystem from './config/system.mjs';
+import ConfigView from './config/view.mjs';
+
 export default class Central {
   static ENV: string = '';
+  static cacheId = 0;
+  static modules = new Map<string, any>();
 
   static config:any = {
-    classes: {
-      cache : true
-    },
-    view: {
-      cache : true
-    },
-    system: {
-      debug: false
-    }
+    classes: ConfigClasses,
+    database: ConfigDatabase,
+    language: ConfigLanguage,
+    system: ConfigSystem,
+    view: ConfigView,
   };
 
   static runtime: RuntimeAdapter = new RuntimeAdapterNode();
@@ -62,6 +65,13 @@ export default class Central {
       return;
     }
     console.trace(args);
+  }
+
+  static addConfig(configs: Map<string, any>){
+    for(const [key, value] of configs.entries()){
+      if(Central.config[key] === undefined) Central.config[key] = {};
+      Object.assign(Central.config[key], value.default || value);
+    }
   }
 
   //add modules to a set of filename, load config, then run init.mjs in each dirname
