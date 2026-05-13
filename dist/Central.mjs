@@ -5,10 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
-import HelperCache from './helper/central/Cache.mjs';
-import HelperBootstrap from './helper/central/Bootstrap.mjs';
-import HelperConfig from './helper/central/Config.mjs';
-import HelperPath from './helper/central/Path.mjs';
+import ORM from './ORM.mjs';
+import Model from './Model.mjs';
 import RuntimeAdapterNode from './adapter/runtime/Node.mjs';
 export var CentralEnv;
 (function (CentralEnv) {
@@ -18,9 +16,6 @@ export var CentralEnv;
     CentralEnv["PRODUCTION"] = "prd";
 })(CentralEnv || (CentralEnv = {}));
 export default class Central {
-    static EXE_PATH = null;
-    static APP_PATH = null;
-    static VIEW_PATH = null;
     static ENV = '';
     static config = {
         classes: {
@@ -35,64 +30,13 @@ export default class Central {
     };
     static runtime = new RuntimeAdapterNode();
     static port = "";
-    static get modules() { return this.helperPath.modules; }
-    static get classPath() { return this.helperPath.fileList; }
-    static get viewPath() { return this.helperPath.templateList; }
-    static helperPath = new HelperPath();
-    static async init(opts = {}) {
-        const options = {
-            EXE_PATH: this.runtime.process().cwd(),
-            APP_PATH: null,
-            VIEW_PATH: null,
-            modules: [],
-            ...opts,
-        };
-        if (!options.EXE_PATH)
-            throw new Error('Central.init requires EXE_PATH option');
-        Object.keys(this.config).forEach(key => delete this.config[key]);
-        await HelperConfig.init(this.config);
-        this.helperPath.init(options.EXE_PATH, options.APP_PATH, options.VIEW_PATH, options.modules);
-        await HelperCache.init();
-        await this.applyApplicationConfigs();
-        await HelperBootstrap.init(this.runtime, this.APP_PATH);
-        await this.helperPath.reloadModuleInit();
-        await HelperBootstrap.loadRoutes(this.runtime, this.APP_PATH);
-        return Central;
-    }
-    static async applyApplicationConfigs() {
-        //apply application configs
-        await Promise.all(Object.keys(Central.config).map(async (key) => {
-            //fs check file exist in ${APP_PATH}/config/${key}.mjs
-            //if exists, apply to Central.config[key]
-            const source = `${Central.APP_PATH}/config/${key}`;
-            const exist = this.runtime.fileExists(source);
-            if (exist) {
-                const config = await this.runtime.import(source, HelperCache.cacheId);
-                Object.assign(Central.config[key], config);
-            }
-        }));
-    }
-    /**
-     *
-     * @param configMap
-     */
-    static async initConfig(configMap) {
-        await HelperConfig.addConfig(this.config, configMap);
-        await this.applyApplicationConfigs();
-    }
-    static async import(pathToFile) {
-        // pathToFile may include file extension;
-        const adjustedPathToFile = /\..*$/.test(pathToFile) ? pathToFile : `${pathToFile}.mjs`;
-        const file = this.helperPath.resolve(adjustedPathToFile);
-        if (!file) {
-            throw new Error(`Resolve path error: path ${adjustedPathToFile}.mjs not found. prefixPath: classes , store: {} `);
-        }
-        if (typeof file !== 'string')
-            return file;
-        return await this.runtime.import(file, HelperCache.cacheId);
+    static viewFiles = new Map();
+    static modelFiles = new Map();
+    static resolveModel(modelName) {
+        return this.modelFiles.get(modelName);
     }
     static resolveView(pathToFile) {
-        return this.helperPath.resolveView(pathToFile);
+        return this.viewFiles.get(pathToFile);
     }
     static log(args, verbose = true) {
         if (Central.ENV === CentralEnv.PRODUCTION && Central.config?.system?.debug !== true)
@@ -105,59 +49,25 @@ export default class Central {
     }
     //add modules to a set of filename, load config, then run init.mjs in each dirname
     static async addModules(modules) {
-        this.helperPath.addModules(modules);
-        await this.helperPath.reloadModuleInit();
         //loop modules, if have it.configs, add them to config
         for (const it of modules) {
             if (!it)
                 continue;
             const configs = it.configs || it.default?.configs;
-            const filename = it.filename || it.default?.filename;
-            if (!filename)
-                continue;
-            const dirname = this.runtime.dirname(filename);
             if (configs) {
-                const configMap = new Map();
-                for (const configName of configs) {
-                    const configPath = `${dirname}/config/${configName}.mjs`;
-                    if (this.runtime.fileExists(configPath)) {
-                        const configModule = await this.runtime.import(configPath, HelperCache.cacheId);
-                        configMap.set(configName, configModule);
-                    }
+                for (const key of Object.keys(configs)) {
+                    if (Central.config[key] === undefined)
+                        Central.config[key] = {};
+                    Object.assign(Central.config[key], configs[key]);
                 }
-                if (configMap.size > 0) {
-                    await HelperConfig.addConfig(this.config, configMap);
+            }
+            //loop all exports of module, if export is ORM, add to modelFiles, if export is view, add to viewFiles
+            for (const exportKey of Object.keys(it)) {
+                const exportValue = it[exportKey];
+                if (typeof exportValue === 'function' && exportValue.prototype instanceof Model) {
+                    Central.modelFiles.set(ORM.classPrefix + exportKey.replaceAll('Model', ''), exportValue);
                 }
             }
         }
-        await this.applyApplicationConfigs();
-    }
-    //module may add after init, so we need to force reload module init
-    static async reloadModuleInit(force = false) {
-        if (force === false && Central.config.classes.cache)
-            return;
-        await this.helperPath.reloadModuleInit();
-    }
-    static async reloadConfig() {
-        const configKeys = Object.keys(Central.config);
-        for (let i = 0; i < configKeys.length; i++) {
-            const configKey = configKeys[i];
-            const packages = [...this.helperPath.modules.keys()];
-            for (let j = 0; j < packages.length; j++) {
-                const dir = packages[j];
-                const configFile = `${dir}/config/${configKey}`;
-                const exist = this.runtime.fileExists(configFile);
-                if (exist) {
-                    const config = await this.runtime.import(configFile, HelperCache.cacheId);
-                    Central[configKey] = Object.assign(Central.config[configKey], config.default || config);
-                }
-            }
-        }
-        await this.applyApplicationConfigs();
-    }
-    static async flushCache() {
-        HelperCache.clearImportCache();
-        if (this.config.classes.cache === false)
-            await this.reloadConfig();
     }
 }

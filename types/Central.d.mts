@@ -6,12 +6,6 @@
  *
  */
 import RuntimeAdapter from './adapter/runtime/Noop.mjs';
-interface CentralInitOptions {
-    EXE_PATH?: string | null;
-    APP_PATH?: string | null;
-    VIEW_PATH?: string | null;
-    modules?: any[];
-}
 export declare enum CentralEnv {
     DEVELOPMENT = "dev",
     TEST = "uat",
@@ -19,30 +13,14 @@ export declare enum CentralEnv {
     PRODUCTION = "prd"
 }
 export default class Central {
-    static EXE_PATH: string | null;
-    static APP_PATH: string | null;
-    static VIEW_PATH: string | null;
     static ENV: string;
     static config: any;
     static runtime: RuntimeAdapter;
     static port: string;
-    static get modules(): Map<string, any>;
-    static get classPath(): Map<string, string>;
-    static get viewPath(): Map<string, string>;
-    private static helperPath;
-    static init(opts?: CentralInitOptions): Promise<typeof Central>;
-    static applyApplicationConfigs(): Promise<void>;
-    /**
-     *
-     * @param configMap
-     */
-    static initConfig(configMap: Map<string, any>): Promise<void>;
-    static import(pathToFile: string): Promise<any>;
-    static resolveView(pathToFile: string): string;
+    static viewFiles: Map<string, any>;
+    static modelFiles: Map<string, any>;
+    static resolveModel(modelName: string): any;
+    static resolveView(pathToFile: string): any;
     static log(args: any, verbose?: boolean): any;
     static addModules(modules: any[]): Promise<void>;
-    static reloadModuleInit(force?: boolean): Promise<void>;
-    static reloadConfig(): Promise<void>;
-    static flushCache(): Promise<void>;
 }
-export {};

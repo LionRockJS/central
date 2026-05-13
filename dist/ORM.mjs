@@ -109,7 +109,7 @@ export default class ORM {
     }
     static async import(modelName, defaultMClass = Model) {
         try {
-            return await Central.import(ORM.classPrefix + modelName);
+            return await Central.resolveModel(ORM.classPrefix + modelName);
         }
         catch (e) {
             if (defaultMClass === Model)

@@ -126,7 +126,7 @@ export default class ORM {
 
   static async import(modelName: string, defaultMClass: typeof Model = Model): Promise<typeof Model> {
     try{
-      return await Central.import(ORM.classPrefix + modelName);
+      return await Central.resolveModel(ORM.classPrefix + modelName);
     }catch(e){
       if(defaultMClass === Model)throw e;
       return defaultMClass;
