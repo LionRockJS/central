@@ -10,6 +10,11 @@ import RuntimeAdapterNode from './adapter/runtime/Node.mjs';
 import RuntimeAdapterWorker from './adapter/runtime/Worker.mjs';
 import Central, { CentralEnv } from './Central.mjs';
 import HelperCrypto from './helper/Crypto.mjs';
+import ConfigClasses from './config/classes.mjs';
+import ConfigDatabase from './config/database.mjs';
+import ConfigLanguage from './config/language.mjs';
+import ConfigSystem from './config/system.mjs';
+import ConfigView from './config/view.mjs';
 import ORM from './ORM.mjs';
 import Model from './Model.mjs';
 import ControllerMixinMime from './controller-mixin/Mime.mjs';
@@ -21,7 +26,15 @@ import ORMAdapter from './adapter/ORM.mjs';
 import DatabaseAdapter from './adapter/Database.mjs';
 import JSONView from "./view/JSONView.mjs";
 import { Controller, ControllerMixin, View, ControllerState } from '@lionrockjs/mvc';
-export default Central;
+export default {
+    configs: {
+        classes: ConfigClasses,
+        database: ConfigDatabase,
+        language: ConfigLanguage,
+        system: ConfigSystem,
+        view: ConfigView,
+    }
+};
 export { RuntimeAdapterBun, RuntimeAdapterNode, RuntimeAdapterWorker, 
 //mvc
 Model, View, Controller, ControllerMixin, ControllerState, ORM, 

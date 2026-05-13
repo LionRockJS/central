@@ -21,5 +21,32 @@ import ORMAdapter from './adapter/ORM.mjs';
 import DatabaseAdapter from './adapter/Database.mjs';
 import JSONView from "./view/JSONView.mjs";
 import { Controller, ControllerMixin, View, ControllerState } from '@lionrockjs/mvc';
-export default Central;
+declare const _default: {
+    configs: {
+        classes: {
+            cache: boolean;
+        };
+        database: {
+            cache: boolean;
+        };
+        language: {
+            route: string;
+            default: string;
+            names: Map<string, string>;
+        };
+        system: {
+            debug: boolean;
+            serve_static_file: boolean;
+            platform: {
+                adapter: {
+                    setup: () => Promise<{
+                        listen: (port: any) => void;
+                    }>;
+                };
+            };
+        };
+        view: {};
+    };
+};
+export default _default;
 export { RuntimeAdapterBun, RuntimeAdapterNode, RuntimeAdapterWorker, Model, View, Controller, ControllerMixin, ControllerState, ORM, ORMAdapter, DatabaseAdapter, JSONView, ControllerMixinMime, ControllerMixinView, ControllerMixinDatabase, ControllerMixinViewData, ControllerMixinActionLogger, CentralEnv, ControllerMixinViewState, ActionLoggerState, HelperCrypto, Central, };
