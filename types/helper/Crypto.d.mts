@@ -17,7 +17,7 @@ export default class HelperCrypto {
         PBKDF2: string;
         AES_KW: string;
     };
-    static makeSignKey(filePath: string, algorithm?: any): Promise<any>;
+    static makeSignKey(algorithm?: any): Promise<any>;
     static sign(jwk: any, data: string, algorithm?: any, expire?: number, timestamp?: number): Promise<string>;
     static verify(jwk: any, sign: string, data: string, algorithm?: any, timestamp?: number): Promise<boolean>;
 }

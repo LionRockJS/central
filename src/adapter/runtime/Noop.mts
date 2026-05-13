@@ -15,6 +15,30 @@ export default abstract class Noop {
     return false;
   }
 
+  isDirectory(pathToFile: string): boolean {
+    return false;
+  }
+
+  readDir(pathToFile: string): string[] {
+    return [];
+  }
+
+  joinPath(...parts: string[]): string {
+    return parts.join('/').replace(/\/+/g, '/');
+  }
+
+  relativePath(from: string, to: string): string {
+    // simple relative path: strip common prefix
+    if (to.startsWith(from)) return to.slice(from.length).replace(/^\//, '');
+    return to;
+  }
+
+  extname(filePath: string): string {
+    const i = filePath.lastIndexOf('.');
+    const j = filePath.lastIndexOf('/');
+    return i > j ? filePath.slice(i) : '';
+  }
+
   process(): any {
     return {
       status: 'Noop adapter - no process object available', 

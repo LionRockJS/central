@@ -1,6 +1,5 @@
-import { fileURLToPath } from 'node:url';
-import { dirname, join, relative, extname } from 'node:path';
-import { readdirSync, statSync } from 'node:fs';
+import Central from '../Central.mjs';
+import type Noop from '../adapter/runtime/Noop.mjs';
 
 interface LoaderOptions {
   ignoreList?: RegExp[];
@@ -17,21 +16,23 @@ export default class CascadeFileLoader {
     this.pathHandler = options?.pathHandler || ((path) => path);
   }
 
+  private get runtime(): Noop {
+    return Central.runtime;
+  }
+
   scanDir(basePath: string, currentPath: string = "") {
     if (!currentPath) currentPath = basePath;
 
     try {
-      const files = readdirSync(currentPath);
+      const files = this.runtime.readDir(currentPath);
       for (const file of files) {
         if (this.ignoreList.some(ignore => ignore.test(file))) continue;
-        const fullPath = join(currentPath, file);
-        const stat = statSync(fullPath);
-          if (stat.isDirectory()) {
-            this.scanDir(basePath, fullPath);
-          } else {
-
-          const ext = extname(file);
-          const relativePath = relative(basePath, fullPath);
+        const fullPath = this.runtime.joinPath(currentPath, file);
+        if (this.runtime.isDirectory(fullPath)) {
+          this.scanDir(basePath, fullPath);
+        } else {
+          const ext = this.runtime.extname(file);
+          const relativePath = this.runtime.relativePath(basePath, fullPath);
           const normalizedPath = relativePath.split('\\').join('/');
 
           const fileKey = (ext.length > 0) ? normalizedPath.slice(0, -ext.length) : normalizedPath;
@@ -46,7 +47,7 @@ export default class CascadeFileLoader {
   }
 
   resolve(moduleName: string) {
-    const ext = extname(moduleName);
+    const ext = this.runtime.extname(moduleName);
     return this.fileList.get((ext.length > 0) ? moduleName.slice(0, -ext.length) : moduleName);
   }
 
@@ -55,7 +56,7 @@ export default class CascadeFileLoader {
     const m = module.default || module;
     if (!m.filename)return;
 
-    const path = dirname(fileURLToPath(m.filename));
+    const path = this.runtime.dirname(m.filename);
     const targetPath = this.pathHandler ? this.pathHandler(path) : path;
     this.scanDir(targetPath);
   }

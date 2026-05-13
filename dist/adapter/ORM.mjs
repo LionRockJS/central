@@ -1,5 +1,4 @@
 import Central from '../Central.mjs';
-import { randomUUID } from 'node:crypto';
 export default class ORM {
     client;
     tableName;
@@ -22,7 +21,7 @@ export default class ORM {
         return (Math.floor((Date.now() - 1563741060000) / 1000)) * 100000 + ((Math.random() * 100000) & 65535);
     }
     static uuid() {
-        return randomUUID({ disableEntropyCache: true });
+        return crypto.randomUUID();
     }
     static translateValue(values) {
         return values;

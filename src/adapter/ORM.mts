@@ -1,5 +1,4 @@
 import Central from '../Central.mjs';
-import { randomUUID } from 'node:crypto';
 import type Model from '../Model.mjs';
 
 export default class ORM {
@@ -27,7 +26,7 @@ export default class ORM {
   }
 
   static uuid(): string {
-    return randomUUID({ disableEntropyCache: true });
+    return crypto.randomUUID();
   }
 
   static translateValue(values: any[]): any[] {

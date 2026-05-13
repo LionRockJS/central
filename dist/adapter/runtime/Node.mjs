@@ -24,6 +24,31 @@ export default class Node extends Noop {
             return false;
         }
     }
+    isDirectory(pathToFile) {
+        try {
+            return fs.statSync(pathToFile).isDirectory();
+        }
+        catch (e) {
+            return false;
+        }
+    }
+    readDir(pathToFile) {
+        try {
+            return fs.readdirSync(pathToFile);
+        }
+        catch (e) {
+            return [];
+        }
+    }
+    joinPath(...parts) {
+        return path.join(...parts);
+    }
+    relativePath(from, to) {
+        return path.relative(from, to);
+    }
+    extname(filePath) {
+        return path.extname(filePath);
+    }
     dirname(file = null) {
         return path.dirname(fileURLToPath(file || import.meta.url));
     }

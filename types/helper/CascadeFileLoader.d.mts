@@ -7,6 +7,7 @@ export default class CascadeFileLoader {
     private ignoreList;
     private pathHandler?;
     constructor(options?: LoaderOptions);
+    private get runtime();
     scanDir(basePath: string, currentPath?: string): void;
     resolve(moduleName: string): string;
     addModule(module: any): void;

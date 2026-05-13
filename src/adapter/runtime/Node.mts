@@ -27,6 +27,34 @@ export default class Node extends Noop{
     }
   }
 
+  override isDirectory(pathToFile: string): boolean {
+    try {
+      return fs.statSync(pathToFile).isDirectory();
+    } catch(e) {
+      return false;
+    }
+  }
+
+  override readDir(pathToFile: string): string[] {
+    try {
+      return fs.readdirSync(pathToFile);
+    } catch(e) {
+      return [];
+    }
+  }
+
+  override joinPath(...parts: string[]): string {
+    return path.join(...parts);
+  }
+
+  override relativePath(from: string, to: string): string {
+    return path.relative(from, to);
+  }
+
+  override extname(filePath: string): string {
+    return path.extname(filePath);
+  }
+
   override dirname(file: string | null = null): string {
     return path.dirname(fileURLToPath(file || import.meta.url));
   }

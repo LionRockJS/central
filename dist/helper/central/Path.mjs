@@ -1,7 +1,4 @@
 import Central from '../../Central.mjs';
-import { dirname, join } from 'node:path';
-import { readdirSync, statSync, existsSync } from 'node:fs';
-import { fileURLToPath, pathToFileURL } from 'node:url';
 import CascadeFileLoader from '../CascadeFileLoader.mjs';
 export default class HelperPath {
     constructor() { }
@@ -9,13 +6,10 @@ export default class HelperPath {
     loader = new CascadeFileLoader({
         ignoreList: [/^\./, /^index/, /^init/, /^readme/],
         pathHandler: (path) => {
-            const classesPath = join(path, 'classes');
-            try {
-                if (existsSync(classesPath) && statSync(classesPath).isDirectory()) {
-                    return classesPath;
-                }
+            const classesPath = Central.runtime.joinPath(path, 'classes');
+            if (Central.runtime.isDirectory(classesPath)) {
+                return classesPath;
             }
-            catch (e) { }
             return path;
         }
     });
@@ -43,52 +37,36 @@ export default class HelperPath {
             this.viewLoader.scanDir(Central.VIEW_PATH);
         }
         // 4. Scan EXE_PATH/modules
-        try {
-            const modulesDir = join(Central.EXE_PATH, 'modules');
-            const stat = statSync(modulesDir);
-            if (stat.isDirectory()) {
-                const dirs = readdirSync(modulesDir);
-                for (const dir of dirs) {
-                    if (dir.startsWith('.'))
-                        continue;
-                    const modulePath = join(modulesDir, dir);
-                    try {
-                        if (statSync(modulePath).isDirectory()) {
-                            const initFile = join(modulePath, 'init.mjs');
-                            if (statSync(initFile).isFile()) {
-                                this.modules.set(modulePath, {
-                                    filename: pathToFileURL(initFile).href
-                                });
-                                const classesPath = join(modulePath, 'classes');
-                                try {
-                                    if (statSync(classesPath).isDirectory()) {
-                                        this.loader.scanDir(classesPath);
-                                    }
-                                    else {
-                                        this.loader.scanDir(modulePath);
-                                    }
-                                }
-                                catch (e) {
-                                    this.loader.scanDir(modulePath);
-                                }
-                            }
+        const modulesDir = Central.runtime.joinPath(Central.EXE_PATH, 'modules');
+        if (Central.runtime.isDirectory(modulesDir)) {
+            const dirs = Central.runtime.readDir(modulesDir);
+            for (const dir of dirs) {
+                if (dir.startsWith('.'))
+                    continue;
+                const modulePath = Central.runtime.joinPath(modulesDir, dir);
+                if (Central.runtime.isDirectory(modulePath)) {
+                    const initFile = Central.runtime.joinPath(modulePath, 'init.mjs');
+                    if (Central.runtime.fileExists(initFile)) {
+                        this.modules.set(modulePath, {
+                            filename: initFile
+                        });
+                        const classesPath = Central.runtime.joinPath(modulePath, 'classes');
+                        if (Central.runtime.isDirectory(classesPath)) {
+                            this.loader.scanDir(classesPath);
                         }
-                    }
-                    catch (e) {
-                        // ignore
+                        else {
+                            this.loader.scanDir(modulePath);
+                        }
                     }
                 }
             }
-        }
-        catch (e) {
-            // ignore
         }
     }
     async reloadModuleInit() {
         const initFiles = [...this.modules.keys()].map(x => `${x}/init.mjs`);
         for (let i = 0; i < initFiles.length; i++) {
             const file = initFiles[i];
-            if (!existsSync(file))
+            if (!Central.runtime.fileExists(file))
                 continue;
             try {
                 await import(file);
@@ -119,7 +97,7 @@ export default class HelperPath {
             const module = m.default || m;
             if (!module.filename)
                 return;
-            const dir = dirname(fileURLToPath(module.filename));
+            const dir = Central.runtime.dirname(module.filename);
             this.modules.set(dir, module);
         });
     }

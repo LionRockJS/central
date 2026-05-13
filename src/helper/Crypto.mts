@@ -1,7 +1,4 @@
-import { Buffer } from 'node:buffer';
-import { TextEncoder } from 'node:util';
-import { subtle } from 'node:crypto';
-import fs from 'node:fs/promises';
+
 
 const CRYPTO_ALGORITHMS = {
   RSASSA_PKCS1_v1_5: 'RSASSA-PKCS1-v1_5',
@@ -27,26 +24,23 @@ const defaultSignAlgorithm = { name: CRYPTO_ALGORITHMS.HMAC, hash: CRYPTO_ALGORI
 export default class HelperCrypto {
   static CRYPTO_ALGORITHMS = CRYPTO_ALGORITHMS;
 
-  static async makeSignKey(filePath: string, algorithm: any = defaultSignAlgorithm): Promise<any> {
-    const keyResult = await subtle.generateKey(algorithm, true, ['sign', 'verify']);
+  static async makeSignKey(algorithm: any = defaultSignAlgorithm): Promise<any> {
+    const keyResult = await crypto.subtle.generateKey(algorithm, true, ['sign', 'verify']);
     // Handle both CryptoKey and CryptoKeyPair
     const key = 'privateKey' in keyResult ? keyResult.privateKey : keyResult;
-    const jwk = await subtle.exportKey('jwk', key as CryptoKey);
-
-    await fs.writeFile(filePath, /.json$/.test(filePath)? JSON.stringify(jwk) : `export default ${JSON.stringify(jwk)}`);
-    return jwk;
+    return crypto.subtle.exportKey('jwk', key as CryptoKey);
   }
 
   static async sign(jwk: any, data: string, algorithm: any = defaultSignAlgorithm, expire: number = 0, timestamp: number = 0): Promise<string> {
-    const key = await subtle.importKey('jwk', jwk, algorithm, true, ['sign', 'verify']);
+    const key = await crypto.subtle.importKey('jwk', jwk, algorithm, true, ['sign', 'verify']);
     const expire_ms = expire * 1000;
 
     const strExpire = (expire ? `::${ Math.floor(((timestamp || Date.now()) + expire_ms) / 1000) }` : '');
 
     const buffer = new TextEncoder().encode(data + strExpire);
-    const sign = await subtle.sign(algorithm, key, buffer);
+    const sign = await crypto.subtle.sign(algorithm, key, buffer);
 
-    return Buffer.from(sign).toString('base64') + strExpire;
+    return btoa(String.fromCharCode(...new Uint8Array(sign))) + strExpire;
   }
 
   static async verify(jwk: any, sign: string, data: string, algorithm: any = defaultSignAlgorithm, timestamp: number = 0): Promise<boolean> {
@@ -57,9 +51,9 @@ export default class HelperCrypto {
     }
     const strExpire = signs[1] ? `::${signs[1]}` : '';
 
-    const key = await subtle.importKey('jwk', jwk, algorithm, true, ['sign', 'verify']);
-    const bufferSign = Buffer.from(signs[0], "base64");
+    const key = await crypto.subtle.importKey('jwk', jwk, algorithm, true, ['sign', 'verify']);
+    const bufferSign = Uint8Array.from(atob(signs[0]), c => c.charCodeAt(0));
     const bufferData = new TextEncoder().encode(data + strExpire);
-    return subtle.verify(algorithm, key, bufferSign, bufferData);
+    return crypto.subtle.verify(algorithm, key, bufferSign, bufferData);
   }
 }
