@@ -51,10 +51,6 @@ export default class Bun extends Node {
                 payload,
             };
             Central.viewFiles.set(viewKey, view);
-            const [rootFolder, ...rest] = viewKey.split('/');
-            if ((rootFolder === 'snippets' || rootFolder === 'sections') && rest.length > 0) {
-                Central.viewFiles.set(rest.join('/'), view);
-            }
         };
         const walkViews = async (dirPath) => {
             for (const entry of fs.readdirSync(dirPath, { withFileTypes: true })) {
