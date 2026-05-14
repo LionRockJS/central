@@ -1,8 +1,87 @@
 import Node from './Node.mjs';
+import path from 'node:path';
+import fs from 'node:fs';
+import Central from '../../Central.mjs';
 
 export default class Bun extends Node{
   constructor() {
     super();
+  }
+
+  async registerControllers(controllerDir){
+    const controllerExtensions = ['.mjs', '.mts', '.ts', '.js'];
+
+    const registerController = async (filePath: string): Promise<void> => {
+      const mod = await import(filePath);
+      const controllerName = path.relative(controllerDir, filePath)
+        .slice(0, -path.extname(filePath).length)
+        .split(path.sep)
+        .join('/');
+
+      Central.controllerFiles.set(
+        `controller/${controllerName}`,
+        mod.default
+      );
+    };
+
+    const walkControllers = async (dirPath: string): Promise<void> => {
+      for (const entry of fs.readdirSync(dirPath, { withFileTypes: true })) {
+        const entryPath = path.join(dirPath, entry.name);
+
+        if (entry.isDirectory()) {
+          await walkControllers(entryPath);
+          continue;
+        }
+
+        if (controllerExtensions.includes(path.extname(entry.name))) {
+          await registerController(entryPath);
+        }
+      }
+    };
+
+    await walkControllers(controllerDir);
+  }
+
+  async registerViews(options: { package: string; path: string }): Promise<void> {
+    const viewExtensions = ['.liquid', '.json'];
+    const { package: packageName, path: viewsDir } = options;
+
+    const registerView = async (filePath: string): Promise<void> => {
+      const ext = path.extname(filePath);
+      let payload: any;
+      if(ext === '.json') {
+        payload = await import(filePath, { with: { type: 'json' } });
+      }else{
+        payload = await import(filePath, { with: { type: 'text' } });
+      }
+
+      const viewKey = path.relative(viewsDir, filePath)
+        .slice(0, -ext.length)
+        .split(path.sep)
+        .join('/');
+
+      Central.viewFiles.set(viewKey, {
+        package: packageName,
+        payload,
+      });
+    };
+
+    const walkViews = async (dirPath: string): Promise<void> => {
+      for (const entry of fs.readdirSync(dirPath, { withFileTypes: true })) {
+        const entryPath = path.join(dirPath, entry.name);
+
+        if (entry.isDirectory()) {
+          await walkViews(entryPath);
+          continue;
+        }
+
+        if (viewExtensions.includes(path.extname(entry.name))) {
+          await registerView(entryPath);
+        }
+      }
+    };
+
+    await walkViews(viewsDir);
   }
 
   override resolveFetchList(x: string, store: Map<string, any>, pathToFile: string): boolean {
