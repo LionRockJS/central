@@ -19,8 +19,10 @@ export default class Central {
     static config: any;
     static runtime: RuntimeAdapter;
     static port: string;
+    static controllerFiles: Map<string, any>;
     static viewFiles: Map<string, any>;
     static modelFiles: Map<string, any>;
+    static resolveController(controllerName: string): any;
     static resolveModel(modelName: string): any;
     static resolveView(pathToFile: string): any;
     static log(args: any, verbose?: boolean): any;

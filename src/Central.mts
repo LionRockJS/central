@@ -47,8 +47,13 @@ export default class Central {
   static runtime: RuntimeAdapter = new RuntimeAdapterNode();
   static port: string = "";
 
+  static controllerFiles = new Map<string, any>();
   static viewFiles = new Map<string, any>();
   static modelFiles = new Map<string, any>();
+
+  static resolveController(controllerName: string) {
+    return this.controllerFiles.get(controllerName);
+  }
 
   static resolveModel(modelName: string) {
     return this.modelFiles.get(modelName);

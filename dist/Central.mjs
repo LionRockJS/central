@@ -33,8 +33,12 @@ export default class Central {
     };
     static runtime = new RuntimeAdapterNode();
     static port = "";
+    static controllerFiles = new Map();
     static viewFiles = new Map();
     static modelFiles = new Map();
+    static resolveController(controllerName) {
+        return this.controllerFiles.get(controllerName);
+    }
     static resolveModel(modelName) {
         return this.modelFiles.get(modelName);
     }
