@@ -19,17 +19,17 @@ export default class ORM {
      * @param {[]} values
      * @returns {Promise<void>}
      */
-    update(values: any): Promise<void>;
+    update(values: any): Promise<any>;
     /**
      *
      * @param {[]} values
      * @returns {Promise<void>}
      */
-    insert(values: any): Promise<void>;
+    insert(values: any): Promise<any>;
     /**
      * @returns {Promise<void>}
      */
-    delete(): Promise<void>;
+    delete(): Promise<any>;
     /**
      *
      * @param tableName
@@ -54,7 +54,7 @@ export default class ORM {
      * @param {string} lk
      * @param {string} fk
      */
-    add(models: any, weight: any, jointTableName: any, lk: any, fk: any): Promise<void>;
+    add(models: any, weight: any, jointTableName: any, lk: any, fk: any): Promise<any>;
     /**
      * remove
      * @param {ORM[]} models
@@ -62,14 +62,14 @@ export default class ORM {
      * @param {string} lk
      * @param {string} fk
      */
-    remove(models: any, jointTableName: any, lk: any, fk: any): Promise<void>;
+    remove(models: any, jointTableName: any, lk: any, fk: any): Promise<any>;
     /**
      *
      * @param {string} jointTableName
      * @param {string} lk
      * @returns {Promise<void>}
      */
-    removeAll(jointTableName: any, lk: any): Promise<void>;
+    removeAll(jointTableName: any, lk: any): Promise<any>;
     /**
      *
      * @param {Map} kv
@@ -125,27 +125,27 @@ export default class ORM {
      * @param {Map|null} kv
      * @returns {Promise<void>}
      */
-    deleteAll(kv?: any): Promise<void>;
+    deleteAll(kv?: any): Promise<any>;
     /**
      *
      * @param {string} key
      * @param {[]} values
      * @returns {Promise<void>}
      */
-    deleteBy(key: any, values: any): Promise<void>;
+    deleteBy(key: any, values: any): Promise<any>;
     /**
      *
      * @param {[[string]]}criteria
      * @returns {Promise<void>}
      */
-    deleteWith(criteria: any): Promise<void>;
+    deleteWith(criteria: any): Promise<any>;
     /**
      *
      * @param {Map} kv
      * @param {Map} columnValues
      * @returns {Promise<void>}
      */
-    updateAll(kv: any, columnValues: any): Promise<void>;
+    updateAll(kv: any, columnValues: any): Promise<any>;
     /**
      *
      * @param {string} key
@@ -153,14 +153,14 @@ export default class ORM {
      * @param {Map} columnValues
      * @returns {Promise<void>}
      */
-    updateBy(key: any, values: any, columnValues: any): Promise<void>;
+    updateBy(key: any, values: any, columnValues: any): Promise<any>;
     /**
      *
      * @param {[[string]]}criteria
      * @param {Map} columnValues
      * @returns {Promise<void>}
      */
-    updateWith(criteria: any, columnValues: any): Promise<void>;
+    updateWith(criteria: any, columnValues: any): Promise<any>;
     /**
      *
      * @param {[]} columns
@@ -168,5 +168,5 @@ export default class ORM {
      * @param {number[]} ids
      * @returns {Promise<void>}
      */
-    insertAll(columns: any, valueGroups: any, ids: any): Promise<void>;
+    insertAll(columns: any, valueGroups: any, ids: any): Promise<any>;
 }

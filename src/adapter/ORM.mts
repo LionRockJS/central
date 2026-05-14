@@ -47,7 +47,7 @@ export default class ORM {
    * @returns {Promise<void>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async update(values) {/***/}
+  async update(values): Promise<any> {/***/}
 
   /**
    *
@@ -55,13 +55,13 @@ export default class ORM {
    * @returns {Promise<void>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async insert(values) {/***/}
+  async insert(values): Promise<any> {/***/}
 
   /**
    * @returns {Promise<void>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async delete() {/***/}
+  async delete(): Promise<any> {/***/}
 
   /**
    *
@@ -92,7 +92,7 @@ export default class ORM {
    * @param {string} fk
    */
   // eslint-disable-next-line class-methods-use-this
-  async add(models, weight, jointTableName, lk, fk) {/***/}
+  async add(models, weight, jointTableName, lk, fk): Promise<any> {/***/}
 
   /**
    * remove
@@ -102,7 +102,7 @@ export default class ORM {
    * @param {string} fk
    */
   // eslint-disable-next-line class-methods-use-this
-  async remove(models, jointTableName, lk, fk) {/***/}
+  async remove(models, jointTableName, lk, fk): Promise<any> {/***/}
 
   /**
    *
@@ -111,7 +111,7 @@ export default class ORM {
    * @returns {Promise<void>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async removeAll(jointTableName, lk) {/***/}
+  async removeAll(jointTableName, lk): Promise<any> {/***/}
 
   /**
    *
@@ -193,7 +193,7 @@ export default class ORM {
    * @returns {Promise<void>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async deleteAll(kv = null) {/***/}
+  async deleteAll(kv = null): Promise<any> {/***/}
 
   /**
    *
@@ -202,7 +202,7 @@ export default class ORM {
    * @returns {Promise<void>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async deleteBy(key, values) {/***/}
+  async deleteBy(key, values): Promise<any> {/***/}
 
   /**
    *
@@ -210,7 +210,7 @@ export default class ORM {
    * @returns {Promise<void>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async deleteWith(criteria) {/***/}
+  async deleteWith(criteria): Promise<any> {/***/}
 
   /**
    *
@@ -219,7 +219,7 @@ export default class ORM {
    * @returns {Promise<void>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async updateAll(kv, columnValues) {/***/}
+  async updateAll(kv, columnValues): Promise<any> {/***/}
 
   /**
    *
@@ -229,7 +229,7 @@ export default class ORM {
    * @returns {Promise<void>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async updateBy(key, values, columnValues) {/***/}
+  async updateBy(key, values, columnValues): Promise<any> {/***/}
 
   /**
    *
@@ -238,7 +238,7 @@ export default class ORM {
    * @returns {Promise<void>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async updateWith(criteria, columnValues) {/***/}
+  async updateWith(criteria, columnValues): Promise<any> {/***/}
 
   /**
    *
@@ -248,6 +248,6 @@ export default class ORM {
    * @returns {Promise<void>}
    */
   // eslint-disable-next-line class-methods-use-this
-  async insertAll(columns, valueGroups, ids) {/***/}
+  async insertAll(columns, valueGroups, ids): Promise<any> {/***/}
 
 }
