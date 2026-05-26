@@ -16,7 +16,7 @@ export default class DatabaseAdapter {
      *
      * @param datasource
      */
-    constructor(datasource: string);
+    constructor(datasource: any, options?: any);
     prepare(sql: string): DatabaseStatement;
     transaction(fn: () => Promise<void>): Promise<void>;
     exec(sql: string): Promise<void>;
@@ -30,6 +30,6 @@ export default class DatabaseAdapter {
      * @param datasource
      * @returns {function | Object | Database}
      */
-    static create(datasource: string): DatabaseAdapter;
+    static create(datasource: any, options?: any): DatabaseAdapter;
 }
 export {};

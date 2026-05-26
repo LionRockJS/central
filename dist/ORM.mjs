@@ -109,7 +109,12 @@ export default class ORM {
     }
     static async import(modelName, defaultMClass = Model) {
         try {
-            return await Central.resolveModel(ORM.classPrefix + modelName);
+            const resolved = await Central.resolveModel(ORM.classPrefix + modelName);
+            if (resolved)
+                return resolved;
+            if (defaultMClass === Model)
+                throw new Error(`Model not found: ${ORM.classPrefix + modelName}`);
+            return defaultMClass;
         }
         catch (e) {
             if (defaultMClass === Model)

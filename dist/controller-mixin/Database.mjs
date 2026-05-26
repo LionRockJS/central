@@ -19,7 +19,7 @@ export default class ControllerMixinDatabase extends ControllerMixin {
             state.set(this.DATABASE_ADAPTER, this.defaultAdapter);
     }
     static async setup(state) {
-        const conn = await this.#getConnections(state.get(this.DATABASE_MAP), state.get(this.DATABASE_ADAPTER));
+        const conn = await this.#getConnections(state.get(this.DATABASE_MAP), state.get(this.DATABASE_ADAPTER), state);
         conn.forEach((v, k) => {
             state.get(this.DATABASES).set(k, v);
         });
@@ -30,8 +30,8 @@ export default class ControllerMixinDatabase extends ControllerMixin {
      * @param driverClass
      * @returns {Map}
      */
-    static async #getConnections(databaseMap, driverClass) {
-        const raw = new TextEncoder().encode(Array.from(databaseMap.keys()).join('') + Array.from(databaseMap.values()).join(''));
+    static async #getConnections(databaseMap, driverClass, state) {
+        const raw = new TextEncoder().encode(driverClass.name + Array.from(databaseMap.keys()).join('') + Array.from(databaseMap.values()).join(''));
         const hashBuf = await crypto.subtle.digest('SHA-256', raw);
         const key = Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2, '0')).join('');
         const conn = ControllerMixinDatabase.#dbConnection.get(key);
@@ -40,7 +40,7 @@ export default class ControllerMixinDatabase extends ControllerMixin {
         const connections = new Map();
         databaseMap.forEach((v, k) => {
             try {
-                connections.set(k, driverClass.create(v));
+                connections.set(k, driverClass.create(v, { state }));
             }
             catch (e) {
                 Central.log(e);

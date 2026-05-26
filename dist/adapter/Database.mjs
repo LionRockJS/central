@@ -22,7 +22,7 @@ export default class DatabaseAdapter {
      * @param datasource
      */
     // eslint-disable-next-line no-useless-constructor,no-empty-function
-    constructor(datasource) { }
+    constructor(datasource, options = {}) { }
     // eslint-disable-next-line class-methods-use-this
     prepare(sql) { return new DatabaseStatement(sql); }
     // eslint-disable-next-line class-methods-use-this
@@ -57,7 +57,7 @@ export default class DatabaseAdapter {
      * @param datasource
      * @returns {function | Object | Database}
      */
-    static create(datasource) {
-        return new DatabaseAdapter(datasource);
+    static create(datasource, options = {}) {
+        return new DatabaseAdapter(datasource, options);
     }
 }
